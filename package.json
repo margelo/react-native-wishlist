@@ -1,0 +1,13 @@
+{
+  "name": "WishList",
+  "version": "1.0.0",
+  "description": "The ultimate virtualised list solution",
+  "main": "index.js",
+  "author": "Skapala",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "react-native-tscodegen": "^0.68.4",
+    "react-native-tscodegen-types": "^0.67.3"
+  }
+}
