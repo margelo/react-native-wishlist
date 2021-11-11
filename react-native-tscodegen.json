@@ -7,8 +7,7 @@
       "events",
       "props",
       "tests",
-      "shadow-nodes",
-      "modules"
+      "shadow-nodes"
   ],
-  "inputFile": "./src/turboModule.ts"
+  "inputFile": "./src/Component.ts"
 }
