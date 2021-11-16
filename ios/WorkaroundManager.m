@@ -11,6 +11,11 @@
 
 RCT_EXPORT_MODULE(MGWishListComponentManager)
 
+RCT_CUSTOM_VIEW_PROPERTY(names, NSArray<NSString*>* , UIView)
+{
+ // [view setRegion:json ? [RCTConvert MKCoordinateRegion:json] : defaultView.region animated:YES];
+}
+
 - (UIView *)view
 {
   return [[UIView alloc] init];
