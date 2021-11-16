@@ -15,6 +15,7 @@
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
 #include "LayoutContext.h"
 #include "LayoutConstraints.h"
+#include <iostream>
 
 namespace facebook {
 namespace react {
@@ -52,8 +53,14 @@ public:
         LayoutContext lc;
         LayoutConstraints lcc;
         //lsn->layoutTree(lc);
-        Size sz = lsn->measure(lc, lcc);
-        int x = 5;
+        std::cout << "sdfwefwef" << std::endl;
+        for (int i = 0; i < 10000; ++i) {
+            Size sz = lsn->measure(lc, lcc);
+            int x = 5;
+        }
+        
+        std::cout << "2 sdfwefwef" << std::endl;
+        
     }
     
     virtual ~ModuleShadowNode(){}

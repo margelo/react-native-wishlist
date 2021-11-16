@@ -1,13 +1,9 @@
 {
   "libraryName": "PlaygroundModule",
-  "outputDirectory": "./lib/cpp-generated",
+  "outputDirectory": "./lib-new/cpp-generated",
   "moduleSpecName": "PlaygroundModuleSpec",
   "generators": [
-      "descriptors",
-      "events",
-      "props",
-      "tests",
-      "shadow-nodes"
+      "props"
   ],
-  "inputFile": "./src/Component.ts"
+  "inputFile": "./src/NativeComponent.tsx"
 }

@@ -18,9 +18,9 @@ namespace react {
 ModuleProps::ModuleProps(
     const PropsParserContext &context,
     const ModuleProps &sourceProps,
-    const RawProps &rawProps): ViewProps(context, sourceProps, rawProps)
+    const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
 
-    
+    names(convertRawProp(context, rawProps, "names", sourceProps.names, {}))
       {}
 
 } // namespace react
