@@ -40,7 +40,7 @@ Pod::Spec.new do |s|
 
   s.source_files = [
     "ios/**/*.{mm,h,m,cpp}",
-    "lib/cpp-generated/**/*.{cpp,h,m,mm}",
+    "lib/cpp-generated/**/*.{cpp,h,m,mm,hpp}",
   ]
 
   s.compiler_flags = folly_compiler_flags + ' ' + boost_compiler_flags
