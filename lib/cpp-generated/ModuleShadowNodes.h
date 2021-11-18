@@ -71,7 +71,7 @@ public:
     
     virtual ~ModuleShadowNode(){}
     
-    std::vector<std::shared_ptr<const ShadowNode>> registeredViews;
+    std::vector<std::shared_ptr<ShadowNode const>> registeredViews;
 };
 
 } // namespace react
