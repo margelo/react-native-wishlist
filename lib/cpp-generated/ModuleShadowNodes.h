@@ -61,8 +61,20 @@ public:
     void appendChild(
                      ShadowNode::Shared const &childNode) {
         if (registeredViews.size() == 0) {
+            realAppendChild(childNode);
             realAppendChild(ShadowNodeCopyMachine::copyShadowSubtree(childNode));
         }
+        std::shared_ptr<const LayoutableShadowNode> lsn2 = std::dynamic_pointer_cast<const LayoutableShadowNode>(this->getChildren()[0]);
+        LayoutContext lc2;
+        LayoutConstraints lcc2;
+        Size sz2 = lsn2->measure(lc2, lcc2);
+        
+        
+        std::shared_ptr<const LayoutableShadowNode> lsn = std::dynamic_pointer_cast<const LayoutableShadowNode>(this->getChildren()[1]);
+        LayoutContext lc;
+        LayoutConstraints lcc;
+        Size sz = lsn->measure(lc, lcc);
+        
         //ConcreteViewShadowNode::appendChild(childNode);
         /*std::shared_ptr<const LayoutableShadowNode> lsn = std::dynamic_pointer_cast<const LayoutableShadowNode>(childNode);
         LayoutContext lc;
