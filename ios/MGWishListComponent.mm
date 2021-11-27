@@ -58,6 +58,10 @@ using namespace facebook::react;
 - (void)updateState:(State::Shared const &)state oldState:(State::Shared const &)oldState
 {
     _eventEmitter = nil; // temporary TODO fix this
+    if (state == nullptr) return;
+    auto newState = std::static_pointer_cast<ModuleShadowNode::ConcreteState const>(state);
+    auto &data = newState->getData();
+    int y = 4;
  /* _state = std::static_pointer_cast<ScrollViewShadowNode::ConcreteState const>(state);
   auto &data = _state->getData();
 
@@ -82,8 +86,9 @@ using namespace facebook::react;
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-    [super scrollViewDidScroll: scrollView];
+    //[super scrollViewDidScroll: scrollView];
     NSLog(@"offset: %f", scrollView.contentOffset.y);
+    //TODO update list
 }
 
 

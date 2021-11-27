@@ -27,7 +27,7 @@ public:
         const ShadowNodeFragment &fragment,
         ShadowNodeFamily::Shared const &family) const override {
       auto shadowNode =
-            std::make_shared<ModuleShadowNode>(ShadowNodeFragment{fragment.props, nullptr}, family, getTraits());
+            std::make_shared<ModuleShadowNode>(ShadowNodeFragment{fragment.props, nullptr, fragment.state}, family, getTraits());
       ShadowNode::SharedListOfShared registeredComponents = fragment.children;
             //
           /*  for (std::shared_ptr<const ShadowNode> sn : (*(fragment.children))) {
@@ -47,11 +47,11 @@ public:
         const ShadowNode &sourceShadowNode,
         const ShadowNodeFragment &fragment) const override {
             auto shadowNode = std::make_shared<ModuleShadowNode>(sourceShadowNode, ShadowNodeFragment{});
-        ShadowNode::SharedListOfShared registeredComponents = fragment.children;
+        const ModuleShadowNode &SourceModuleSN = static_cast<const ModuleShadowNode&>(sourceShadowNode);
+        if (SourceModuleSN.registeredViews.size() > 0)
+        shadowNode->registeredViews = SourceModuleSN.registeredViews;
         //
-        const std::shared_ptr<const ShadowNode> sn = (*registeredComponents)[0];
-        int x = 5;
-        int y = x;
+    
         //
 
         adopt(shadowNode);

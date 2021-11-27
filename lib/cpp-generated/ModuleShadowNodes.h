@@ -17,6 +17,8 @@
 #include "LayoutConstraints.h"
 #include "ShadowNodeCopyMachine.hpp"
 #include <iostream>
+#include <memory>
+#include "ModuleState.h"
 
 namespace facebook {
 namespace react {
@@ -30,7 +32,8 @@ extern const char ModuleComponentName[];
 class ModuleShadowNode : public ConcreteViewShadowNode<
                                 ModuleComponentName,
                                 ModuleProps,
-ModuleEventEmitter> {
+                                ModuleEventEmitter,
+                                ModuleState>, std::enable_shared_from_this<ModuleShadowNode> {
 public:
     ModuleShadowNode(
         ShadowNodeFragment const &fragment,
@@ -81,6 +84,21 @@ public:
             }
         }
     }
+                                    
+    void layout(LayoutContext layoutContext) {
+      ConcreteViewShadowNode::layout(layoutContext);
+      //updateScrollContentOffsetIfNeeded();
+      updateStateIfNeeded();
+    }
+                                    
+    void updateStateIfNeeded() {
+      ensureUnsealed();
+    
+      auto state = getStateData();
+      state.weakSn = this->clone(ShadowNodeFragment{});
+      setStateData(std::move(state));
+    }
+
     
     virtual ~ModuleShadowNode(){}
     
