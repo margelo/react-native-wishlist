@@ -16,6 +16,9 @@
 #include <react/renderer/mapbuffer/MapBufferBuilder.h>
 #endif
 
+#include "ComponentsPool.h"
+#include "ViewportObserver.h"
+
 namespace facebook {
 namespace react {
 
@@ -26,9 +29,11 @@ namespace react {
  */
 class ModuleState final {
  public:
-    double originContentOffset;
-    int originItemIndex;
+    double originContentOffset = 50000;
+    int originItemIndex = 10; // Hardcode for now
     std::weak_ptr<ShadowNode> weakSn;
+    ComponentsPool componentsPool;
+    ViewportObserver viewportObserver;
 
 #ifdef ANDROID
   ModuleState() = default;
