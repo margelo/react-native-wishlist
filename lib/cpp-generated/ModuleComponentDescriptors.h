@@ -46,13 +46,15 @@ public:
     virtual ShadowNode::Unshared cloneShadowNode(
         const ShadowNode &sourceShadowNode,
         const ShadowNodeFragment &fragment) const override {
-            auto shadowNode = std::make_shared<ModuleShadowNode>(sourceShadowNode, ShadowNodeFragment{});
-        const ModuleShadowNode &SourceModuleSN = static_cast<const ModuleShadowNode&>(sourceShadowNode);
-        if (SourceModuleSN.registeredViews.size() > 0)
+        
+        ShadowNode::Unshared shadowNode(nullptr);
+        if (ViewportObserver::isPushingChildren) {
+            shadowNode = std::make_shared<ModuleShadowNode>(sourceShadowNode, fragment);
+        } else {
+            shadowNode = std::make_shared<ModuleShadowNode>(sourceShadowNode, ShadowNodeFragment{});
+        }
+        
         shadowNode->registeredViews = SourceModuleSN.registeredViews;
-        //
-    
-        //
 
         adopt(shadowNode);
         return shadowNode;
