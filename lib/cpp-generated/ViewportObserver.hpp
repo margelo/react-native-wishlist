@@ -11,15 +11,14 @@
 #include <stdio.h>
 #include "ItemProvider.hpp"
 #include <deque>
-#import "RCTFollyConvert.h"
-
 // Temporary solution only for PoC
 #include <react/renderer/uimanager/UIManager.h>
 
-
+// TODO make use of pointFactor
 struct ViewportObserver {
     float offset;
     float windowHeight;
+    float windowWidth;
     int surfaceId;
     static thread_local bool isPushingChildren;
     
@@ -28,7 +27,7 @@ struct ViewportObserver {
     std::deque<WishItem> window;
     std::weak_ptr<ShadowNode> weakWishListNode;
     
-    void initOrUpdate(int surfaceId, float offset, float windowHeight, float originItemOffset, int originItem, std::weak_ptr<ShadowNode> weakWishListNode) {
+    void boot(int surfaceId, float offset, float windowHeight, float windowWidth, float originItemOffset, int originItem, std::weak_ptr<ShadowNode> weakWishListNode) {
         
         this->weakWishListNode = weakWishListNode;
         itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<ItemProviderTestImpl>());
@@ -45,14 +44,35 @@ struct ViewportObserver {
         
         window.push_back(itemProvider->provide(originItem));
         window.back().offset = originItemOffset;
-        updateWindow();
+        updateWindow(true);
+    }
+    
+    // TODO: fix
+    void update(int surfaceId, float offset, float windowHeight, float originItemOffset, int originItem, std::weak_ptr<ShadowNode> weakWishListNode) {
+        
+        this->weakWishListNode = weakWishListNode;
+        itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<ItemProviderTestImpl>());
+        itemProvider->setComponentsPool(componentsPool);
+        
+        for (WishItem & item : window) {
+            componentsPool->returnToPool(item.sn);
+        }
+        window.clear();
+        
+        this->surfaceId = surfaceId;
+        this->offset = offset;
+        this->windowHeight = windowHeight;
+        
+        window.push_back(itemProvider->provide(originItem));
+        window.back().offset = originItemOffset;
+        updateWindow(true);
     }
     
     void reactToOffsetChange(float offset) {
-        updateWindow();
+        updateWindow(false);
     }
     
-    void updateWindow() {
+    void updateWindow(bool updateDirectly) {
         float topEdge = offset - windowHeight;
         float bottomEdge = offset + 2 * windowHeight;
         
@@ -117,7 +137,7 @@ struct ViewportObserver {
             }
         }
         
-        pushChildren();
+        pushChildren(updateDirectly);
         
         for (auto & item : itemsToRemove) {
             componentsPool->returnToPool(item.sn);
@@ -126,31 +146,7 @@ struct ViewportObserver {
     
     std::shared_ptr<ShadowNode> getOffseter(float offset);
     
-    void pushChildren() {
-        isPushingChildren = true;
-        
-        std::shared_ptr<ShadowNode> sWishList = weakWishListNode.lock();
-        if (sWishList.get() == nullptr) {
-            return;
-        }
-        KeyClassHolder::shadowTreeRegistry->visit(surfaceId, [&](const ShadowTree & st) {
-            ShadowTreeCommitTransaction transaction = [&](RootShadowNode const &oldRootShadowNode) -> std::shared_ptr<RootShadowNode> {
-                return std::static_pointer_cast<RootShadowNode>(oldRootShadowNode.cloneTree(sWishList->getFamily(), [&](const ShadowNode & sn) -> std::shared_ptr<ShadowNode> {
-                    auto children = std::make_shared<ShadowNode::ListOfShared>();
-                    
-                    children->push_back(getOffseter(window[0].offset));
-                    
-                    for (WishItem & wishItem : window) {
-                      children->push_back(wishItem.sn);
-                    }
-                    
-                    return sn.clone(ShadowNodeFragment{nullptr, children, nullptr});
-                }));
-            };
-            st.commit(transaction);
-        });
-        isPushingChildren = false;
-    }
+    void pushChildren(bool pushDirectly);
 };
 
 #endif /* ViewportObserver_hpp */
