@@ -97,9 +97,11 @@ public:
             LayoutMetrics lm = getLayoutMetrics();
             
             state.viewportObserver.boot(state.viewportObserver.surfaceId,
-                                              state.viewportObserver.offset,
-                                              lm.frame.size.height, lm.frame.size.width, 5000, 10, state.viewportObserver.weakWishListNode);
-
+                                              5000,
+                                              lm.frame.size.height, lm.frame.size.width, 5000, 10, state.viewportObserver.weakWishListNode, registeredViews, layoutContext,
+                                                  std::static_pointer_cast<const ModuleProps>(getProps())->names);
+            
+            setStateData(std::move(state));
         }
         // TODO update viewportObserver if needed
         

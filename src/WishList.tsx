@@ -13,7 +13,7 @@ export default function createWishList() {
   function WishList(props) {
     console.log(componentsRegistry.keys())
     return (
-      <NativeWishList names={Array.from(componentsRegistry.keys())} >
+      <NativeWishList {...props} names={Array.from(componentsRegistry.keys())} >
         { Array.from(componentsRegistry.values())}
       </NativeWishList>
     );
