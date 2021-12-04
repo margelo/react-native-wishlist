@@ -95,17 +95,26 @@ public:
         if (!state.initialised) {
             state.initialised = true;
             LayoutMetrics lm = getLayoutMetrics();
+        
             
             state.viewportObserver.boot(state.viewportObserver.surfaceId,
                                               5000,
-                                              lm.frame.size.height, lm.frame.size.width, 5000, 10, state.viewportObserver.weakWishListNode, registeredViews, layoutContext,
+                                              lm.frame.size.height, lm.frame.size.width, 5000, 10, sharedThis, registeredViews, layoutContext,
                                                   std::static_pointer_cast<const ModuleProps>(getProps())->names);
             
             setStateData(std::move(state));
+            
+            auto layoutM = this->getLayoutMetrics();
+            LayoutConstraints lcc = LayoutConstraints();
+            lcc.minimumSize = lcc.maximumSize = layoutM.frame.size;
+            lcc.layoutDirection = layoutM.layoutDirection;
+            layoutTree(layoutContext, lcc);
+            return;
         }
         // TODO update viewportObserver if needed
         
         ConcreteViewShadowNode::layout(layoutContext);
+        
       //updateScrollContentOffsetIfNeeded();
         updateStateIfNeeded();
     }
@@ -118,6 +127,7 @@ public:
     virtual ~ModuleShadowNode(){}
     
     std::vector<std::shared_ptr<ShadowNode const>> registeredViews;
+    std::weak_ptr<ModuleShadowNode> sharedThis;
 };
 
 } // namespace react

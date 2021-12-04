@@ -26,9 +26,11 @@ public:
     virtual ShadowNode::Shared createShadowNode(
         const ShadowNodeFragment &fragment,
         ShadowNodeFamily::Shared const &family) const override {
-      auto shadowNode =
+        
+        auto shadowNode =
             std::make_shared<ModuleShadowNode>(ShadowNodeFragment{fragment.props, nullptr, fragment.state}, family, getTraits());
-      ShadowNode::SharedListOfShared registeredComponents = fragment.children;
+        ShadowNode::SharedListOfShared registeredComponents = fragment.children;
+        shadowNode->sharedThis = shadowNode;
             //
           /*  for (std::shared_ptr<const ShadowNode> sn : (*(fragment.children))) {
                 int x = 5;
@@ -54,7 +56,9 @@ public:
             shadowNode = std::make_shared<ModuleShadowNode>(sourceShadowNode, ShadowNodeFragment{});
         }
         
-        std::static_pointer_cast<ModuleShadowNode>(shadowNode)->registeredViews = static_cast<const ModuleShadowNode&>(sourceShadowNode).registeredViews;
+        auto moduleShadowNode = std::static_pointer_cast<ModuleShadowNode>(shadowNode);
+        moduleShadowNode->registeredViews = static_cast<const ModuleShadowNode&>(sourceShadowNode).registeredViews;
+            moduleShadowNode->sharedThis = moduleShadowNode;
 
         adopt(shadowNode);
         return shadowNode;

@@ -72,6 +72,7 @@ struct ItemProviderTestImpl : ItemProvider
         
         auto affected = std::vector<const LayoutableShadowNode *>();
         this->lc.affectedNodes = &affected;
+        // better use layoutTree instead of measure (will be persistant)
         facebook::react::Size sz = sn->measure(this->lc, this->lcc);
         
         wishItem.sn = sn;

@@ -17,8 +17,11 @@ std::shared_ptr<ShadowNode> ViewportObserver::getOffseter(float offset) {
     auto & cd = offseterTemplate->getComponentDescriptor();
     PropsParserContext propsParserContext{surfaceId, *cd.getContextContainer().get()};
     
+    // todo remove color 
     folly::dynamic props = convertIdToFollyDynamic(@{
-        @"height": @(offset)
+        @"height": @(offset),
+        @"width": @(this->windowWidth),
+        @"backgroundColor": @((*(colorFromComponents(ColorComponents{0, 0, 1, 1}))))
     });
     
     Props::Shared newProps = cd.cloneProps(
