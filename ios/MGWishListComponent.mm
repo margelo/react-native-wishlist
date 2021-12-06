@@ -28,7 +28,7 @@ using namespace facebook::react;
 @end
 
 @implementation MGWishListComponent{
-    ModuleState _sharedState;
+    ModuleShadowNode::ConcreteState::Shared _sharedState;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -63,7 +63,8 @@ using namespace facebook::react;
     if (state == nullptr) return;
     auto newState = std::static_pointer_cast<ModuleShadowNode::ConcreteState const>(state);
     auto &data = newState->getData();
-    _sharedState = data;
+    _sharedState = newState;
+    self.scrollView.contentOffset = CGPointMake(0, data.viewportObserver->offset);//
     
  /* _state = std::static_pointer_cast<ScrollViewShadowNode::ConcreteState const>(state);
   auto &data = _state->getData();
@@ -89,10 +90,21 @@ using namespace facebook::react;
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+    if (_sharedState == nullptr) {
+        return;
+    }
     //[super scrollViewDidScroll: scrollView];
     NSLog(@"offset: %f", scrollView.contentOffset.y);
+    _sharedState->getData().viewportObserver->reactToOffsetChange(scrollView.contentOffset.y);
     //TODO update list
 }
+
+- (void)prepareForRecycle
+{
+  _sharedState.reset();
+  [super prepareForRecycle];
+}
+
 
 
 Class<RCTComponentViewProtocol> MGWishListCls(void)

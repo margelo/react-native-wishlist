@@ -30,6 +30,9 @@ struct ComponentsPool
     
     void returnToPool(std::shared_ptr<const ShadowNode> sn) {
         std::string type = tagToType[sn->getTag()];
+        if (type == "") {
+            int x = 4;
+        }
         reusable[type].push_back(sn);
     }
     

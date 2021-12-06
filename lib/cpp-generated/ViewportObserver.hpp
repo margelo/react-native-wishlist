@@ -53,33 +53,24 @@ struct ViewportObserver {
     }
     
     // TODO: fix
-    void update(int surfaceId, float offset, float windowHeight, float originItemOffset, int originItem, std::weak_ptr<ShadowNode> weakWishListNode) {
-        
-        this->weakWishListNode = weakWishListNode;
-        itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<ItemProviderTestImpl>(3453453, LayoutContext{}));
-        itemProvider->setComponentsPool(componentsPool);
-        
-        for (WishItem & item : window) {
-            componentsPool->returnToPool(item.sn);
-        }
-        window.clear();
-        
-        this->surfaceId = surfaceId;
+    void update(float offset) {
+    
         this->offset = offset;
-        this->windowHeight = windowHeight;
-        
-        window.push_back(itemProvider->provide(originItem));
-        window.back().offset = originItemOffset;
-        updateWindow(true);
+        //window.push_back(itemProvider->provide(originItem));
+        //window.back().offset = originItemOffset;
+        //updateWindow(false);
     }
     
     void reactToOffsetChange(float offset) {
+        this->offset = offset;
         updateWindow(false);
     }
     
     void updateWindow(bool updateDirectly) {
         float topEdge = offset - windowHeight;
         float bottomEdge = offset + 2 * windowHeight;
+        
+        assert(window.size() != 0);
         
         // Add above
         while (1) {
@@ -145,7 +136,7 @@ struct ViewportObserver {
         pushChildren(updateDirectly);
         
         for (auto & item : itemsToRemove) {
-            componentsPool->returnToPool(item.sn);
+            componentsPool->returnToPool(item.sn->clone({}));
         }
     }
     
@@ -153,7 +144,5 @@ struct ViewportObserver {
     
     void pushChildren(bool pushDirectly);
 };
-
-thread_local bool ViewportObserver::isPushingChildren = false;
 
 #endif /* ViewportObserver_hpp */
