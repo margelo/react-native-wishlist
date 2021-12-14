@@ -25,8 +25,11 @@ export default function App() {
       inflateItem={(index, pool) => {
         'worklet'
         const item = pool.getComponent(`type${index % 2}`);
-        item.text.value = "erigjo3ijgoiejgoiejgoiejroigjerg";
-        item.text.backgroundColor = "yellow";
+        item.Text.addProps({
+          value: 'sdfwgwgrg4gth4h4h',
+          backgroundColor: 'yellow'
+        })
+        return item;
       }}
       style={{flex:1}}/>
     </View>

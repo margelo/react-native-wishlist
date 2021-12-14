@@ -33,9 +33,12 @@ struct ViewportObserver {
         std::vector<std::string> names) {
         
         this->weakWishListNode = weakWishListNode;
+        
         componentsPool->registeredViews = registeredViews;
         componentsPool->setNames(names);
-        itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<ItemProviderTestImpl>(windowWidth, lc));
+        
+        int tag = weakWishListNode.lock()->getTag();
+        itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<WorkletItemProvider>(windowWidth, lc, tag));
         itemProvider->setComponentsPool(componentsPool);
         
         for (WishItem & item : window) {

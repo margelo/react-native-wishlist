@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <memory>
 #include "ComponentsPool.h"
+#include "decorator.h"
+#include <react/renderer/uimanager/primitives.h>
 
 using namespace facebook::react;
 
@@ -85,42 +87,20 @@ struct ItemProviderTestImpl : ItemProvider
 
 struct WorkletItemProvider : ItemProvider
 {
-    std::shared_ptr<ComponentsPool> cp;
+    static std::shared_ptr<jsi::Runtime> rtPtr;
     
-    WorkletItemProvider(float maxWidth, LayoutContext lc): ItemProvider(maxWidth, lc) {}
+    std::shared_ptr<ComponentsPool> cp;
+    int tag;
+    
+    WorkletItemProvider(float maxWidth, LayoutContext lc, int tag): ItemProvider(maxWidth, lc) {
+        this->tag = tag;
+    }
     
     void setComponentsPool(std::shared_ptr<ComponentsPool> pool) {
         cp = pool;
     }
     
-    WishItem provide(int index) {
-        WishItem wishItem;
-        if (index < 0 or index > 1000) {
-            return wishItem;
-        }
-        std::shared_ptr<const ShadowNode> sn;
-        if (index & 1) {
-            std::shared_ptr<const ShadowNode> item = cp->getNodeForType("type1");
-            sn = item;
-            // TODO change some things
-        } else {
-            std::shared_ptr<const ShadowNode> item = cp->getNodeForType("type2");
-            sn = item;
-            // TODO change some things
-        }
-        
-        auto affected = std::vector<const LayoutableShadowNode *>();
-        this->lc.affectedNodes = &affected;
-        // better use layoutTree instead of measure (will be persistant)
-        std::shared_ptr<YogaLayoutableShadowNode> ysn = std::static_pointer_cast<YogaLayoutableShadowNode>(sn->clone({}));
-        facebook::react::Size sz = ysn->measure(this->lc, this->lcc);
-        
-        wishItem.sn = std::static_pointer_cast<ShadowNode>(ysn);
-        wishItem.height = sz.height;
-        wishItem.index = index;
-        return wishItem;
-    }
+    WishItem provide(int index);
 };
-
 
 #endif /* ItemProvider_hpp */
