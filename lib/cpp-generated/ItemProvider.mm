@@ -12,14 +12,12 @@
 //TODO we need to use our own runtime because we can call things from several threads
 // just not enought time to do it right now
 
-std::shared_ptr<jsi::Runtime> WorkletItemProvider::rtPtr = nullptr;
-
 struct 
 
 WishItem WorkletItemProvider::provide(int index) {
     WishItem wishItem;
     
-    jsi::Runtime &rt = *rtPtr;
+    jsi::Runtime &rt = *ReanimatedRuntimeHandler::rtPtr;
     
     jsi::Function inflateItem = rt.global().getPropertyAsObject(rt, "InflatorRegistry").getPropertyAsFunction(rt, "inflateItem");
     

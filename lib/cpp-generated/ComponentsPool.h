@@ -77,7 +77,7 @@ struct ShadowNodeBinding : public jsi::HostObject, std::enable_shared_from_this<
         
         for (auto child : sn->getChildren()) {
             if (child->getComponentName() == name) {
-                return jsi::Object::createFromHostObject(rt, std::make_shared<ShadowNodeBinding>(child, sn));
+                return jsi::Object::createFromHostObject(rt, std::make_shared<ShadowNodeBinding>(child, shared_from_this()));
             }
         }
         
@@ -129,7 +129,7 @@ struct ComponentsPool : std::enable_shared_from_this<ComponentsPool>
         return jsi::Object::createFromHostObject(rt, this->proxy);
     }
     
-    class Proxy : jsi::HostObject {
+    class Proxy : public jsi::HostObject {
     public:
         std::weak_ptr<ComponentsPool> wcp;
         Proxy(std::weak_ptr<ComponentsPool> wcp) {
