@@ -13,13 +13,14 @@
 #include <memory>
 #include <map>
 #include "decorator.h"
+#include <react/renderer/core/ConcreteComponentDescriptor.h>
 
 using namespace facebook::react;
 using namespace jsi;
 
 struct ShadowNodeBinding : public jsi::HostObject, std::enable_shared_from_this<ShadowNodeBinding> {
     
-    std::shared_ptr<ShadowNodeBinding> parent;
+    std::weak_ptr<ShadowNodeBinding> parent;
     std::shared_ptr<const ShadowNode> sn;
     
     ShadowNodeBinding(std::shared_ptr<const ShadowNode> sn, std::shared_ptr<ShadowNodeBinding> parent=nullptr) {
@@ -38,8 +39,37 @@ struct ShadowNodeBinding : public jsi::HostObject, std::enable_shared_from_this<
                 size_t count) -> jsi::Value {
                     RawProps rawProps(rt, args[0]);
                     
+                    auto &cd = sn->getComponentDescriptor();
                     
+                    PropsParserContext propsParserContext{
+                        sn->getFamily().getSurfaceId(), *cd.getContextContainer().get()};
+
+                   
+                    auto clonedShadowNode = cd.cloneShadowNode(
+                        *sn,
+                        {
+                            cd.cloneProps(
+                                propsParserContext, sn->getProps(), rawProps),
+                            nullptr,
+                        });
                     
+                    sn = clonedShadowNode;
+                   
+                    std::shared_ptr<ShadowNodeBinding> currentParent = parent.lock();
+                    std::shared_ptr<ShadowNode> currentSN = clonedShadowNode;
+                    while (currentParent != nullptr) {
+                        auto &cd = currentParent->sn->getComponentDescriptor();
+                        auto children = currentParent->sn->getChildren();
+                        for (int i = 0; i < children.size(); ++i) {
+                            if (children[i]->getTag() == currentSN->getTag()) {
+                                children[i] = currentSN;
+                                break;
+                            }
+                        }
+                        currentSN = cd.cloneShadowNode(*(currentParent->sn), {nullptr, std::make_shared<SharedShadowNodeList>(children)});
+                        currentParent->sn = currentSN;
+                        currentParent = currentParent->parent.lock();
+                    }
                     
                     return jsi::Value::undefined();
             });
@@ -110,11 +140,13 @@ struct ComponentsPool : std::enable_shared_from_this<ComponentsPool>
             std::string name = nameProp.utf8(rt);
             
             if (name == "getComponent") {
-                return jsi::Function::createFromHostFunction(rt, jsi::PropNameID::forUtf8(rt, std::string("getComponent")), 1, [](Runtime & rt, const Value& thisVal, const Value* args, size_t count) -> Value {
+                std::weak_ptr<ComponentsPool> blockWcp = this->wcp;
+                return jsi::Function::createFromHostFunction(rt, jsi::PropNameID::forUtf8(rt, std::string("getComponent")), 1, [blockWcp](Runtime & rt, const Value& thisVal, const Value* args, size_t count) -> Value {
                     
+                    std::string componentName = args[0].asString(rt).utf8(rt);
+                    auto sn = blockWcp.lock()->getNodeForType(componentName);
                     
-                    
-    
+                    return jsi::Object::createFromHostObject(rt, std::make_shared<ShadowNodeBinding>(sn));
                 });
             }
             
