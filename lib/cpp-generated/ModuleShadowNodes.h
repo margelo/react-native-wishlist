@@ -19,6 +19,7 @@
 #include <iostream>
 #include <memory>
 #include "ModuleState.h"
+#include "ReanimatedRuntimeHandler.hpp"
 
 namespace facebook {
 namespace react {
@@ -93,6 +94,11 @@ public:
         auto state = getStateData();
         if (!state.initialised) {
             state.initialised = true;
+            
+            // remove that flushing in the future
+            // I know it's not always on UI (In our case it's fine)
+            ReanimatedRuntimeHandler::scheduler->triggerUI();
+            
             LayoutMetrics lm = getLayoutMetrics();
         
             
