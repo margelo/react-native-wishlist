@@ -19,7 +19,7 @@ WishItem WorkletItemProvider::provide(int index) {
     
     jsi::Runtime &rt = *ReanimatedRuntimeHandler::rtPtr;
     
-    jsi::Function inflateItem = rt.global().getPropertyAsObject(rt, "InflatorRegistry").getPropertyAsFunction(rt, "inflateItem");
+    jsi::Function inflateItem = rt.global().getPropertyAsObject(rt, "global").getPropertyAsObject(rt, "InflatorRegistry").getPropertyAsFunction(rt, "inflateItem");
     
     jsi::Value returnedValue = inflateItem.call(
         rt,
