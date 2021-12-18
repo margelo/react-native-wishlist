@@ -23,8 +23,7 @@ WishItem WorkletItemProvider::provide(int index) {
     
     jsi::Value returnedValue = inflateItem.call(
         rt,
-        jsi::Value::undefined(),
-        jsi::Value(tag),
+        jsi::String::createFromUtf8(rt, tag),
         jsi::Value(index),
         cp->prepareProxy(rt)
     );

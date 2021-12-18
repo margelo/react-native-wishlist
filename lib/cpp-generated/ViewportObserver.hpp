@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include "ItemProvider.hpp"
 #include <deque>
+#include <iostream>
 // Temporary solution only for PoC
 #include <react/renderer/uimanager/UIManager.h>
 
@@ -32,13 +33,15 @@ struct ViewportObserver {
         LayoutContext lc,
         std::vector<std::string> names) {
         
+        std::cout << "aaa boot" << std::endl;
+        
         this->weakWishListNode = weakWishListNode;
         
         componentsPool->registeredViews = registeredViews;
         componentsPool->setNames(names);
         
-        int tag = weakWishListNode.lock()->getTag();
-        itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<WorkletItemProvider>(windowWidth, lc, tag));
+        std::string inflatorId = std::static_pointer_cast<const ModuleProps>(weakWishListNode.lock()->getProps())->inflatorId;
+        itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<WorkletItemProvider>(windowWidth, lc, inflatorId));
         itemProvider->setComponentsPool(componentsPool);
         
         for (WishItem & item : window) {

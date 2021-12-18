@@ -8,36 +8,33 @@ runOnUI(() => {
   const registry = new Map();
 
   global.InflatorRegistry = {
-    inflateItem: (tag, index, pool) => {
-      return (registry.get(tag))(index, pool);
+    inflateItem: (id, index, pool) => {
+      return (registry.get(id))(index, pool);
     },
-    registerInflator: (tag, inflateMethod) => {
-      registry.set(tag, inflateMethod);
+    registerInflator: (id, inflateMethod) => {
+      registry.set(id, inflateMethod);
     },
-    unregisterInflator: (tag) => {
-      registry.delete(tag);
+    unregisterInflator: (id) => {
+      registry.delete(id);
     }
   }
 
   console.log("aaa registered");
-  _log("aaa");
 
 })();
 
 export default class InflatorRepository {
-  static register(ref: React.ElementRef<any>, inflateMethod) {
-    const tag = findNodeHandle(ref);
+  static register(id: string, inflateMethod) {
     runOnUI(() => {
       'worklet'
-      global.InflatorRegistry.registerInflator(tag, inflateMethod);
+      global.InflatorRegistry.registerInflator(id, inflateMethod);
     })();
   }
 
-  static unregister(ref: React.ElementRef<any>) {
-    const tag = findNodeHandle(ref);
+  static unregister(id: string) {
     runOnUI(() => {
       'worklet'
-      global.InflatorRegistry.unregisterInflator(tag);
+      global.InflatorRegistry.unregisterInflator(id);
     })();
   }
 }

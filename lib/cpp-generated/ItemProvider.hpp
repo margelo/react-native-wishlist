@@ -51,7 +51,7 @@ struct ItemProviderTestImpl : ItemProvider
 {
     std::shared_ptr<ComponentsPool> cp;
     
-    ItemProviderTestImpl(float maxWidth, LayoutContext lc, int tag): ItemProvider(maxWidth, lc) {}
+    ItemProviderTestImpl(float maxWidth, LayoutContext lc, std::string tag): ItemProvider(maxWidth, lc) {}
     
     void setComponentsPool(std::shared_ptr<ComponentsPool> pool) {
         cp = pool;
@@ -89,9 +89,9 @@ struct ItemProviderTestImpl : ItemProvider
 struct WorkletItemProvider : ItemProvider
 {
     std::shared_ptr<ComponentsPool> cp;
-    int tag;
+    std::string tag;
     
-    WorkletItemProvider(float maxWidth, LayoutContext lc, int tag): ItemProvider(maxWidth, lc) {
+    WorkletItemProvider(float maxWidth, LayoutContext lc, std::string tag): ItemProvider(maxWidth, lc) {
         this->tag = tag;
     }
     

@@ -16,6 +16,16 @@ RCT_CUSTOM_VIEW_PROPERTY(names, NSArray<NSString*>* , UIView)
  // [view setRegion:json ? [RCTConvert MKCoordinateRegion:json] : defaultView.region animated:YES];
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(inflatorId, NSString* , UIView)
+{
+ // [view setRegion:json ? [RCTConvert MKCoordinateRegion:json] : defaultView.region animated:YES];
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(kkk, NSNumber* , UIView)
+{
+ // [view setRegion:json ? [RCTConvert MKCoordinateRegion:json] : defaultView.region animated:YES];
+}
+
 - (UIView *)view
 {
   return [[UIView alloc] init];
