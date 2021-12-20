@@ -75,6 +75,30 @@ struct ShadowNodeBinding : public jsi::HostObject, std::enable_shared_from_this<
             });
         }
         
+        if (name == "at") {
+            return jsi::Function::createFromHostFunction(rt, nameProp, 1, [=](
+                jsi::Runtime &rt,
+                jsi::Value const &thisValue,
+                jsi::Value const *args,
+                size_t count) -> jsi::Value {
+                    int index = (int) (args[0].getNumber());
+                    std::string type = sn->getComponentName();
+                    
+                    int i = 0;
+                    
+                    for (auto sibiling : parent.lock()->sn->getChildren()) {
+                        if (sibiling->getComponentName() == type) {
+                            if (i == index) {
+                                return jsi::Object::createFromHostObject(rt, std::make_shared<ShadowNodeBinding>(sibiling, shared_from_this()));
+                            }
+                            i++;
+                        }
+                    }
+                    
+                    return jsi::Value::undefined();
+            });
+        }
+        
         for (auto child : sn->getChildren()) {
             if (child->getComponentName() == name) {
                 return jsi::Object::createFromHostObject(rt, std::make_shared<ShadowNodeBinding>(child, shared_from_this()));
