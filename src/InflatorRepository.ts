@@ -19,8 +19,6 @@ runOnUI(() => {
     }
   }
 
-  console.log("aaa registered");
-
 })();
 
 export default class InflatorRepository {

@@ -1,5 +1,4 @@
-import React from 'react';
-import { InteractionManager } from 'react-native';
+import React, { useEffect } from 'react';
 import { View, Text } from 'react-native';
 import createWishList from './WishList';
 
@@ -19,7 +18,7 @@ const authors = [
 
 WishList.registerComponent("type1", (
   <View style={{flexDirection: 'row-reverse'}} >
-    <View style={{margin: 10, width: '70%', backgroundColor: '#00008B'}} >
+    <View style={{margin: 1, width: '70%', backgroundColor: '#00008B'}} >
       <View style={{margin: 5}} > 
         <Text style={{color: 'white'}} wishId='author'> me </Text>
       </View>
@@ -32,7 +31,7 @@ WishList.registerComponent("type1", (
 
 WishList.registerComponent("type2", (
   <View>
-    <View style={{margin: 10, width: '70%', backgroundColor: '#6495ED'}} >
+    <View style={{margin: 1, width: '70%', backgroundColor: '#6495ED'}} >
       <View style={{margin: 5}} > 
         <Text style={{color: 'white'}} wishId='author'> author </Text>
       </View>
@@ -44,20 +43,32 @@ WishList.registerComponent("type2", (
 ));
 
 export default function App() {
+
+  useEffect(() => {
+    let counter = 0;
+    const startHeavyWork = async () => {
+      while (1) {
+        counter++;
+      }
+    }
+
+    startHeavyWork(); // <- Wishlist can handle that easily. It could be just parsing json or just rerender.
+  }, []);
+
   return (
     <View style={{borderWidth: 4, borderColor: 'purple', flex: 1}}>
       <WishList.Component 
       inflateItem={(index, pool) => {
         'worklet'
         
-        if (index < 0 || index > 1000) return undefined;
+        if (index > 1000) return undefined;
 
-        const type = (index % 2) + 1;
+        const type = (Math.abs(index) % 2) + 1;
         const item = pool.getComponent(`type${type}`);
 
         const len = SampleText.length;
         const start = Math.floor(Math.random() * len);
-        const messageLen = Math.floor(Math.random() * (len - start - 1)) + 1; 
+        const messageLen = Math.min(Math.floor(Math.random() * (len - start - 1)) + 1, 70); 
         const newMessage = SampleText.slice(start, start + messageLen);
 
         if (type === 2) {

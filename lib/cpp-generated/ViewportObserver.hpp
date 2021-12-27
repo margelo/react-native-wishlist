@@ -73,8 +73,8 @@ struct ViewportObserver {
     }
     
     void updateWindow(bool updateDirectly) {
-        float topEdge = offset - windowHeight;
-        float bottomEdge = offset + 2 * windowHeight;
+        float topEdge = offset + 150;
+        float bottomEdge = offset + windowHeight - 150;
         
         assert(window.size() != 0);
         
