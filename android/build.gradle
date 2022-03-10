@@ -19,7 +19,7 @@ buildscript {
 
 apply plugin: 'com.android.library'
 
-apply plugin: "com.facebook.react"
+//apply plugin: "com.facebook.react"
 
 
 android {
@@ -28,31 +28,26 @@ android {
     defaultConfig {
         minSdkVersion getExtOrDefault('minSdkVersion', 16)
         targetSdkVersion getExtOrDefault('targetSdkVersion', 28)
-        versionCode 1
+        versionCode 4
         versionName "1.0"
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", "true"
 
-         if (isNewArchitectureEnabled()) {
-            var appProject = rootProject.allprojects.find {it.plugins.hasPlugin('com.android.application')}
-            externalNativeBuild {
-                ndkBuild {
-                    arguments "APP_PLATFORM=android-21",
-                            "APP_STL=c++_shared",
-                            "NDK_TOOLCHAIN_VERSION=clang",
-                            "GENERATED_SRC_DIR=${appProject.buildDir}/generated/source",
-                            "PROJECT_BUILD_DIR=${appProject.buildDir}",
-                            "REACT_ANDROID_DIR=${appProject.rootDir}/../node_modules/react-native/ReactAndroid",
-                            "REACT_ANDROID_BUILD_DIR=${appProject.rootDir}/../node_modules/react-native/ReactAndroid/build"
-                    cFlags "-Wall", "-Werror", "-fexceptions", "-frtti", "-DWITH_INSPECTOR=1"
-                    cppFlags "-std=c++17"
-                    targets "safeareacontext_modules"
-                }
+        var appProject = rootProject
+        externalNativeBuild {
+            ndkBuild {
+                arguments "APP_PLATFORM=android-21",
+                        "APP_STL=c++_shared",
+                        "NDK_TOOLCHAIN_VERSION=clang",
+                        "GENERATED_SRC_DIR=${appProject.buildDir}/generated/source",
+                        "PROJECT_BUILD_DIR=${appProject.buildDir}",
+                        "REACT_ANDROID_DIR=${appProject.rootDir}/../node_modules/react-native/ReactAndroid",
+                        "REACT_ANDROID_BUILD_DIR=${appProject.rootDir}/../node_modules/react-native/ReactAndroid/build"
+                cFlags "-Wall", "-Werror", "-fexceptions", "-frtti", "-DWITH_INSPECTOR=1"
+                cppFlags "-std=c++17"
+                targets "wishlist_modules"
             }
         }
-    }
 
-    lintOptions{
-        abortOnError false
     }
 
     externalNativeBuild {
@@ -87,9 +82,9 @@ repositories {
 }
 
 dependencies {
-    if (isNewArchitectureEnabled()) {
+
         implementation project(":ReactAndroid")
-    } else {
-        implementation 'com.facebook.react:react-native:+'
-    }
+
+       // implementation 'com.facebook.react:react-native:+'
+
 }

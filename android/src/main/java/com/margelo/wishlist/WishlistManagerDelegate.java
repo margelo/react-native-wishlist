@@ -15,7 +15,7 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.uimanager.BaseViewManagerDelegate;
 import com.facebook.react.uimanager.BaseViewManagerInterface;
 
-public class WishlistManagerDelegate<T extends View, U extends BaseViewManagerInterface<T> & ModuleManagerInterface<T>> extends BaseViewManagerDelegate<T, U> {
+public class WishlistManagerDelegate<T extends View, U extends BaseViewManagerInterface<T> & WishlistManagerInterface<T>> extends BaseViewManagerDelegate<T, U> {
   public WishlistManagerDelegate(U viewManager) {
     super(viewManager);
   }

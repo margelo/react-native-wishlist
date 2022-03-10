@@ -11,18 +11,16 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.ViewManagerDelegate;
 import com.facebook.react.uimanager.annotations.ReactProp;
-import com.facebook.react.viewmanagers.RNCSafeAreaViewManagerDelegate;
-import com.facebook.react.viewmanagers.RNCSafeAreaViewManagerInterface;
 
 import java.util.EnumSet;
 
-public class WishlistViewManager extends ViewGroupManager<SafeAreaView> implements RNCSafeAreaViewManagerInterface<SafeAreaView> {
+public class WishlistViewManager extends ViewGroupManager<Wishlist> implements WishlistManagerInterface<Wishlist> {
   private final ViewManagerDelegate<Wishlist> mDelegate;
 
   public WishlistViewManager() {
     super();
 
-    mDelegate = new WishlistViewManagerDelegate<>(this);
+    mDelegate = new WishlistManagerDelegate<Wishlist, WishlistViewManager>(this);
   }
 
   @Nullable
@@ -48,5 +46,10 @@ public class WishlistViewManager extends ViewGroupManager<SafeAreaView> implemen
   public Object updateState(@NonNull Wishlist view, ReactStylesDiffMap props, @Nullable StateWrapper stateWrapper) {
     view.getFabricViewStateManager().setStateWrapper(stateWrapper);
     return null;
+  }
+
+  @Override
+  public void scrollTo(Wishlist view, int y, boolean animated) {
+
   }
 }
