@@ -9,22 +9,22 @@
 
 /*#include <gtest/gtest.h>
 #include <react/renderer/core/PropsParserContext.h>
-#include <react/renderer/components/PlaygroundModule/Props.h>
+#include <react/renderer/components/PlaygroundWishlist/Props.h>
 #include <react/renderer/core/RawProps.h>
 #include <react/renderer/core/RawPropsParser.h>
 #include <react/renderer/core/propsConversions.h>
 
 using namespace facebook::react;
 
-TEST(ModuleProps_DoesNotDie, etc) {
+TEST(WishlistProps_DoesNotDie, etc) {
   auto propParser = RawPropsParser();
-  propParser.prepare<ModuleProps>();
-  auto const &sourceProps = ModuleProps();
+  propParser.prepare<WishlistProps>();
+  auto const &sourceProps = WishlistProps();
   auto const &rawProps = RawProps(folly::dynamic::object("xx_invalid_xx", "xx_invalid_xx"));
 
   ContextContainer contextContainer{};
   PropsParserContext parserContext{-1, contextContainer};
 
   rawProps.parse(propParser, parserContext);
-  ModuleProps(parserContext, sourceProps, rawProps);
+  WishlistProps(parserContext, sourceProps, rawProps);
 }*/

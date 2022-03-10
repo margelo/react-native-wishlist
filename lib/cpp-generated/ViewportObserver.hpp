@@ -40,7 +40,7 @@ struct ViewportObserver {
         componentsPool->registeredViews = registeredViews;
         componentsPool->setNames(names);
         
-        std::string inflatorId = std::static_pointer_cast<const ModuleProps>(weakWishListNode.lock()->getProps())->inflatorId;
+        std::string inflatorId = std::static_pointer_cast<const WishlistProps>(weakWishListNode.lock()->getProps())->inflatorId;
         itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<WorkletItemProvider>(windowWidth, lc, inflatorId));
         itemProvider->setComponentsPool(componentsPool);
         

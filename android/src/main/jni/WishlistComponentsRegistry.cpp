@@ -3,8 +3,7 @@
 #include <CoreComponentsRegistry.h>
 #include <fbjni/fbjni.h>
 #include <react/renderer/componentregistry/ComponentDescriptorProviderRegistry.h>
-#include <react/renderer/components/safeareacontext/ComponentDescriptors.h> // TODO
-#include <react/renderer/components/safeareacontext/RNCSafeAreaViewComponentDescriptor.h> // TODO
+#include "../../../../lib/cpp-generated/WishlistComponentDescriptors.h"
 
 namespace facebook {
 namespace react {

@@ -8,7 +8,7 @@
 #ifndef ShadowNodeCopyMachine_hpp
 #define ShadowNodeCopyMachine_hpp
 
-#include "ModuleProps.h"
+#include "WishlistProps.h"
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
 #include "LayoutContext.h"
 #include "LayoutConstraints.h"

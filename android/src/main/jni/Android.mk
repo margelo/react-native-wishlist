@@ -1,18 +1,25 @@
 THIS_DIR := $(call my-dir)
+# shared library
+include $(CLEAR_VARS)
+LOCAL_MODULE := reanimated
+LOCAL_SRC_FILES := $(THIS_DIR)/../../../../Example/node_modules/react-native-reanimated/android/build/intermediates/library_jni/debug/jni/$(TARGET_ARCH_ABI)/libreanimated.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+THIS_DIR := $(call my-dir)
 
 include $(REACT_ANDROID_DIR)/Android-prebuilt.mk
 
-include $(THIS_DIR)/../../../build/generated/source/codegen/jni/Android.mk
-include $(THIS_DIR)/../../../../common/cpp/Android.mk
+#include $(THIS_DIR)/../../../build/generated/source/codegen/jni/Android.mk
+#include $(THIS_DIR)/../../../../common/cpp/Android.mk
 
 include $(CLEAR_VARS)
 
 LOCAL_PATH := $(THIS_DIR)
 LOCAL_MODULE := wishlist_modules
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH) $(wildcard $(LOCAL_PATH)/../../lib/cpp-generated/*.h)
-LOCAL_SRC_FILES := $(wildcard $(LOCAL_PATH)/*.cpp) $(LOCAL_PATH)/../../lib/cpp-generated/*.cpp)
-LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH) $(wildcard $(LOCAL_PATH)/../../lib/cpp-generated/*.h)
+LOCAL_C_INCLUDES := $(LOCAL_PATH) $(wildcard $(LOCAL_PATH)/../../../../lib/cpp-generated/*.h)
+LOCAL_SRC_FILES := $(wildcard $(LOCAL_PATH)/*.cpp) $(wildcard $(LOCAL_PATH)/../../../../lib/cpp-generated/*.cpp)
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH) $(wildcard $(LOCAL_PATH)/../../../../lib/cpp-generated/*.h)
 
 # Please note as one of the library listed is libreact_codegen_samplelibrary
 # This name will be generated as libreact_codegen_<library-name>
@@ -35,7 +42,7 @@ LOCAL_SHARED_LIBRARIES := libjsi \
     libruntimeexecutor \
     libreact_render_mapbuffer \
     libreact_codegen_rncore \
-    libsafeareacontext_common
+    libreanimated
 
 LOCAL_CFLAGS := \
     -DLOG_TAG=\"ReactNative\"

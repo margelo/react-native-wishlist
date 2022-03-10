@@ -12,7 +12,7 @@
 #include "ShadowNodeCopyMachine.h"
 #include <memory>
 #include <map>
-#include "decorator.h"
+#include <jsi/decorator.h>
 #include <react/renderer/core/ConcreteComponentDescriptor.h>
 
 using namespace facebook::react;
