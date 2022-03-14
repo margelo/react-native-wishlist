@@ -1,14 +1,13 @@
 {
-  "libraryName": "PlaygroundModule",
+  "libraryName": "Wishlist",
   "outputDirectory": "./lib-new/cpp-generated",
-  "moduleSpecName": "PlaygroundModuleSpec",
+  "moduleSpecName": "WishlistModuleSpec",
   "generators": [
     "descriptors",
     "events",
     "props",
     "tests",
-    "shadow-nodes",
-    "modules"
+    "shadow-nodes"
   ],
   "inputFile": "./src/NativeComponent.tsx"
 }
