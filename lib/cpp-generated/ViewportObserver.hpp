@@ -81,7 +81,6 @@ struct ViewportObserver {
         // Add above
         while (1) {
             WishItem item = window.front();
-            float bottom = item.offset + item.height;
             
             if (item.offset > topEdge) {
                 WishItem wishItem = itemProvider->provide(item.index-1);
