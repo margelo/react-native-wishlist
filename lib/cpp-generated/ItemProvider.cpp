@@ -9,8 +9,8 @@
 #include <react/renderer/uimanager/UIManager.h>
 #include <react/renderer/uimanager/primitives.h>
 
-//TODO we need to use our own runtime because we can call things from several threads
-// just not enought time to do it right now
+// TODO(Szymon) render for the first time on UI Thread
+// return dummy children on JS
 
 struct 
 
