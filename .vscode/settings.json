@@ -3,5 +3,8 @@
     "**/node_modules/react-native/**",
     "**/node_modules/react-native-reanimated/**"
   ],
-  "search.useIgnoreFiles": false
+  "search.useIgnoreFiles": false,
+  "files.associations": {
+    "vector": "cpp"
+  }
 }

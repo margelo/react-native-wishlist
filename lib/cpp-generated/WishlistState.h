@@ -32,7 +32,6 @@ class WishlistState final {
     double originContentOffset = 50000;
     int originItemIndex = 10; // Hardcode for now
     std::shared_ptr<ViewportObserver> viewportObserver;
-    bool initialised = false;
     virtual ~WishlistState();
 
 #ifdef ANDROID
