@@ -1,10 +1,3 @@
-//
-//  ComponentsPool.hpp
-//  MGWishList
-//
-//  Created by Szymon on 27/11/2021.
-//
-
 #ifndef ComponentsPool_hpp
 #define ComponentsPool_hpp
 

@@ -1,10 +1,3 @@
-//
-//  ReanimatedRuntimeHandler.hpp
-//  MGWishList
-//
-//  Created by Szymon on 15/12/2021.
-//
-
 #ifndef ReanimatedRuntimeHandler_hpp
 #define ReanimatedRuntimeHandler_hpp
 

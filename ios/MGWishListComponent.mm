@@ -1,10 +1,3 @@
-//
-//  MGWishListComponent.m
-//  MGWishList
-//
-//  Created by Szymon on 11/11/2021.
-//
-
 #import "MGWishListComponent.h"
 #import <React/RCTConversions.h>
 #import <React/RCTImageResponseDelegate.h>

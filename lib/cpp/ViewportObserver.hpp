@@ -1,10 +1,3 @@
-//
-//  ViewportObserver.hpp
-//  MGWishList
-//
-//  Created by Szymon on 27/11/2021.
-//
-
 #ifndef ViewportObserver_hpp
 #define ViewportObserver_hpp
 

@@ -20,7 +20,7 @@ include $(CLEAR_VARS)
 LOCAL_PATH := $(THIS_DIR)
 LOCAL_MODULE := wishlist_modules
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH) $(wildcard $(LOCAL_PATH)/../../../../lib/cpp-generated/*.h)
+LOCAL_C_INCLUDES := $(LOCAL_PATH) $(wildcard $(LOCAL_PATH)/../../../../lib/cpp/*.h)
 LOCAL_C_INCLUDES += $(NODE_MODULES_DIR)/react-native-reanimated/Common/cpp/headers/Tools \
         $(NODE_MODULES_DIR)/react-native-reanimated/Common/cpp/headers/SpecTools \
         $(NODE_MODULES_DIR)/react-native-reanimated/Common/cpp/headers/Tools \
@@ -28,9 +28,9 @@ LOCAL_C_INCLUDES += $(NODE_MODULES_DIR)/react-native-reanimated/Common/cpp/heade
         $(NODE_MODULES_DIR)/react-native-reanimated/Common/cpp/headers/Registries \
         $(NODE_MODULES_DIR)/react-native-reanimated/Common/cpp/hidden_headers
 LOCAL_SRC_FILES := $(wildcard $(LOCAL_PATH)/*.cpp) 
-LOCAL_SRC_FILES += $(wildcard $(LOCAL_PATH)/../../../../lib/cpp-generated/*.cpp)
+LOCAL_SRC_FILES += $(wildcard $(LOCAL_PATH)/../../../../lib/cpp/*.cpp)
 
-LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH) $(wildcard $(LOCAL_PATH)/../../../../lib/cpp-generated/*.h)
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH) $(wildcard $(LOCAL_PATH)/../../../../lib/cpp/*.h)
 LOCAL_EXPORT_C_INCLUDES += $(NODE_MODULES_DIR)/react-native-reanimated/Common/cpp/headers/Tools \
         $(NODE_MODULES_DIR)/react-native-reanimated/Common/cpp/headers/SpecTools \
         $(NODE_MODULES_DIR)/react-native-reanimated/Common/cpp/headers/Tools \
@@ -64,5 +64,6 @@ LOCAL_SHARED_LIBRARIES := libjsi \
 LOCAL_CFLAGS := \
     -DLOG_TAG=\"ReactNative\"
 LOCAL_CFLAGS += -fexceptions -frtti -std=c++17 -Wall
+LOCAL_LDLIBS := -llog
 
 include $(BUILD_SHARED_LIBRARY)
