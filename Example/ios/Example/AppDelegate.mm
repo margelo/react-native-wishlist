@@ -16,6 +16,8 @@
 
 #import <react/config/ReactNativeConfig.h>
 
+static NSString *const kRNConcurrentRoot = @"concurrentRoot";
+
 @interface AppDelegate () <RCTCxxBridgeDelegate, RCTTurboModuleManagerDelegate> {
   RCTTurboModuleManager *_turboModuleManager;
   RCTSurfacePresenterBridgeAdapter *_bridgeAdapter;
@@ -41,7 +43,9 @@
   bridge.surfacePresenter = _bridgeAdapter.surfacePresenter;
 #endif
 
-  UIView *rootView = RCTAppSetupDefaultRootView(bridge, @"Example", nil);
+  NSDictionary *initProps = [self prepareInitialProps];
+
+  UIView *rootView = RCTAppSetupDefaultRootView(bridge, @"Example", initProps);
 
   if (@available(iOS 13.0, *)) {
     rootView.backgroundColor = [UIColor systemBackgroundColor];
@@ -56,6 +60,28 @@
   [self.window makeKeyAndVisible];
   return YES;
 }
+
+/// This method controls whether the `concurrentRoot`feature of React18 is turned on or off.
+64	///
+65	/// @see: https://reactjs.org/blog/2022/03/29/react-v18.html
+66	/// @note: This requires to be rendering on Fabric (i.e. on the New Architecture).
+67	/// @return: `true` if the `concurrentRoot` feture is enabled. Otherwise, it returns `false`.
+68	- (BOOL)concurrentRootEnabled
+69	{
+70	  // Switch this bool to turn on and off the concurrent root
+71	  return true;
+72	}
+73	
+74	- (NSDictionary *)prepareInitialProps
+75	{
+76	  NSMutableDictionary *initProps = [NSMutableDictionary new];
+77	
+78	#ifdef RCT_NEW_ARCH_ENABLED
+79	  initProps[kRNConcurrentRoot] = @([self concurrentRootEnabled]);
+80	#endif
+81	
+82	  return initProps;
+83	}
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
