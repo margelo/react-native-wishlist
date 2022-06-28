@@ -949,7 +949,7 @@ SPEC CHECKSUMS:
   glog: 3d02b25ca00c2d456734d0bcff864cbc62f6ae1a
   hermes-engine: 03851318b18b534b671ea435fad2202154135c72
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
-  MGWishList: 368782ac0c345a734f9c1bc80f647d6b66ecdad3
+  MGWishList: e3e11de09d80227039af6eb39c80022e7bcb9a12
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
   RCT-Folly: 4d8508a426467c48885f1151029bc15fa5d7b3b8
   RCTRequired: eff60a46da0f496a6c76c8f60108c20626860d27

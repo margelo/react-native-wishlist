@@ -6,9 +6,9 @@
 #import <react/renderer/components/rncore/EventEmitters.h>
 #import <react/renderer/components/rncore/Props.h>
 #import "RCTFabricComponentsPlugins.h"
-#import "ModuleComponentDescriptors.h"
-#import "ModuleProps.h"
-#import "ModuleShadowNodes.h"
+#import "WishlistComponentDescriptors.h"
+#import "WishlistProps.h"
+#import "WishlistShadowNodes.h"
 #import <React/RCTBridgeModule.h>
 #import <React/RCTComponentViewFactory.h>
 
@@ -21,7 +21,7 @@ using namespace facebook::react;
 @end
 
 @implementation MGWishListComponent{
-    ModuleShadowNode::ConcreteState::Shared _sharedState;
+    WishlistShadowNode::ConcreteState::Shared _sharedState;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -35,14 +35,14 @@ using namespace facebook::react;
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
 {
-  return concreteComponentDescriptorProvider<ModuleComponentDescriptor>();
+  return concreteComponentDescriptorProvider<WishlistComponentDescriptor>();
 }
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
     NSLog(@"wegwgw");
-  const auto &oldSliderProps = *std::static_pointer_cast<const ModuleProps>(_props);
-  const auto &newSliderProps = *std::static_pointer_cast<const ModuleProps>(props);
+  const auto &oldSliderProps = *std::static_pointer_cast<const WishlistProps>(_props);
+  const auto &newSliderProps = *std::static_pointer_cast<const WishlistProps>(props);
     int z = 3;
     self.scrollView.contentSize = CGSizeMake(1000, 100000);
     _eventEmitter = nil; // temporary TODO fix this
@@ -54,7 +54,7 @@ using namespace facebook::react;
 {
     _eventEmitter = nil; // temporary TODO fix this
     if (state == nullptr) return;
-    auto newState = std::static_pointer_cast<ModuleShadowNode::ConcreteState const>(state);
+    auto newState = std::static_pointer_cast<WishlistShadowNode::ConcreteState const>(state);
     auto &data = newState->getData();
     _sharedState = newState;
     self.scrollView.contentOffset = CGPointMake(0, data.viewportObserver->offset);//

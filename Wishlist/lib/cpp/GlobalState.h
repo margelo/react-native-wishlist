@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <memory>
 #include <react/renderer/uimanager/primitives.h>
-#include <android/log.h>
+//#include <android/log.h>
 #define APPNAME "Wishlist"
 
 

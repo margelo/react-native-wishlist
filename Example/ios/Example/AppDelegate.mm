@@ -16,6 +16,10 @@
 
 #import <react/config/ReactNativeConfig.h>
 
+#import "ReanimatedRuntimeHandler.hpp"
+#import "REAInitializer.h"
+#import <React/RCTJSIExecutorRuntimeInstaller.h>
+
 static NSString *const kRNConcurrentRoot = @"concurrentRoot";
 
 @interface AppDelegate () <RCTCxxBridgeDelegate, RCTTurboModuleManagerDelegate> {
@@ -62,26 +66,26 @@ static NSString *const kRNConcurrentRoot = @"concurrentRoot";
 }
 
 /// This method controls whether the `concurrentRoot`feature of React18 is turned on or off.
-64	///
-65	/// @see: https://reactjs.org/blog/2022/03/29/react-v18.html
-66	/// @note: This requires to be rendering on Fabric (i.e. on the New Architecture).
-67	/// @return: `true` if the `concurrentRoot` feture is enabled. Otherwise, it returns `false`.
-68	- (BOOL)concurrentRootEnabled
-69	{
-70	  // Switch this bool to turn on and off the concurrent root
-71	  return true;
-72	}
-73	
-74	- (NSDictionary *)prepareInitialProps
-75	{
-76	  NSMutableDictionary *initProps = [NSMutableDictionary new];
-77	
-78	#ifdef RCT_NEW_ARCH_ENABLED
-79	  initProps[kRNConcurrentRoot] = @([self concurrentRootEnabled]);
-80	#endif
-81	
-82	  return initProps;
-83	}
+	///
+	/// @see: https://reactjs.org/blog/2022/03/29/react-v18.html
+	/// @note: This requires to be rendering on Fabric (i.e. on the New Architecture).
+	/// @return: `true` if the `concurrentRoot` feture is enabled. Otherwise, it returns `false`.
+	- (BOOL)concurrentRootEnabled
+	{
+	  // Switch this bool to turn on and off the concurrent root
+	  return true;
+	}
+	
+	- (NSDictionary *)prepareInitialProps
+	{
+	  NSMutableDictionary *initProps = [NSMutableDictionary new];
+	
+	#ifdef RCT_NEW_ARCH_ENABLED
+	  initProps[kRNConcurrentRoot] = @([self concurrentRootEnabled]);
+	#endif
+	
+	  return initProps;
+	}
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
@@ -101,7 +105,56 @@ static NSString *const kRNConcurrentRoot = @"concurrentRoot";
   _turboModuleManager = [[RCTTurboModuleManager alloc] initWithBridge:bridge
                                                              delegate:self
                                                             jsInvoker:bridge.jsCallInvoker];
-  return RCTAppSetupDefaultJsExecutorFactory(bridge, _turboModuleManager);
+  // Necessary to allow NativeModules to lookup TurboModules
+  [bridge setRCTTurboModuleRegistry:_turboModuleManager];
+
+#if RCT_DEV
+  if (!RCTTurboModuleEagerInitEnabled()) {
+    /**
+     * Instantiating DevMenu has the side-effect of registering
+     * shortcuts for CMD + d, CMD + i,  and CMD + n via RCTDevMenu.
+     * Therefore, when TurboModules are enabled, we must manually create this
+     * NativeModule.
+     */
+    [_turboModuleManager moduleForName:"RCTDevMenu"];
+  }
+#endif
+
+  __weak __typeof(self) weakSelf = self;
+    JSIExecutor::RuntimeInstaller reactNativeInstaller = [weakSelf, bridge](facebook::jsi::Runtime &runtime) {
+      if (!bridge) {
+        return;
+      }
+      __typeof(self) strongSelf = weakSelf;
+      if (strongSelf) {
+        facebook::react::RuntimeExecutor syncRuntimeExecutor =
+            [&](std::function<void(facebook::jsi::Runtime & runtime_)> &&callback) { callback(runtime); };
+        [strongSelf->_turboModuleManager installJSBindingWithRuntimeExecutor:syncRuntimeExecutor];
+      }
+      //RCTInstallNativeComponentRegistryBinding(runtime);
+    };
+    const auto installer = reanimated::REAJSIExecutorRuntimeInstaller(bridge, reactNativeInstaller);
+    
+    const auto runtimeInstaller = [installer](facebook::jsi::Runtime &runtime) {
+      if (installer) {
+          installer(runtime);
+      }
+        
+      jsi::Value value = runtime.global().getProperty(runtime,
+                                   jsi::PropNameID::forAscii(runtime, "__reanimatedModuleProxy"));
+      auto reanimatedModule = value.asObject(runtime).asHostObject<reanimated::NativeReanimatedModule>(runtime);
+      ReanimatedRuntimeHandler::scheduler = reanimatedModule->scheduler;
+      ReanimatedRuntimeHandler::rtPtr = reanimatedModule->runtime;
+    };
+   
+    
+  #if RCT_USE_HERMES
+    return std::make_unique<facebook::react::HermesExecutorFactory>(
+  #else
+    return std::make_unique<facebook::react::JSCExecutorFactory>(
+  #endif
+        facebook::react::RCTJSIExecutorRuntimeInstaller(runtimeInstaller)
+    );
 }
 
 #pragma mark RCTTurboModuleManagerDelegate

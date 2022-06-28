@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <jsi/jsi.h>
 #include <memory>
-#include "Scheduler.h"
+#include <RNReanimated/Scheduler.h>
 
 using namespace facebook;
 
