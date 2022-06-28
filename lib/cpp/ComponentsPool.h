@@ -1,3 +1,10 @@
+//
+//  ComponentsPool.hpp
+//  MGWishList
+//
+//  Created by Szymon on 27/11/2021.
+//
+
 #ifndef ComponentsPool_hpp
 #define ComponentsPool_hpp
 
@@ -5,7 +12,7 @@
 #include "ShadowNodeCopyMachine.h"
 #include <memory>
 #include <map>
-#include <jsi/decorator.h>
+#include "decorator.h"
 #include <react/renderer/core/ConcreteComponentDescriptor.h>
 
 using namespace facebook::react;

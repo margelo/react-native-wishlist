@@ -1,6 +1,13 @@
+//
+//  ViewportObserver.cpp
+//  MGWishList
+//
+//  Created by Szymon on 27/11/2021.
+//
+
 #include "ViewportObserver.hpp"
-#include "WishlistShadowNodes.h"
-#include <folly/dynamic.h>
+#include "ModuleShadowNodes.h"
+#import "RCTFollyConvert.h"
 
 using namespace facebook::react;
 
@@ -13,10 +20,12 @@ std::shared_ptr<ShadowNode> ViewportObserver::getOffseter(float offset) {
     auto & cd = offseterTemplate->getComponentDescriptor();
     PropsParserContext propsParserContext{surfaceId, *cd.getContextContainer().get()};
     
-    // TODO(Szymon) remove bg color
-    folly::dynamic props = folly::dynamic::object("height", offset)
-    ("width", this->windowWidth)
-    ("backgroundColor", (*(colorFromComponents(ColorComponents{0, 0, 1, 1}))));
+    // todo remove color
+    folly::dynamic props = convertIdToFollyDynamic(@{
+        @"height": @(offset),
+        @"width": @(this->windowWidth),
+        @"backgroundColor": @((*(colorFromComponents(ColorComponents{0, 0, 1, 1}))))
+    });
     
     Props::Shared newProps = cd.cloneProps(
         propsParserContext,
@@ -36,11 +45,11 @@ void  ViewportObserver::pushChildren(bool pushDirectly) {
     }
     
     if (pushDirectly) {
-        std::shared_ptr<WishlistShadowNode> WishlistNode = std::static_pointer_cast<WishlistShadowNode>(sWishList);
-        WishlistNode->realAppendChild(getOffseter(window[0].offset));
+        std::shared_ptr<ModuleShadowNode> moduleNode = std::static_pointer_cast<ModuleShadowNode>(sWishList);
+        moduleNode->realAppendChild(getOffseter(window[0].offset));
         
         for (WishItem & wishItem : window) {
-            WishlistNode->realAppendChild(wishItem.sn);
+            moduleNode->realAppendChild(wishItem.sn);
         }
     } else {
         KeyClassHolder::shadowTreeRegistry->visit(surfaceId, [&](const ShadowTree & st) {
