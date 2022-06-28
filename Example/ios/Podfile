@@ -19,8 +19,6 @@ target 'Example' do
     :app_path => "#{Dir.pwd}/.."
   )
 
-  pod 'MGWishList', :path => "../../"
-
   target 'ExampleTests' do
     inherit! :complete
     # Pods for testing
