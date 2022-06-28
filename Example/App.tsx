@@ -1,9 +1,9 @@
 import React from 'react';
 import { InteractionManager } from 'react-native';
 import { View, Text } from 'react-native';
-import createWishList from 'WishList';
+import createWishlist from 'root/Wishlist';
 
-const WishList = createWishList();
+const WishList = createWishlist();
 
 const SampleText = `Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
 Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, 

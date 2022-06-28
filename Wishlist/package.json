@@ -2,7 +2,7 @@
   "name": "Wishlist",
   "version": "1.0.0",
   "description": "The ultimate virtualised list solution",
-  "main": "index.js",
+  "main": "index.ts",
   "author": "Marc & Szymon",
   "license": "MIT",
   "private": true,
@@ -10,8 +10,8 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
-    "@types/react-native": "^0.66.4",
-    "react-native": "0.66.3",
+    "@types/react-native": "^0.69.0",
+    "react-native": "0.69.0",
     "react-native-tscodegen": "^0.68.4",
     "react-native-tscodegen-types": "^0.67.3"
   }
