@@ -1,2 +1,2 @@
-import WishList from './src/Component';
-export default x = WishList;
+import create from './src/Wishlist';
+export default Wishlist = create;
