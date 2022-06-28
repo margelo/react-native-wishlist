@@ -13,6 +13,6 @@
     "@types/react-native": "^0.69.0",
     "react-native": "0.69.0",
     "react-native-tscodegen": "^0.68.4",
-    "react-native-tscodegen-types": "^0.67.3"
+    "react-native-tscodegen-types": "^0.69.1"
   }
 }

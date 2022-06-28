@@ -46,7 +46,7 @@ WishList.registerComponent("type2", (
 export default function App() {
   return (
     <View style={{borderWidth: 4, borderColor: 'purple', flex: 1}}>
-      <WishList.Component 
+      {<WishList.Component 
       inflateItem={(index, pool) => {
         'worklet'
         
@@ -70,7 +70,7 @@ export default function App() {
 
         return item;
       }}
-      style={{flex:1}}/>
+    style={{flex:1}}/>}
     </View>
   );
 }
