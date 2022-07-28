@@ -2,6 +2,7 @@ import React, { useEffect, useCallback, useRef } from 'react';
 import { View, Dimensions } from 'react-native';
 import NativeWishList from './NativeComponent';
 import InflatorRepository from './InflatorRepository';
+import { initEventHandler } from './EventHandler';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
@@ -12,6 +13,7 @@ export default function createWishList() {
   ));
 
   function WishList(props) {
+    initEventHandler();
     const { inflateItem } = props;
     const inflatorId = useRef(null);
 

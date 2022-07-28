@@ -15,24 +15,31 @@ and more recently with desktop publishing software like Aldus PageMaker includin
 
 const authors = ['John', 'Bob', 'Szymon', 'Marc', 'Elon Musk'];
 
-WishList.registerComponent('type1', (
+WishList.registerComponent(
+  'type1',
   <View style={{flexDirection: 'row-reverse'}}>
     <View style={{margin: 10, width: '70%', backgroundColor: '#00008B'}}>
       <Image
         style={{width: 100, height: 100}}
         source={{
-          uri: 'https://picsum.photos/100'
+          uri: 'https://picsum.photos/100',
         }}
       />
       <View style={{margin: 5}}>
-        <Text style={{color: 'white'}} wishId="author"> me </Text>
+        <Text style={{color: 'white'}} wishId="author">
+          {' '}
+          me{' '}
+        </Text>
       </View>
       <View style={{margin: 5}}>
-        <Text style={{color: 'white'}} wishId="content"> simple Message </Text>
+        <Text style={{color: 'white'}} wishId="content">
+          {' '}
+          simple Message{' '}
+        </Text>
       </View>
     </View>
-  </View>
-));
+  </View>,
+);
 
 const Type: React.FC<{}> = () => {
   return (
@@ -45,27 +52,33 @@ const Type: React.FC<{}> = () => {
           }}
         />
         <View wishId="sth" style={{margin: 5}}>
-          <Text style={{color: 'white'}} wishId="author"> author </Text>
+          <Text style={{color: 'white'}} wishId="author">
+            {' '}
+            author{' '}
+          </Text>
         </View>
         <View style={{margin: 5}}>
-          <Text style={{color: 'white'}} wishId="content"> simple Message </Text>
+          <Text style={{color: 'white'}} wishId="content">
+            {' '}
+            simple Message{' '}
+          </Text>
         </View>
       </View>
     </View>
   );
 };
 
-WishList.registerComponent('type2', (
-  <Type/>
-));
+WishList.registerComponent('type2', <Type />);
 
 export default function App() {
   return (
     <View style={{borderWidth: 4, borderColor: 'purple', flex: 1}}>
       <WishList.Component
-      inflateItem={(index, pool) => {
-        'worklet';
-          if (index < 0 || index > 1000) {return undefined;}
+        inflateItem={(index, pool) => {
+          'worklet';
+          if (index < 0 || index > 1000) {
+            return undefined;
+          }
           let imgSource = 'https://picsum.photos/seed/picsumme/100';
 
           const type = (index % 2) + 1;
@@ -85,6 +98,11 @@ export default function App() {
 
           item.View.View.at(1).Paragraph.RawText.addProps({text: newMessage});
           item.View.Image.addProps({source: {uri: imgSource}});
+
+          item.View.Image.setCallback('loadEnd', () => {
+            // modify data
+            console.log('loadEvent' + index);
+          });
 
           return item;
         }}
