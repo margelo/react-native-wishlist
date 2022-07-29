@@ -1,6 +1,6 @@
 import React from 'react';
 import {InteractionManager} from 'react-native';
-import {View, Text, Image} from 'react-native';
+import {View, Text, Image, Button} from 'react-native';
 import createWishlist from 'root/Wishlist';
 
 const WishList = createWishlist();
@@ -63,6 +63,7 @@ const Type: React.FC<{}> = () => {
             simple Message{' '}
           </Text>
         </View>
+        <Button title="click me" onPress={() => {}} />
       </View>
     </View>
   );
@@ -94,6 +95,13 @@ export default function App() {
             const randomAuthor = authors[randomIndex];
             item.View.View.Paragraph.RawText.addProps({text: randomAuthor});
             imgSource = `https://picsum.photos/seed/picsum${authors[randomIndex]}/100`;
+
+            const button = item.View.View.at(2);
+            button.addProps({pointerEvents: 'box-only'});
+            button.setCallback('touchEnd', () => {
+              console.log('touched', index, newMessage);
+            });
+
           }
 
           item.View.View.at(1).Paragraph.RawText.addProps({text: newMessage});

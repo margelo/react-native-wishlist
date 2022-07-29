@@ -111,7 +111,19 @@ public:
     }
                                     
     void updateStateIfNeeded() {
-        ensureUnsealed();
+      ensureUnsealed();
+
+      auto contentBoundingRect = Rect{};
+      for (const auto &childNode : getLayoutableChildNodes()) {
+        contentBoundingRect.unionInPlace(childNode->getLayoutMetrics().frame);
+      }
+
+      auto state = getStateData();
+
+      if (state.contentBoundingRect != contentBoundingRect) {
+        state.contentBoundingRect = contentBoundingRect;
+        setStateData(std::move(state));
+      }
     }
 
     
