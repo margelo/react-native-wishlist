@@ -1,7 +1,6 @@
 import React from 'react';
-import {InteractionManager} from 'react-native';
 import {View, Text, Image, Button} from 'react-native';
-import createWishlist from 'root/Wishlist';
+import createWishlist from 'Wishlist';
 
 const WishList = createWishlist();
 
@@ -101,7 +100,6 @@ export default function App() {
             button.setCallback('touchEnd', () => {
               console.log('touched', index, newMessage);
             });
-
           }
 
           item.View.View.at(1).Paragraph.RawText.addProps({text: newMessage});
