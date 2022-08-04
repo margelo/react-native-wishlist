@@ -12,6 +12,7 @@
 #include "ShadowNodeCopyMachine.h"
 #include <memory>
 #include <map>
+#include <sstream>
 #include "decorator.h"
 #include <react/renderer/core/ConcreteComponentDescriptor.h>
 
@@ -29,15 +30,34 @@ struct ShadowNodeBinding : public jsi::HostObject, std::enable_shared_from_this<
         this->parent = parent;
     }
   
-    std::shared_ptr<const ShadowNode> findNodeByWishId(const std::string& nativeId, std::shared_ptr<const ShadowNode> root) {
-      auto v = root->getProps()->nativeId;
-      if(v == nativeId) {
-        return root;
+    void describe(std::stringstream &ss, const std::shared_ptr<const ShadowNode> n, int level) {
+      for(auto i=0; i<level; ++i) { ss << " "; }
+      ss << n->getComponentName();
+      if(n->getProps()->nativeId.length() > 0) {
+        ss << " (" << n->getProps()->nativeId << ")";
       }
-      for(auto child : root->getChildren()) {
-        auto node = findNodeByWishId(nativeId, child);
-        if(node != nullptr) {
-          return node;
+      ss << " " << n->getProps()->getDebugDescription();
+      ss << "\n";
+      for(auto child : n->getChildren()) {
+        describe(ss, child, level + 2);
+      }
+    };
+  
+    std::shared_ptr<ShadowNodeBinding> findNodeByWishId(const std::string& nativeId,
+                                                       std::shared_ptr<ShadowNodeBinding> p) {
+      for(auto child : p->sn->getChildren()) {
+        // Create binding
+        auto bc = std::make_shared<ShadowNodeBinding>(child, p);;
+        
+        // Test against native id
+        if(child->getProps()->nativeId == nativeId) {
+          return bc;
+        }
+        
+        // Test child's children
+        auto binding = findNodeByWishId(nativeId, bc);
+        if(binding != nullptr) {
+          return binding;
         }
       }
       return nullptr;
@@ -77,13 +97,14 @@ struct ShadowNodeBinding : public jsi::HostObject, std::enable_shared_from_this<
                     
                     PropsParserContext propsParserContext{
                         sn->getFamily().getSurfaceId(), *cd.getContextContainer().get()};
-
-                   
+                  
+                    auto nextProps = cd.cloneProps(propsParserContext, sn->getProps(), rawProps);
+                    std::cout << nextProps->getDebugValue() << std::endl;
+                  
                     auto clonedShadowNode = cd.cloneShadowNode(
                         *sn,
                         {
-                            cd.cloneProps(
-                                propsParserContext, sn->getProps(), rawProps),
+                            nextProps,
                             nullptr,
                         });
                     
@@ -109,14 +130,34 @@ struct ShadowNodeBinding : public jsi::HostObject, std::enable_shared_from_this<
             });
         }
       
+        if(name == "getName") {
+          return jsi::Function::createFromHostFunction(rt, nameProp, 1, [=](jsi::Runtime &rt,
+                                                                            jsi::Value const &thisValue,
+                                                                            jsi::Value const *args,
+                                                                            size_t count) -> jsi::Value {
+            return jsi::String::createFromUtf8(rt, sn->getComponentName());
+          });
+        }
+      
+        if(name == "describe") {
+          return jsi::Function::createFromHostFunction(rt, nameProp, 1, [=](jsi::Runtime &rt,
+                                                                            jsi::Value const &thisValue,
+                                                                            jsi::Value const *args,
+                                                                            size_t count) -> jsi::Value {
+            std::stringstream ss;
+            describe(ss, sn, 0);
+            return jsi::String::createFromUtf8(rt, ss.str());
+          });
+        }
+      
         if (name == "getByWishId") {
           return jsi::Function::createFromHostFunction(rt, nameProp, 1, [=](jsi::Runtime &rt,
                                                                             jsi::Value const &thisValue,
                                                                             jsi::Value const *args,
                                                                             size_t count) -> jsi::Value {
-            auto node = findNodeByWishId(args[0].asString(rt).utf8(rt), sn);
-            if(node != nullptr) {
-              return jsi::Object::createFromHostObject(rt, std::make_shared<ShadowNodeBinding>(node, parent.lock()));
+            auto binding = findNodeByWishId(args[0].asString(rt).utf8(rt), shared_from_this());
+            if(binding != nullptr) {
+              return jsi::Object::createFromHostObject(rt, binding);
             }
             
             return jsi::Value::undefined();
