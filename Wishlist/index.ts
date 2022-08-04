@@ -1,2 +1,1 @@
-import create from './src/WishList';
-export default create;
+export { WishList } from "./src/WishList";
