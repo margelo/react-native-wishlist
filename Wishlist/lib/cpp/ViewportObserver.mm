@@ -60,7 +60,9 @@ void  ViewportObserver::pushChildren(bool pushDirectly) {
                     children->push_back(getOffseter(window[0].offset));
                     
                     for (WishItem & wishItem : window) {
-                      children->push_back(wishItem.sn);
+                      if(wishItem.sn != nullptr) {
+                        children->push_back(wishItem.sn);
+                      }
                     }
                     
                     return sn.clone(ShadowNodeFragment{nullptr, children, nullptr});
