@@ -22,7 +22,7 @@ using namespace jsi;
 
 struct ShadowNodeBinding : public jsi::HostObject, std::enable_shared_from_this<ShadowNodeBinding> {
     
-    std::weak_ptr<ShadowNodeBinding> parent;
+    std::shared_ptr<ShadowNodeBinding> parent;
     std::shared_ptr<const ShadowNode> sn;
     
     ShadowNodeBinding(std::shared_ptr<const ShadowNode> sn, std::shared_ptr<ShadowNodeBinding> parent=nullptr) {
@@ -47,7 +47,7 @@ struct ShadowNodeBinding : public jsi::HostObject, std::enable_shared_from_this<
                                                        std::shared_ptr<ShadowNodeBinding> p) {
       for(auto child : p->sn->getChildren()) {
         // Create binding
-        auto bc = std::make_shared<ShadowNodeBinding>(child, p);;
+        auto bc = std::make_shared<ShadowNodeBinding>(child, p);
         
         // Test against native id
         if(child->getProps()->nativeId == nativeId) {
@@ -110,7 +110,7 @@ struct ShadowNodeBinding : public jsi::HostObject, std::enable_shared_from_this<
                     
                     sn = clonedShadowNode;
                    
-                    std::shared_ptr<ShadowNodeBinding> currentParent = parent.lock();
+                    std::shared_ptr<ShadowNodeBinding> currentParent = parent;
                     std::shared_ptr<ShadowNode> currentSN = clonedShadowNode;
                     while (currentParent != nullptr) {
                         auto &cd = currentParent->sn->getComponentDescriptor();
@@ -123,7 +123,8 @@ struct ShadowNodeBinding : public jsi::HostObject, std::enable_shared_from_this<
                         }
                         currentSN = cd.cloneShadowNode(*(currentParent->sn), {nullptr, std::make_shared<SharedShadowNodeList>(children)});
                         currentParent->sn = currentSN;
-                        currentParent = currentParent->parent.lock();
+                        currentParent = currentParent->parent;
+                        std::cout << "is currentParent null " << (currentParent == nullptr) << std::endl;
                     }
                     
                     return jsi::Value::undefined();
@@ -150,7 +151,7 @@ struct ShadowNodeBinding : public jsi::HostObject, std::enable_shared_from_this<
           });
         }
       
-        if (name == "getByWishId") {
+        if (name == "getByWishId") { //That can be optimised to O(depth) when template preprocessing
           return jsi::Function::createFromHostFunction(rt, nameProp, 1, [=](jsi::Runtime &rt,
                                                                             jsi::Value const &thisValue,
                                                                             jsi::Value const *args,
@@ -175,10 +176,10 @@ struct ShadowNodeBinding : public jsi::HostObject, std::enable_shared_from_this<
                     
                     int i = 0;
                     
-                    for (auto sibiling : parent.lock()->sn->getChildren()) {
+                    for (auto sibiling : parent->sn->getChildren()) {
                         if (sibiling->getComponentName() == type) {
                             if (i == index) {
-                                return jsi::Object::createFromHostObject(rt, std::make_shared<ShadowNodeBinding>(sibiling, parent.lock()));
+                                return jsi::Object::createFromHostObject(rt, std::make_shared<ShadowNodeBinding>(sibiling, parent));
                             }
                             i++;
                         }
