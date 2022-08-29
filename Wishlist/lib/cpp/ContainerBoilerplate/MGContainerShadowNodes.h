@@ -24,7 +24,7 @@ extern const char MGTemplateContainerComponentComponentName[];
 class MGTemplateContainerComponentShadowNode : ConcreteViewShadowNode<
     MGTemplateContainerComponentComponentName,
 MGTemplateContainerComponentProps> {
-    
+    std::vector<std::shared_ptr<ShadowNode const>> templates;
 };
 
 } // namespace react

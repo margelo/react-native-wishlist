@@ -6,6 +6,7 @@ import NativeTemplateInterceptor from "./NativeViews/NativeTemplateInterceptor";
 import InflatorRepository from "./InflatorRepository";
 import { initEventHandler } from "./EventHandler";
 
+const TemplateContainer = React.memo(NativeTemplateContainer);
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
 function Component(props) {
@@ -72,11 +73,11 @@ function Component(props) {
         inflatorId={inflatorId.current}
       />
         
-      <NativeTemplateContainer names={keys} inflatorId={inflatorId.current} key={Math.random().toString()} collapsable={false} />
+      <TemplateContainer names={keys} inflatorId={inflatorId.current} key={Math.random().toString()} collapsable={false} />
       {Array.from(componentsRegistry.values()).map((c, i) => (
           <View key={keys[i]}>{c}</View>
         ))}
-      <NativeTemplateContainer/>
+      <TemplateContainer/>
     </NativeTemplateInterceptor>
   );
 }
