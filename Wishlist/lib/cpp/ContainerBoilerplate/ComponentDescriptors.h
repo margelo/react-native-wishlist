@@ -16,7 +16,7 @@
 namespace facebook {
 namespace react {
 
-using MGTemplateInterceptorComponentComponentDescriptor = ConcreteComponentDescriptor<MGTemplateInterceptorComponentShadowNode>;
+using MGTemplateContainerComponentComponentDescriptor = ConcreteComponentDescriptor<MGTemplateContainerComponentShadowNode>;
 
 } // namespace react
 } // namespace facebook

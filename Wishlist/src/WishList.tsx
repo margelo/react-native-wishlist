@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import { View, Dimensions } from "react-native";
-import NativeWishList from "./NativeViews/NativeComponent";
+import NativeWishList from "./NativeViews/NativeWishlistComponent";
 import NativeTemplateContainer from "./NativeViews/NativeTemplateContainer";
 import NativeTemplateInterceptor from "./NativeViews/NativeTemplateInterceptor";
 import InflatorRepository from "./InflatorRepository";

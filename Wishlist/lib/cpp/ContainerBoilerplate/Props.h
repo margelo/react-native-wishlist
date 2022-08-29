@@ -15,10 +15,10 @@
 namespace facebook {
 namespace react {
 
-class MGTemplateInterceptorComponentProps final : public ViewProps {
+class MGTemplateContainerComponentProps final : public ViewProps {
  public:
-  MGTemplateInterceptorComponentProps() = default;
-  MGTemplateInterceptorComponentProps(const PropsParserContext& context, const MGTemplateInterceptorComponentProps &sourceProps, const RawProps &rawProps);
+  MGTemplateContainerComponentProps() = default;
+  MGTemplateContainerComponentProps(const PropsParserContext& context, const MGTemplateContainerComponentProps &sourceProps, const RawProps &rawProps);
 
 #pragma mark - Props
 

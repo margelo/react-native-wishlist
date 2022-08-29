@@ -15,9 +15,9 @@
 namespace facebook {
 namespace react {
 
-MGTemplateInterceptorComponentProps::MGTemplateInterceptorComponentProps(
+MGTemplateContainerComponentProps::MGTemplateContainerComponentProps(
     const PropsParserContext &context,
-    const MGTemplateInterceptorComponentProps &sourceProps,
+    const MGTemplateContainerComponentProps &sourceProps,
     const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
 
     inflatorId(convertRawProp(context, rawProps, "inflatorId", sourceProps.inflatorId, {}))

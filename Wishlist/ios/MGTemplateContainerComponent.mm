@@ -17,4 +17,11 @@
 }
 */
 
+#pragma mark - RCTComponentViewProtocol
+
++ (ComponentDescriptorProvider)componentDescriptorProvider
+{
+  return concreteComponentDescriptorProvider<WishlistComponentDescriptor>(); // CHANGE !!!!!
+}
+
 @end

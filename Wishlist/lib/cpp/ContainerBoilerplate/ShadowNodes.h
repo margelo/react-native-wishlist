@@ -16,14 +16,14 @@
 namespace facebook {
 namespace react {
 
-extern const char MGTemplateInterceptorComponentComponentName[];
+extern const char MGTemplateContainerComponentComponentName[];
 
 /*
- * `ShadowNode` for <MGTemplateInterceptorComponent> component.
+ * `ShadowNode` for <MGTemplateContainerComponent> component.
  */
-using MGTemplateInterceptorComponentShadowNode = ConcreteViewShadowNode<
-    MGTemplateInterceptorComponentComponentName,
-    MGTemplateInterceptorComponentProps>;
+using MGTemplateContainerComponentShadowNode = ConcreteViewShadowNode<
+    MGTemplateContainerComponentComponentName,
+    MGTemplateContainerComponentProps>;
 
 } // namespace react
 } // namespace facebook
