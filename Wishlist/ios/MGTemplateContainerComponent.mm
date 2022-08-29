@@ -8,7 +8,9 @@
 #import "MGTemplateContainerComponent.h"
 #import "MGContainerComponentDescriptors.h"
 
-@implementation MGTemplateContainerComponent
+@implementation MGTemplateContainerComponent {
+    std::vector<std::shared_ptr<facebook::react::ShadowNode const>> _templates;
+}
 
 /*
 // Only override drawRect: if you perform custom drawing.
@@ -23,6 +25,11 @@
 + (facebook::react::ComponentDescriptorProvider)componentDescriptorProvider
 {
     return facebook::react::concreteComponentDescriptorProvider<facebook::react::MGTemplateContainerComponentComponentDescriptor>();
+}
+
+-(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>) getTemplates
+{
+    return _templates;
 }
 
 @end

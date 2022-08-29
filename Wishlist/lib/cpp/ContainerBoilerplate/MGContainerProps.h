@@ -24,6 +24,7 @@ class MGTemplateContainerComponentProps final : public ViewProps {
 #pragma mark - Props
 
   std::string inflatorId{};
+  std::vector<std::string> names{};
 };
 
 } // namespace react

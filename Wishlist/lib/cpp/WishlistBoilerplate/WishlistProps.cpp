@@ -19,7 +19,6 @@ WishlistProps::WishlistProps(
     const PropsParserContext &context,
     const WishlistProps &sourceProps,
     const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
-    kkk(convertRawProp(context, rawProps, "kkk", sourceProps.kkk, 1)),
     inflatorId(convertRawProp(context, rawProps, "inflatorId", sourceProps.inflatorId, "__defaultId__")),
     names(convertRawProp(context, rawProps, "names", sourceProps.names, {}))
       {

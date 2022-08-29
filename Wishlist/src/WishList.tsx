@@ -70,10 +70,9 @@ function Component(props) {
         {...props}
         removeClippedSubviews={false}
         inflatorId={inflatorId.current}
-        names={keys}
       />
         
-      <NativeTemplateContainer inflatorId={inflatorId.current} collapsable={false} />
+      <NativeTemplateContainer names={keys} inflatorId={inflatorId.current} key={Math.random().toString()} collapsable={false} />
       {Array.from(componentsRegistry.values()).map((c, i) => (
           <View key={keys[i]}>{c}</View>
         ))}

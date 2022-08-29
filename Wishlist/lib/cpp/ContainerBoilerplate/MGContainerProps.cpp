@@ -11,7 +11,7 @@
 #include <react/renderer/components/view/ViewProps.h>
 #include <react/renderer/core/PropsParserContext.h>
 #include <react/renderer/core/propsConversions.h>
-#include "MGContainerProps.h""
+#include "MGContainerProps.h"
 
 namespace facebook {
 namespace react {
@@ -20,7 +20,7 @@ MGTemplateContainerComponentProps::MGTemplateContainerComponentProps(
     const PropsParserContext &context,
     const MGTemplateContainerComponentProps &sourceProps,
     const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
-
+    names(convertRawProp(context, rawProps, "names", sourceProps.names, {})),
     inflatorId(convertRawProp(context, rawProps, "inflatorId", sourceProps.inflatorId, {}))
       {}
 

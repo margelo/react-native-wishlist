@@ -21,9 +21,11 @@ extern const char MGTemplateContainerComponentComponentName[];
 /*
  * `ShadowNode` for <MGTemplateContainerComponent> component.
  */
-using MGTemplateContainerComponentShadowNode = ConcreteViewShadowNode<
+class MGTemplateContainerComponentShadowNode : ConcreteViewShadowNode<
     MGTemplateContainerComponentComponentName,
-    MGTemplateContainerComponentProps>;
+MGTemplateContainerComponentProps> {
+    
+};
 
 } // namespace react
 } // namespace facebook
