@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <react/renderer/components/view/ShadowNodes.h>
+#import "MGContainerShadowNodes.h"
 #include <react/renderer/core/ConcreteComponentDescriptor.h>
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
 

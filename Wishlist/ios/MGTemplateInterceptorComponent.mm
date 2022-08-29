@@ -6,7 +6,7 @@
 //
 
 #import "MGTemplateInterceptorComponent.h"
-#import "MG"
+#import "MGInterceptorComponentDescriptors.h"
 
 @implementation MGTemplateInterceptorComponent
 
@@ -20,9 +20,9 @@
 
 #pragma mark - RCTComponentViewProtocol
 
-+ (ComponentDescriptorProvider)componentDescriptorProvider
++ (facebook::react::ComponentDescriptorProvider)componentDescriptorProvider
 {
-  return concreteComponentDescriptorProvider<WishlistComponentDescriptor>(); // CHANGE !!!!!
+    return facebook::react::concreteComponentDescriptorProvider<facebook::react::MGTemplateInterceptorComponentComponentDescriptor>(); 
 }
 
 
