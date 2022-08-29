@@ -6,6 +6,7 @@
 //
 
 #import "MGTemplateInterceptorComponent.h"
+#import "MG"
 
 @implementation MGTemplateInterceptorComponent
 
