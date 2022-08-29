@@ -93,28 +93,6 @@ using namespace facebook::react;
   [super prepareForRecycle];
 }
 
-
-
-Class<RCTComponentViewProtocol> MGWishListCls(void)
-{
-  return [MGWishListComponent class];
-}
-
-@end
-
-@interface Workaround : NSObject <RCTBridgeModule>
-
-@end
-
-@implementation Workaround
-
-RCT_EXPORT_MODULE(Workaround);
-
-RCT_EXPORT_METHOD(registerList)
-{
-    [[RCTComponentViewFactory currentComponentViewFactory] registerComponentViewClass: [MGWishListComponent class]];
-}
-
 -(void)setBridge:(RCTBridge *)bridge
 {
     // TODO here you can intercept uiManager by registering fake surface
