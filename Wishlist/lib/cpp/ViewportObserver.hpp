@@ -26,15 +26,15 @@ struct ViewportObserver {
     std::shared_ptr<ComponentsPool> componentsPool = std::make_shared<ComponentsPool>();
     std::shared_ptr<ItemProvider> itemProvider;
     std::deque<WishItem> window;
-    std::weak_ptr<ShadowNode> weakWishListNode;
+    std::shared_ptr<ShadowNode> wishListNode;
     LayoutContext lc;
     
-    void setInitialValues(std::weak_ptr<ShadowNode> weakWishListNode, LayoutContext lc) {
-        this->weakWishListNode = weakWishListNode;
+    void setInitialValues(std::shared_ptr<ShadowNode> wishListNode, LayoutContext lc) {
+        this->wishListNode = wishListNode;
         this->lc = lc;
     }
     
-    void boot(int surfaceId, float offset, float windowHeight, float windowWidth, float originItemOffset, int originItem,
+    void boot(float offset, float windowHeight, float windowWidth, float originItemOffset, int originItem,
         std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
         std::vector<std::string> names,
         std::string inflatorId) {
@@ -52,7 +52,7 @@ struct ViewportObserver {
         }
         window.clear();
         
-        this->surfaceId = surfaceId;
+        this->surfaceId = wishListNode->getFamily().getSurfaceId();
         this->offset = offset;
         this->windowHeight = windowHeight;
         

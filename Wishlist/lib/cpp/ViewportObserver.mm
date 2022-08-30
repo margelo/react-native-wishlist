@@ -39,7 +39,7 @@ std::shared_ptr<ShadowNode> ViewportObserver::getOffseter(float offset) {
 void  ViewportObserver::pushChildren() {
     isPushingChildren = true;
     
-    std::shared_ptr<ShadowNode> sWishList = weakWishListNode.lock();
+    std::shared_ptr<ShadowNode> sWishList = wishListNode;
     if (sWishList.get() == nullptr) {
         return;
     }

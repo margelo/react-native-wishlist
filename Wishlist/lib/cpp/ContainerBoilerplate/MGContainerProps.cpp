@@ -16,6 +16,7 @@
 namespace facebook {
 namespace react {
 
+
 MGTemplateContainerComponentProps::MGTemplateContainerComponentProps(
     const PropsParserContext &context,
     const MGTemplateContainerComponentProps &sourceProps,
