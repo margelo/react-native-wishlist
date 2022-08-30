@@ -27,20 +27,23 @@ struct ViewportObserver {
     std::shared_ptr<ItemProvider> itemProvider;
     std::deque<WishItem> window;
     std::weak_ptr<ShadowNode> weakWishListNode;
+    LayoutContext lc;
     
-    void boot(int surfaceId, float offset, float windowHeight, float windowWidth, float originItemOffset, int originItem, std::weak_ptr<ShadowNode> weakWishListNode,
+    void setInitialValues(std::weak_ptr<ShadowNode> weakWishListNode, LayoutContext lc) {
+        this->weakWishListNode = weakWishListNode;
+        this->lc = lc;
+    }
+    
+    void boot(int surfaceId, float offset, float windowHeight, float windowWidth, float originItemOffset, int originItem,
         std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
-        LayoutContext lc,
-        std::vector<std::string> names) {
+        std::vector<std::string> names,
+        std::string inflatorId) {
         
         std::cout << "aaa boot" << std::endl;
-        
-        this->weakWishListNode = weakWishListNode;
         
         componentsPool->registeredViews = registeredViews;
         componentsPool->setNames(names);
         
-        std::string inflatorId = std::static_pointer_cast<const WishlistProps>(weakWishListNode.lock()->getProps())->inflatorId;
         itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<WorkletItemProvider>(windowWidth, lc, inflatorId));
         itemProvider->setComponentsPool(componentsPool);
         
@@ -72,7 +75,7 @@ struct ViewportObserver {
         updateWindow(false);
     }
     
-    void updateWindow(bool updateDirectly) {
+    void updateWindow(bool newTemplates) {
         float topEdge = offset - windowHeight;
         float bottomEdge = offset + 2 * windowHeight;
         
@@ -139,7 +142,7 @@ struct ViewportObserver {
             }
         }
         
-        pushChildren(updateDirectly);
+        pushChildren();
         
         for (auto & item : itemsToRemove) {
             componentsPool->returnToPool(item.sn);
@@ -148,7 +151,7 @@ struct ViewportObserver {
     
     std::shared_ptr<ShadowNode> getOffseter(float offset);
     
-    void pushChildren(bool pushDirectly);
+    void pushChildren();
 };
 
 #endif /* ViewportObserver_hpp */

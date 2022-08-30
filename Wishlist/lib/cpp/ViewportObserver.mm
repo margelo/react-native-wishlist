@@ -36,7 +36,7 @@ std::shared_ptr<ShadowNode> ViewportObserver::getOffseter(float offset) {
     return offseterTemplate->clone({newProps, nullptr, nullptr});
 }
 
-void  ViewportObserver::pushChildren(bool pushDirectly) {
+void  ViewportObserver::pushChildren() {
     isPushingChildren = true;
     
     std::shared_ptr<ShadowNode> sWishList = weakWishListNode.lock();
@@ -44,32 +44,25 @@ void  ViewportObserver::pushChildren(bool pushDirectly) {
         return;
     }
     
-    if (pushDirectly) {
-        std::shared_ptr<WishlistShadowNode> wishlistNode = std::static_pointer_cast<WishlistShadowNode>(sWishList);
-        wishlistNode->realAppendChild(getOffseter(window[0].offset));
-        
-        for (WishItem & wishItem : window) {
-            wishlistNode->realAppendChild(wishItem.sn);
-        }
-    } else {
-        KeyClassHolder::shadowTreeRegistry->visit(surfaceId, [&](const ShadowTree & st) {
-            ShadowTreeCommitTransaction transaction = [&](RootShadowNode const &oldRootShadowNode) -> std::shared_ptr<RootShadowNode> {
-                return std::static_pointer_cast<RootShadowNode>(oldRootShadowNode.cloneTree(sWishList->getFamily(), [&](const ShadowNode & sn) -> std::shared_ptr<ShadowNode> {
-                    auto children = std::make_shared<ShadowNode::ListOfShared>();
-                    
-                    children->push_back(getOffseter(window[0].offset));
-                    
-                    for (WishItem & wishItem : window) {
-                      if(wishItem.sn != nullptr) {
-                        children->push_back(wishItem.sn);
-                      }
-                    }
-                    
-                    return sn.clone(ShadowNodeFragment{nullptr, children, nullptr});
-                }));
-            };
-            st.commit(transaction);
-        });
-    }
+    
+    KeyClassHolder::shadowTreeRegistry->visit(surfaceId, [&](const ShadowTree & st) {
+        ShadowTreeCommitTransaction transaction = [&](RootShadowNode const &oldRootShadowNode) -> std::shared_ptr<RootShadowNode> {
+            return std::static_pointer_cast<RootShadowNode>(oldRootShadowNode.cloneTree(sWishList->getFamily(), [&](const ShadowNode & sn) -> std::shared_ptr<ShadowNode> {
+                auto children = std::make_shared<ShadowNode::ListOfShared>();
+                
+                children->push_back(getOffseter(window[0].offset));
+                
+                for (WishItem & wishItem : window) {
+                  if(wishItem.sn != nullptr) {
+                    children->push_back(wishItem.sn);
+                  }
+                }
+                
+                return sn.clone(ShadowNodeFragment{nullptr, children, nullptr});
+            }));
+        };
+        st.commit(transaction);
+    });
+    
     isPushingChildren = false;
 }
