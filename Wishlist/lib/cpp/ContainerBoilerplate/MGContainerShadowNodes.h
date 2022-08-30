@@ -21,10 +21,21 @@ extern const char MGTemplateContainerComponentComponentName[];
 /*
  * `ShadowNode` for <MGTemplateContainerComponent> component.
  */
-class MGTemplateContainerComponentShadowNode : ConcreteViewShadowNode<
+struct MGTemplateContainerComponentShadowNode : public ConcreteViewShadowNode<
     MGTemplateContainerComponentComponentName,
 MGTemplateContainerComponentProps> {
     std::vector<std::shared_ptr<ShadowNode const>> templates;
+    
+    MGTemplateContainerComponentShadowNode(
+        ShadowNodeFragment const &fragment,
+        ShadowNodeFamily::Shared const &family,
+                       ShadowNodeTraits traits);
+
+    MGTemplateContainerComponentShadowNode(
+        ShadowNode const &sourceShadowNode,
+                       ShadowNodeFragment const &fragment);
+    
+    void appendChild(ShadowNode::Shared const &childNode);
 };
 
 } // namespace react

@@ -38,7 +38,11 @@
     if ([childComponentView isKindOfClass:[MGTemplateContainerComponent class]]) {
         // TODO get templates
         MGTemplateContainerComponent * container = (MGTemplateContainerComponent *)childComponentView;
-        // container.templates TODO
+        auto templates = [container getTemplates];
+        auto names = [container getNames];
+        if (_wishlist != nil) {
+            [_wishlist setTemplates:templates withNames:names];
+        }
         return;
     }
     if ([childComponentView isKindOfClass:[MGWishListComponent class]]) {

@@ -7,9 +7,13 @@
 
 #import "MGTemplateContainerComponent.h"
 #import "MGContainerComponentDescriptors.h"
+#import "MGContainerProps.h"
+
+using namespace facebook::react;
 
 @implementation MGTemplateContainerComponent {
     std::vector<std::shared_ptr<facebook::react::ShadowNode const>> _templates;
+    std::vector<std::string> _names;
 }
 
 /*
@@ -27,9 +31,21 @@
     return facebook::react::concreteComponentDescriptorProvider<facebook::react::MGTemplateContainerComponentComponentDescriptor>();
 }
 
--(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>) getTemplates
+- (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
+{
+  const auto &newProps = *std::static_pointer_cast<const MGTemplateContainerComponentProps>(props);
+    _names = newProps.names;
+    _templates = newProps.templates;
+}
+
+-(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)getTemplates
 {
     return _templates;
+}
+
+-(std::vector<std::string>)getNames
+{
+    return _names;
 }
 
 @end

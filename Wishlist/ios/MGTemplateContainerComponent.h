@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MGTemplateContainerComponent : RCTViewComponentView
 
 -(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>) getTemplates;
+-(std::vector<std::string>)getNames;
 
 @end
 
