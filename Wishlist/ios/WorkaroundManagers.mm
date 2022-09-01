@@ -44,10 +44,9 @@ RCT_CUSTOM_VIEW_PROPERTY(inflatorId, NSString* , UIView){}
 
 @implementation MGNativeTemplateContainerManager
 
-RCT_EXPORT_MODULE(MGNativeTemplateContainerManager)
+RCT_EXPORT_MODULE(MGTemplateContainerComponentManager)
 
 RCT_CUSTOM_VIEW_PROPERTY(inflatorId, NSString* , UIView){}
-
 
 RCT_CUSTOM_VIEW_PROPERTY(names, NSArray<NSString*>* , UIView){}
 
@@ -60,7 +59,7 @@ RCT_CUSTOM_VIEW_PROPERTY(names, NSArray<NSString*>* , UIView){}
 
 @implementation MGTemplateInterceptorManager
 
-RCT_EXPORT_MODULE(MGTemplateInterceptorManager)
+RCT_EXPORT_MODULE(MGTemplateInterceptorComponentManager)
 
 RCT_CUSTOM_VIEW_PROPERTY(inflatorId, NSString* , UIView){}
 
