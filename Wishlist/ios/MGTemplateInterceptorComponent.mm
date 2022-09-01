@@ -9,6 +9,9 @@
 #import "MGInterceptorComponentDescriptors.h"
 #import "MGTemplateContainerComponent.h"
 #import "MGWishListComponent.h"
+#import "MGInterceptorProps.h"
+
+using namespace facebook::react;
 
 @implementation MGTemplateInterceptorComponent {
     MGWishListComponent * _wishlist;
@@ -60,6 +63,13 @@
         _wishlist = nil;
     }
     [super unmountChildComponentView:childComponentView index:index];
+}
+
+- (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
+{
+    //inflatorId = std::dynamic_pointer_cast<const WishlistProps>(props)->inflatorId;
+    //[super updateProps:props oldProps:oldProps];
+   // _eventEmitter = nil;
 }
 
 

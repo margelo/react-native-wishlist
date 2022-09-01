@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from "react";
-import { View, Dimensions } from "react-native";
+import { View, Dimensions, Text } from "react-native";
 import NativeWishList from "./NativeViews/NativeWishlistComponent";
 import NativeTemplateContainer from "./NativeViews/NativeTemplateContainer";
 import NativeTemplateInterceptor from "./NativeViews/NativeTemplateInterceptor";
@@ -73,11 +73,11 @@ function Component(props) {
         inflatorId={inflatorId.current}
       />
         
-      <TemplateContainer names={keys} inflatorId={inflatorId.current} key={Math.random().toString()} collapsable={false} />
+      <TemplateContainer names={keys} inflatorId={inflatorId.current} key={Math.random().toString()} collapsable={false} >
         {Array.from(componentsRegistry.values()).map((c, i) => (
             <View key={keys[i]}>{c}</View>
-          ))}
-      <TemplateContainer/>
+        ))}
+      </TemplateContainer>
     </NativeTemplateInterceptor>
   );
 }

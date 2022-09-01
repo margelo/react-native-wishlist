@@ -12,6 +12,7 @@
 
 #include "MGContainerProps.h"
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
+#include "LayoutContext.h"
 
 namespace facebook {
 namespace react {
@@ -36,6 +37,10 @@ MGTemplateContainerComponentProps> {
                        ShadowNodeFragment const &fragment);
     
     void appendChild(ShadowNode::Shared const &childNode);
+    
+    void layout(LayoutContext layoutContext);
+    
+    virtual ~MGTemplateContainerComponentShadowNode() {}
 };
 
 } // namespace react
