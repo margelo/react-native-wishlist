@@ -38,6 +38,7 @@ void MGTemplateContainerComponentShadowNode::appendChild(ShadowNode::Shared cons
    if (props->names.size() == this->templates.size()) { // last Child
        PropsParserContext propsParserContext{getSurfaceId(), *this->getComponentDescriptor().getContextContainer().get()};
        auto rawProps = RawProps();
+       rawProps.parse(RawPropsParser(), propsParserContext);
        auto newProps = std::make_shared<MGTemplateContainerComponentProps>(propsParserContext, *props, rawProps);
        newProps->templates = templates;
        props_ = newProps;
