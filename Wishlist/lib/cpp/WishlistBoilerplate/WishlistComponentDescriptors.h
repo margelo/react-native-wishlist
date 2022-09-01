@@ -50,7 +50,7 @@ public:
         }
         
         std::shared_ptr<WishlistShadowNode> wishlistShadowNode = std::static_pointer_cast<WishlistShadowNode>(shadowNode);
-        wishlistShadowNode->registeredViews = static_cast<const WishlistShadowNode&>(sourceShadowNode).registeredViews;
+        /*wishlistShadowNode->registeredViews = static_cast<const WishlistShadowNode&>(sourceShadowNode).registeredViews;*/
             wishlistShadowNode->sharedThis = wishlistShadowNode;
 
         adopt(shadowNode);

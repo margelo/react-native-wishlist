@@ -68,15 +68,15 @@ function Component(props) {
   return (
     <NativeTemplateInterceptor inflatorId={inflatorId.current} style={{flex:1}} collapsable={false} removeClippedSubviews={false}>
       <NativeWishList
-        {...props}
+        style={props.style}
         removeClippedSubviews={false}
         inflatorId={inflatorId.current}
       />
         
       <TemplateContainer names={keys} inflatorId={inflatorId.current} key={Math.random().toString()} collapsable={false} />
-      {Array.from(componentsRegistry.values()).map((c, i) => (
-          <View key={keys[i]}>{c}</View>
-        ))}
+        {Array.from(componentsRegistry.values()).map((c, i) => (
+            <View key={keys[i]}>{c}</View>
+          ))}
       <TemplateContainer/>
     </NativeTemplateInterceptor>
   );
