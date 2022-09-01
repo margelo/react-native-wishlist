@@ -14,6 +14,7 @@ import {ViewProps} from 'react-native-tscodegen-types';
 import {HostComponent} from 'react-native-tscodegen-types';
 import {codegenNativeComponent} from 'react-native-tscodegen-types';
 import {codegenNativeCommands} from 'react-native-tscodegen-types';
+import {View } from 'react-native';
 'use strict';
 
 import {NativeModules} from 'react-native';
