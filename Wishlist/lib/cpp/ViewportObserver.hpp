@@ -26,21 +26,24 @@ struct ViewportObserver {
     std::shared_ptr<ComponentsPool> componentsPool = std::make_shared<ComponentsPool>();
     std::shared_ptr<ItemProvider> itemProvider;
     std::deque<WishItem> window;
-    std::weak_ptr<ShadowNode> weakWishListNode;
+    std::shared_ptr<ShadowNode> wishListNode;
+    LayoutContext lc;
     
-    void boot(int surfaceId, float offset, float windowHeight, float windowWidth, float originItemOffset, int originItem, std::weak_ptr<ShadowNode> weakWishListNode,
+    void setInitialValues(std::shared_ptr<ShadowNode> wishListNode, LayoutContext lc) {
+        this->wishListNode = wishListNode;
+        this->lc = lc;
+    }
+    
+    void boot(float offset, float windowHeight, float windowWidth, float originItemOffset, int originItem,
         std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
-        LayoutContext lc,
-        std::vector<std::string> names) {
+        std::vector<std::string> names,
+        std::string inflatorId) {
         
         std::cout << "aaa boot" << std::endl;
-        
-        this->weakWishListNode = weakWishListNode;
         
         componentsPool->registeredViews = registeredViews;
         componentsPool->setNames(names);
         
-        std::string inflatorId = std::static_pointer_cast<const WishlistProps>(weakWishListNode.lock()->getProps())->inflatorId;
         itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<WorkletItemProvider>(windowWidth, lc, inflatorId));
         itemProvider->setComponentsPool(componentsPool);
         
@@ -49,7 +52,7 @@ struct ViewportObserver {
         }
         window.clear();
         
-        this->surfaceId = surfaceId;
+        this->surfaceId = wishListNode->getFamily().getSurfaceId();
         this->offset = offset;
         this->windowHeight = windowHeight;
         
@@ -58,13 +61,36 @@ struct ViewportObserver {
         updateWindow(true);
     }
     
-    // TODO: fix
-    void update(float offset) {
+    void update(float windowHeight, float windowWidth,
+                std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
+                std::vector<std::string> names,
+                std::string inflatorId) {
+        
+        
+        itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<WorkletItemProvider>(windowWidth, lc, inflatorId));
+        itemProvider->setComponentsPool(componentsPool);
     
-        this->offset = offset;
-        //window.push_back(itemProvider->provide(originItem));
-        //window.back().offset = originItemOffset;
-        //updateWindow(false);
+        float oldOffset = window[0].offset; // TODO (maybe update if frame has changed)
+        float oldIndex = window[0].index;
+        
+        std::vector<WishItem> itemsToRemove;
+        for (auto & ele : window) {
+            itemsToRemove.push_back(ele);
+        }
+        
+        window.clear();
+        
+        for (auto & item : itemsToRemove) {
+            componentsPool->returnToPool(item.sn);
+        }
+        
+        componentsPool->registeredViews = registeredViews;
+        componentsPool->setNames(names);
+        componentsPool->templatesUpdated();
+        
+        window.push_back(itemProvider->provide(oldIndex));
+        window.back().offset = oldOffset;
+        updateWindow(true);
     }
     
     void reactToOffsetChange(float offset) {
@@ -72,7 +98,7 @@ struct ViewportObserver {
         updateWindow(false);
     }
     
-    void updateWindow(bool updateDirectly) {
+    void updateWindow(bool newTemplates) {
         float topEdge = offset - windowHeight;
         float bottomEdge = offset + 2 * windowHeight;
         
@@ -101,7 +127,7 @@ struct ViewportObserver {
             float bottom = item.offset + item.height;
 
             if (bottom < bottomEdge) {
-                WishItem wishItem = itemProvider->provide(item.index+1);
+                WishItem wishItem = itemProvider->provide(item.index + 1);
                 if (wishItem.sn.get() == nullptr) {
                     break;
                 }
@@ -139,7 +165,7 @@ struct ViewportObserver {
             }
         }
         
-        pushChildren(updateDirectly);
+        pushChildren();
         
         for (auto & item : itemsToRemove) {
             componentsPool->returnToPool(item.sn);
@@ -148,7 +174,7 @@ struct ViewportObserver {
     
     std::shared_ptr<ShadowNode> getOffseter(float offset);
     
-    void pushChildren(bool pushDirectly);
+    void pushChildren();
 };
 
 #endif /* ViewportObserver_hpp */

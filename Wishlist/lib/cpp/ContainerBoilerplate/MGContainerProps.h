@@ -10,19 +10,24 @@
 #pragma once
 
 #include <react/renderer/components/view/ViewProps.h>
+#include <react/renderer/core/ShadowNode.h>
 #include <react/renderer/core/PropsParserContext.h>
+#include "MGContainerProps.h"
 
 namespace facebook {
 namespace react {
 
-class MGTemplateInterceptorComponentProps final : public ViewProps {
+struct MGTemplateContainerComponentProps final : public ViewProps {
  public:
-  MGTemplateInterceptorComponentProps() = default;
-  MGTemplateInterceptorComponentProps(const PropsParserContext& context, const MGTemplateInterceptorComponentProps &sourceProps, const RawProps &rawProps);
+  MGTemplateContainerComponentProps() = default;
+  MGTemplateContainerComponentProps(const PropsParserContext& context, const MGTemplateContainerComponentProps &sourceProps, const RawProps &rawProps);
+  
 
 #pragma mark - Props
 
   std::string inflatorId{};
+  std::vector<std::string> names{};
+  std::vector<std::shared_ptr<ShadowNode const>> templates;
 };
 
 } // namespace react

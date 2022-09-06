@@ -1,9 +1,7 @@
 import React from 'react';
-import { InteractionManager } from 'react-native';
-import { View, Text } from 'react-native';
+import { View, Text, Image } from 'react-native';
 import createWishList from './WishList';
 import Animated from 'react-native-reanimated';
-import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 
 const WishList = createWishList();
 
@@ -22,6 +20,12 @@ const authors = [
 WishList.registerComponent("type1", (
   <View style={{flexDirection: 'row-reverse'}} >
     <View style={{margin: 10, width: '70%', backgroundColor: '#00008B'}} >
+      <Image
+        style={{width: 200, height: 200}}
+        source={{
+          uri: 'https://picsum.photos/200',
+        }}
+      />
       <View style={{margin: 5}} > 
         <Text style={{color: 'white'}} wishId='author'> me </Text>
       </View>
@@ -33,24 +37,23 @@ WishList.registerComponent("type1", (
 ));
 
 const Type: React.FC<{}> = () => {
-  const singleTap = Gesture.Tap()
-  .onStart(() => {
-    console.log("tap");
-  });
-
   return (
-    <GestureDetector gesture={singleTap} >
-      <Animated.View>
-        <View style={{margin: 10, width: '70%', backgroundColor: '#6495ED'}} >
-          <View wishId="sth" style={{margin: 5}} > 
-            <Text style={{color: 'white'}} wishId='author'> author </Text>
-          </View>
-          <View style={{margin: 5}}>
-            <Text style={{color: 'white'}} wishId='content'> simple Message </Text>
-          </View>
+    <Animated.View>
+      <View style={{margin: 10, width: '70%', backgroundColor: '#6495ED'}} >
+        <Image
+          style={{width: 200, height: 200}}
+          source={{
+            uri: 'https://picsum.photos/200',
+          }}
+        />
+        <View wishId="sth" style={{margin: 5}} > 
+          <Text style={{color: 'white'}} wishId='author'> author </Text>
         </View>
-      </Animated.View>
-    </GestureDetector>
+        <View style={{margin: 5}}>
+          <Text style={{color: 'white'}} wishId='content'> simple Message </Text>
+        </View>
+      </View>
+    </Animated.View>
   );
 };
 
@@ -67,6 +70,8 @@ export default function App() {
         
         if (index < 0 || index > 1000) return undefined;
 
+        let imgSource = `https://picsum.photos/seed/picsumme/200`;
+
         const type = (index % 2) + 1;
         const item = pool.getComponent(`type${type}`);
 
@@ -79,8 +84,9 @@ export default function App() {
           const randomIndex = Math.floor(Math.random() * authors.length);
           const randomAuthor = authors[randomIndex];
           item.View.View.Paragraph.RawText.addProps({text: randomAuthor});
+          imgSource = `https://picsum.photos/seed/picsum${tauthors[randomIndex]}/200`;
         }
-        
+
         item.View.View.at(1).Paragraph.RawText.addProps({text: newMessage});
 
         return item;

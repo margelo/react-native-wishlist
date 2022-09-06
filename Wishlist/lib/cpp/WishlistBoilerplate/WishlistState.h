@@ -36,6 +36,7 @@ class WishlistState final {
     int originItemIndex = 10; // Hardcode for now
     std::shared_ptr<ViewportObserver> viewportObserver = std::make_shared<ViewportObserver>();
     bool initialised = false;
+    Rect contentBoundingRect;
     
     virtual ~WishlistState();
 

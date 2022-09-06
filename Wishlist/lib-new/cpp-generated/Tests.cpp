@@ -16,28 +16,28 @@
 
 using namespace facebook::react;
 
-TEST(MGWishListComponentProps_DoesNotDie, etc) {
+TEST(MGTemplateInterceptorComponentProps_DoesNotDie, etc) {
   auto propParser = RawPropsParser();
-  propParser.prepare<MGWishListComponentProps>();
-  auto const &sourceProps = MGWishListComponentProps();
+  propParser.prepare<MGTemplateInterceptorComponentProps>();
+  auto const &sourceProps = MGTemplateInterceptorComponentProps();
   auto const &rawProps = RawProps(folly::dynamic::object("xx_invalid_xx", "xx_invalid_xx"));
 
   ContextContainer contextContainer{};
   PropsParserContext parserContext{-1, contextContainer};
 
   rawProps.parse(propParser, parserContext);
-  MGWishListComponentProps(parserContext, sourceProps, rawProps);
+  MGTemplateInterceptorComponentProps(parserContext, sourceProps, rawProps);
 }
 
-TEST(MGWishListComponentProps_inflatorId, etc) {
+TEST(MGTemplateInterceptorComponentProps_inflatorId, etc) {
   auto propParser = RawPropsParser();
-  propParser.prepare<MGWishListComponentProps>();
-  auto const &sourceProps = MGWishListComponentProps();
+  propParser.prepare<MGTemplateInterceptorComponentProps>();
+  auto const &sourceProps = MGTemplateInterceptorComponentProps();
   auto const &rawProps = RawProps(folly::dynamic::object("inflatorId", "foo"));
 
   ContextContainer contextContainer{};
   PropsParserContext parserContext{-1, contextContainer};
 
   rawProps.parse(propParser, parserContext);
-  MGWishListComponentProps(parserContext, sourceProps, rawProps);
+  MGTemplateInterceptorComponentProps(parserContext, sourceProps, rawProps);
 }

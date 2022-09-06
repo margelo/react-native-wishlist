@@ -11,11 +11,7 @@ package com.facebook.react.viewmanagers;
 
 import android.view.View;
 import androidx.annotation.Nullable;
-import com.facebook.react.bridge.ReadableArray;
 
-public interface MGWishListComponentManagerInterface<T extends View> {
-  void setKkk(T view, int value);
+public interface MGTemplateInterceptorComponentManagerInterface<T extends View> {
   void setInflatorId(T view, @Nullable String value);
-  void setNames(T view, @Nullable ReadableArray value);
-  void scrollTo(T view, int y, boolean animated);
 }
