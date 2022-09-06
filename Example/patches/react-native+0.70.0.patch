@@ -1,20 +1,5 @@
-diff --git a/node_modules/react-native/Libraries/Renderer/implementations/ReactFabric-dev.js b/node_modules/react-native/Libraries/Renderer/implementations/ReactFabric-dev.js
-index af858df..c1adef6 100644
---- a/node_modules/react-native/Libraries/Renderer/implementations/ReactFabric-dev.js
-+++ b/node_modules/react-native/Libraries/Renderer/implementations/ReactFabric-dev.js
-@@ -5023,6 +5023,10 @@ var isSuspenseInstanceFallback = shim$1;
- var hydrateTextInstance = shim$1;
- var errorHydratingContainer = shim$1;
- 
-+if (nativeFabricUIManager == null) {
-+  console.error('dupa');
-+}
-+
- var _nativeFabricUIManage = nativeFabricUIManager,
-   createNode = _nativeFabricUIManage.createNode,
-   cloneNode = _nativeFabricUIManage.cloneNode,
 diff --git a/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.cpp b/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.cpp
-index 894ddf8..f0f7bfd 100644
+index 894ddf8..562a0e8 100644
 --- a/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.cpp
 +++ b/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.cpp
 @@ -11,6 +11,7 @@
@@ -35,29 +20,30 @@ index 894ddf8..f0f7bfd 100644
        eventDispatcher_(std::move(eventDispatcher)) {}
  
  void EventEmitter::dispatchEvent(
-@@ -83,6 +85,22 @@ void EventEmitter::dispatchEvent(
-     return;
-   }
-         
-+  std::string eventType = type;
-+  int tag = tag_;
+@@ -54,6 +56,23 @@ void EventEmitter::dispatchEvent(
+     const folly::dynamic &payload,
+     EventPriority priority,
+     RawEvent::Category category) const {
 +        
-+  // TODO use eventListerens from EventDispatcher class in the future
++    std::string eventType = type;
++    int tag = tag_;
++    
++      // TODO use eventListerens from EventDispatcher class in the future
 +  std::shared_ptr<jsi::Runtime> rt = ReanimatedRuntimeHandler::rtPtr;
 +    if (rt != nullptr) {
 +        ReanimatedRuntimeHandler::scheduler->scheduleOnUI([=](){
 +            try {
 +                jsi::Function f = rt->global().getPropertyAsObject(*rt, "global").getPropertyAsFunction(*rt, "handleEvent");
-+                f.call(*rt, jsi::String::createFromUtf8(*rt, eventType), tag, payloadFactory(*rt));
++                f.call(*rt, jsi::String::createFromUtf8(*rt, eventType), tag, valueFromDynamic(*rt, payload));
 +            } catch (std::exception e) {
 +                // do Nothing most likly the handler funciton is not registered yet
 +            }
 +        });
 +    }
-+
-   eventDispatcher->dispatchEvent(
-       RawEvent(
-           normalizeEventType(std::move(type)),
++        
+   dispatchEvent(
+       std::move(type),
+       [payload](jsi::Runtime &runtime) {
 diff --git a/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.h b/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.h
 index 1f5afce..c6735bb 100644
 --- a/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.h
@@ -70,42 +56,25 @@ index 1f5afce..c6735bb 100644
    mutable bool isEnabled_{false};
  };
  
-diff --git a/node_modules/react-native/ReactCommon/react/renderer/scheduler/Scheduler.cpp b/node_modules/react-native/ReactCommon/react/renderer/scheduler/Scheduler.cpp
-index 01cf24e..938b767 100644
---- a/node_modules/react-native/ReactCommon/react/renderer/scheduler/Scheduler.cpp
-+++ b/node_modules/react-native/ReactCommon/react/renderer/scheduler/Scheduler.cpp
-@@ -104,6 +104,7 @@ Scheduler::Scheduler(
-   uiManager->setDelegate(this);
-   uiManager->setComponentDescriptorRegistry(componentDescriptorRegistry_);
- 
-+
-   runtimeExecutor_(
-       [uiManager, runtimeExecutor = runtimeExecutor_](jsi::Runtime &runtime) {
-         UIManagerBinding::createAndInstallIfNeeded(
 diff --git a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.cpp b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.cpp
-index 1e62ecc..6cde564 100644
+index cd2d326..c927ad3 100644
 --- a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.cpp
 +++ b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.cpp
-@@ -45,7 +45,9 @@ UIManager::UIManager(
+@@ -45,7 +45,11 @@ UIManager::UIManager(
      : runtimeExecutor_(runtimeExecutor),
        backgroundExecutor_(std::move(backgroundExecutor)),
        contextContainer_(std::move(contextContainer)),
 -      leakChecker_(constructLeakCheckerIfNeeded(runtimeExecutor)) {}
 +      leakChecker_(constructLeakCheckerIfNeeded(runtimeExecutor)) {
-+        KeyClassHolder::shadowTreeRegistry = &shadowTreeRegistry_;
++          KeyClassHolder::shadowTreeRegistry = &shadowTreeRegistry_;
 +      }
++
++ShadowTreeRegistry * KeyClassHolder::shadowTreeRegistry = nullptr;
  
  UIManager::~UIManager() {
    LOG(WARNING) << "UIManager::~UIManager() was called (address: " << this
-@@ -450,4 +452,6 @@ void UIManager::animationTick() const {
-   }
- }
- 
-+ShadowTreeRegistry * KeyClassHolder::shadowTreeRegistry = nullptr;
-+
- } // namespace facebook::react
 diff --git a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.h b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.h
-index ab950a0..cca9fa6 100644
+index a30a594..6246aa6 100644
 --- a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.h
 +++ b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.h
 @@ -30,6 +30,11 @@ namespace facebook::react {
@@ -120,10 +89,3 @@ index ab950a0..cca9fa6 100644
  class UIManager final : public ShadowTreeDelegate {
   public:
    UIManager(
-diff --git a/node_modules/react-native/scripts/.packager.env b/node_modules/react-native/scripts/.packager.env
-new file mode 100644
-index 0000000..361f5fb
---- /dev/null
-+++ b/node_modules/react-native/scripts/.packager.env
-@@ -0,0 +1 @@
-+export RCT_METRO_PORT=8081
