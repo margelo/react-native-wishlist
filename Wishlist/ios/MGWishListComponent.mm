@@ -52,6 +52,11 @@ using namespace facebook::react;
         _sharedState->getData().viewportObserver->boot(
                                           5000,
                                           frame.size.height, frame.size.width, 5000, 10, templates, names, inflatorId);
+    } else {
+        CGRect frame = self.frame;
+        self.scrollView.contentSize = CGSizeMake(frame.size.width, 1000000);
+        _sharedState->getData().viewportObserver->update(
+                                          frame.size.height, frame.size.width, templates, names, inflatorId);
     }
 }
 

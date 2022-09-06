@@ -61,13 +61,36 @@ struct ViewportObserver {
         updateWindow(true);
     }
     
-    // TODO: fix
-    void update(float offset) {
+    void update(float windowHeight, float windowWidth,
+                std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
+                std::vector<std::string> names,
+                std::string inflatorId) {
+        
+        
+        itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<WorkletItemProvider>(windowWidth, lc, inflatorId));
+        itemProvider->setComponentsPool(componentsPool);
     
-        this->offset = offset;
-        //window.push_back(itemProvider->provide(originItem));
-        //window.back().offset = originItemOffset;
-        //updateWindow(false);
+        float oldOffset = window[0].offset; // TODO (maybe update if frame has changed)
+        float oldIndex = window[0].index;
+        
+        std::vector<WishItem> itemsToRemove;
+        for (auto & ele : window) {
+            itemsToRemove.push_back(ele);
+        }
+        
+        window.clear();
+        
+        for (auto & item : itemsToRemove) {
+            componentsPool->returnToPool(item.sn);
+        }
+        
+        componentsPool->registeredViews = registeredViews;
+        componentsPool->setNames(names);
+        componentsPool->templatesUpdated();
+        
+        window.push_back(itemProvider->provide(oldIndex));
+        window.back().offset = oldOffset;
+        updateWindow(true);
     }
     
     void reactToOffsetChange(float offset) {
@@ -104,7 +127,7 @@ struct ViewportObserver {
             float bottom = item.offset + item.height;
 
             if (bottom < bottomEdge) {
-                WishItem wishItem = itemProvider->provide(item.index+1);
+                WishItem wishItem = itemProvider->provide(item.index + 1);
                 if (wishItem.sn.get() == nullptr) {
                     break;
                 }
