@@ -5,6 +5,7 @@ import {fetchData} from './Chat/Data';
 
 export default function App() {
   const data = useMemo(() => fetchData(500), []);
+  console.log('@@@@ Render APP');
   return (
     <View style={styles.container}>
       <ChatListView style={styles.list} data={data} />
