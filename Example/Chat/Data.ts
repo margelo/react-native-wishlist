@@ -1,8 +1,10 @@
 export type ChatItem = {
+  id: number;
   author: string;
   type: 'me' | 'other';
   message: string;
   avatarUrl?: string;
+  likes: number;
 };
 
 const SampleText = `Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
@@ -25,12 +27,14 @@ const createChatItem = (index: number): ChatItem => {
   const author = authors[index % authors.length];
 
   return {
+    id: index,
     type: author === 'Me' ? 'me' : 'other',
     author,
     message,
     avatarUrl: `https://i.pravatar.cc/100?u=${
       authors[Math.round(index % authors.length)]
     }`,
+    likes: Math.random() > 0.7 ? Math.floor(Math.random() * 8) : 0,
   };
 };
 
