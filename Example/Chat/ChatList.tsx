@@ -34,29 +34,29 @@ export const ChatListView: React.FC<Props> = ({data, onLikeItem, style}) => {
       }}>
       <WishList.Mapping
         nativeId="content"
-        onResolve={(value: any, item: any) => {
+        onInflate={(value: any, item: any) => {
           'worklet';
           item.RawText.addProps({text: value.message});
         }}
       />
       <WishList.Mapping
         nativeId="author"
-        onResolve={(value: any, item: any) => {
+        onInflate={(value: any, item: any) => {
           'worklet';
           item.RawText.addProps({text: value.author});
         }}
       />
       <WishList.Mapping
         nativeId="avatar"
-        onResolve={(value: any, item: any) => {
+        onInflate={(value: any, item: any) => {
           'worklet';
           item.addProps({source: {uri: value.avatarUrl}});
         }}
       />
       <WishList.Mapping
-        nativeId="likes"
         templateType="other"
-        onResolve={(value: any, item: any) => {
+        nativeId="likes"
+        onInflate={(value: any, item: any) => {
           'worklet';
           value.likes > 0
             ? item.RawText.addProps({text: '♥️'})
@@ -65,9 +65,9 @@ export const ChatListView: React.FC<Props> = ({data, onLikeItem, style}) => {
         }}
       />
       <WishList.Mapping
-        nativeId="likeButton"
         templateType="other"
-        onResolve={(value: any, item: any) => {
+        nativeId="likeButton"
+        onInflate={(value: any, item: any) => {
           'worklet';
           item.addProps({pointerEvents: 'box-only'});
           item.setCallback('touchEnd', () => {
