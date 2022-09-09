@@ -26,29 +26,76 @@ type TemplateRegistry = {
 };
 
 type Props = ViewProps & {
-  inflateItem: (index: number, pool: TemplateRegistry) => React.ReactElement;
+  inflateItem?: (index: number, pool: TemplateRegistry) => React.ReactElement;
+  onItemNeeded?: (index: number) => any;
+  mapping?: { [key: string]: (value: any, item: any) => void };
 };
 
-const Component: React.FC<Props> = ({ inflateItem, children, style }) => {
+const Component: React.FC<Props> = ({
+  inflateItem,
+  mapping,
+  onItemNeeded,
+  children,
+  style,
+}) => {
   const { width } = useWindowDimensions();
   useMemo(() => initEventHandler(), []);
 
+  if (
+    inflateItem === undefined &&
+    (mapping === undefined || onItemNeeded === undefined)
+  ) {
+    throw Error("Either inflateItem or mapping / onItemNeeded must be defined");
+  }
+
+  // Resolve inflator - either use the provided callback or use the mapping
+  const resolvedInflater = useMemo(() => {
+    if (inflateItem) {
+      return inflateItem;
+    }
+
+    return (index: number, pool: any) => {
+      "worklet";
+      const value = onItemNeeded!(index);
+      if (!value) {
+        return undefined;
+      }
+
+      const item = pool.getComponent(value.type);
+      if (!item) {
+        return undefined;
+      }
+
+      Object.keys(mapping!).forEach((key) => {
+        const templateItem = item.getByWishId(key);
+        if (templateItem) {
+          try {
+            mapping![key](value, templateItem);
+          } catch (err) {
+            console.error(err);
+          }
+        }
+      });
+      return item;
+    };
+  }, [inflateItem, mapping, onItemNeeded]);
+
   const templatesRef = useRef<{ [key: string]: React.ReactElement }>({});
   const inflatorIdRef = useRef<string | null>(null);
-  const prevInflatorRef = useRef<typeof inflateItem>();
+  const prevInflatorRef = useRef<typeof resolvedInflater>();
 
   // Inflator registration and tracking
   useMemo(() => {
-    if (prevInflatorRef.current !== inflateItem) {
+    if (prevInflatorRef.current !== resolvedInflater) {
       // Unregister?
       if (inflatorIdRef.current) {
         InflatorRepository.unregister(inflatorIdRef.current);
       }
       // Register
       inflatorIdRef.current = (InflatorId++).toString();
-      InflatorRepository.register(inflatorIdRef.current, inflateItem);
+      InflatorRepository.register(inflatorIdRef.current, resolvedInflater);
     }
-  }, [inflateItem]);
+  }, [resolvedInflater]);
 
   // Template registration and tracking
   useMemo(() => {
@@ -84,6 +131,7 @@ const Component: React.FC<Props> = ({ inflateItem, children, style }) => {
     </NativeTemplateInterceptor>
   );
 };
+
 type TemplateProps = {
   type: string;
   children: React.ReactElement;
