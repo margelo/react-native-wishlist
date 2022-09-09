@@ -94,7 +94,6 @@ const Component: React.FC<Props> = ({
 
       Object.keys(mappingRef.current!).forEach((key) => {
         const templateItem = item.getByWishId(key);
-        console.log(key, templateItem);
         if (
           templateItem &&
           (mappingRef.current![key].templateType !== undefined
@@ -104,7 +103,12 @@ const Component: React.FC<Props> = ({
           try {
             mappingRef.current![key].onResolve(value, templateItem);
           } catch (err) {
-            console.error(err);
+            console.error(
+              "Error calling mapper for key / template",
+              key,
+              value.type,
+              err
+            );
           }
         }
       });

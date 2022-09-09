@@ -55,6 +55,7 @@ export const ChatListView: React.FC<Props> = ({data, onLikeItem, style}) => {
       />
       <WishList.Mapping
         mappingKey="likes"
+        templateType="other"
         onResolve={(value: any, item: any) => {
           'worklet';
           value.likes > 0
@@ -65,6 +66,7 @@ export const ChatListView: React.FC<Props> = ({data, onLikeItem, style}) => {
       />
       <WishList.Mapping
         mappingKey="likeButton"
+        templateType="other"
         onResolve={(value: any, item: any) => {
           'worklet';
           item.addProps({pointerEvents: 'box-only'});
