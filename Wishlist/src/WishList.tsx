@@ -25,7 +25,7 @@ function getMappingsFromChildren(children) {
   const nextMappings = {};
   React.Children.forEach(children, (c) => {
     if (c.type.displayName === "WishListMapping") {
-      nextMappings[c.props.mappingKey] = {
+      nextMappings[c.props.nativeId] = {
         onResolve: c.props.onResolve,
         templateType: c.props.templateType,
       };
