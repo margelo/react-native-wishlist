@@ -4,7 +4,7 @@
 namespace facebook {
 namespace react {
 
-int tag = 1e9+2;
+int tag = -2;
 
 std::shared_ptr<const ShadowNode> ShadowNodeCopyMachine::copyShadowSubtree(std::shared_ptr<const ShadowNode> sn) {
     const ComponentDescriptor &cd = sn->getComponentDescriptor();
@@ -12,9 +12,13 @@ std::shared_ptr<const ShadowNode> ShadowNodeCopyMachine::copyShadowSubtree(std::
     
     PropsParserContext propsParserContext{sn->getSurfaceId(), *cd.getContextContainer().get()};
    
+    if (tag < -2e9) {
+        tag = -2;
+    }
+    
     auto const fragment = ShadowNodeFamilyFragment{tag-=2, sn->getSurfaceId(), nullptr};
     auto family = //std::make_shared<ShadowNodeFamily>(fragment, nullptr, cd);
-        cd.createFamily(fragment, nullptr); //TODO create handler on js side
+        cd.createFamily(fragment, std::make_shared<EventTarget>(*ReanimatedRuntimeHandler::rtPtr, jsi::Object(*ReanimatedRuntimeHandler::rtPtr), tag)); //TODO create handler on js side
     auto const props =
         cd.cloneProps(propsParserContext, sn->getProps(), {});
     auto const state =

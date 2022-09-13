@@ -121,7 +121,7 @@ struct ShadowNodeBinding : public jsi::HostObject, std::enable_shared_from_this<
                                 break;
                             }
                         }
-                        currentSN = cd.cloneShadowNode(*(currentParent->sn), {nullptr, std::make_shared<SharedShadowNodeList>(children)});
+                        currentSN = cd.cloneShadowNode(*(currentParent->sn), {nullptr, std::make_shared<ShadowNode::ListOfShared>(children)});
                         currentParent->sn = currentSN;
                         currentParent = currentParent->parent;
                         std::cout << "is currentParent null " << (currentParent == nullptr) << std::endl;
