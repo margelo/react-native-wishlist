@@ -70,7 +70,7 @@ export const ChatListView: React.FC<Props> = ({data, onLikeItem, style}) => {
         onInflate={(value: any, item: any) => {
           'worklet';
           item.addProps({pointerEvents: 'box-only'});
-          item.setCallback('touchEnd', () => {
+          item.setCallback('topTouchEnd', () => {
             runOnJS(handleLikeItem)(value);
           });
         }}
