@@ -144,8 +144,8 @@
             if (event.state == UIGestureRecognizerStateEnded) {
                 _doWeHaveOngoingEvent = NO;
                 // start Animation with velocity
-                _currentAnimation = [[MGDecayAnimation alloc] initWithVelocity:event.velocity];
-                [_currentAnimation setupWithTimestamp:displayLink.timestamp];
+                _currentAnimation = [[MGDecayAnimation alloc] initWithVelocity:event.velocity/1000];
+                [_currentAnimation setupWithTimestamp:displayLink.timestamp * 1000];
             }
         }
            
@@ -153,7 +153,7 @@
     }
     // Run Animations
     if (_currentAnimation != nil) {
-        yDiff += [_currentAnimation getDiffWithTimestamp:displayLink.timestamp];
+        yDiff += [_currentAnimation getDiffWithTimestamp:displayLink.timestamp * 1000];
         if ([_currentAnimation isFinished]) {
             _currentAnimation = nil;
         }
