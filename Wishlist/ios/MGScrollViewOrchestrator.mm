@@ -25,6 +25,8 @@
     // ViewportObserer
     std::shared_ptr<ViewportObserver> _viewportObserver;
     std::string _inflatorId;
+    
+    id<MGScrollAnimation> _currentAnimation;
 }
 
 - (instancetype)initWith:(UIScrollView*)scrollView templates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates names:(std::vector<std::string>)names viewportObserver:(std::shared_ptr<ViewportObserver>)vo
@@ -123,6 +125,8 @@
         _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + diff);
         bottomViewPortEdge += diff;
         topViewportEdge += diff;
+        
+        /* _currentAnimation = nil; */
     }
     
     // topElementY > topViewPortEdge (top overscroll)
@@ -133,6 +137,7 @@
         _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + diff);
         bottomViewPortEdge += diff;
         topViewportEdge += diff;
+        /* _currentAnimation = nil; */
     }
     
     // pause Vsync listener if there is nothing to do
