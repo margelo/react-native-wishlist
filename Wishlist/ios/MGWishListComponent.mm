@@ -53,34 +53,12 @@ using namespace facebook::react;
 
 - (void)handlePan:(UIPanGestureRecognizer *)gesture
 {
-    NSLog(@"jest");
     if (_orchestrator != nil) {
         PanEvent * panEvent = [PanEvent new];
         panEvent.state = gesture.state;
         panEvent.velocity = [gesture velocityInView:self].y;
         panEvent.translation = [gesture translationInView:self].y;
         [_orchestrator notifyAboutEvent:panEvent];
-    }
-    if (gesture.state == UIGestureRecognizerStateBegan) {
-        
-    }
-    
-    if (gesture.state == UIGestureRecognizerStateCancelled) {
-        
-    }
-    
-    if (gesture.state == UIGestureRecognizerStateChanged) {
-        CGPoint tr = [gesture translationInView:self.scrollView];
-        CGPoint offset = self.scrollView.contentOffset;
-        if (offset.y - tr.y)
-        float overscroll = offset.y;
-        self.scrollView.contentOffset = CGPointMake(offset.x, offset.y - tr.y);
-        
-        [gesture setTranslation:CGPointMake(0, 0) inView:self.scrollView];
-    }
-    
-    if (gesture.state == UIGestureRecognizerStateEnded) {
-        
     }
 }
 
