@@ -13,16 +13,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol RCTWishlistViewProtocol <NSObject>
-- (void)scrollTo:(NSInteger)y animated:(BOOL)animated;
+@protocol MGWishlistViewProtocol <NSObject>
+- (void)scrollToItem:(NSInteger)index animated:(BOOL)animated;
 @end
 
 RCT_EXTERN inline void RCTWishlistHandleCommand(
-  id<RCTWishlistViewProtocol> componentView,
+  id<MGWishlistViewProtocol> componentView,
   NSString const *commandName,
   NSArray const *args)
 {
-  if ([commandName isEqualToString:@"scrollTo"]) {
+  if ([commandName isEqualToString:@"scrollToItem"]) {
 #if RCT_DEBUG
   if ([args count] != 2) {
     RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"Wishlist", commandName, (int)[args count], 2);
@@ -36,7 +36,7 @@ RCT_EXTERN inline void RCTWishlistHandleCommand(
     return;
   }
 #endif
-  NSInteger y = [(NSNumber *)arg0 intValue];
+  NSInteger index = [(NSNumber *)arg0 intValue];
 
 NSObject *arg1 = args[1];
 #if RCT_DEBUG
@@ -46,7 +46,7 @@ NSObject *arg1 = args[1];
 #endif
   BOOL animated = [(NSNumber *)arg1 boolValue];
 
-  [componentView scrollTo:y animated:animated];
+  [componentView scrollToItem:index animated:animated];
   return;
 }
 

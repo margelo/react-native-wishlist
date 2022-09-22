@@ -40,15 +40,15 @@ export type WishlistProps = Readonly<ViewProps & {
 
 type NativeType = NativeComponentType<WishlistProps>;
 
-export type ScrollTo = (viewRef: React.ElementRef<NativeType>, y: Int, animated: Boolean) => Void;
+export type ScrollToItem = (viewRef: React.ElementRef<NativeType>, index: Int, animated: Boolean) => Void;
 
 interface NativeCommands {
-  readonly scrollTo: ScrollTo;
+  readonly scrollToItem: ScrollToItem;
 }
 
-export const Commands = codegenNativeCommands<NativeCommands>({
+export const WishlistCommands = codegenNativeCommands<NativeCommands>({
   supportedCommands: [
-    'scrollTo'
+    'scrollToItem'
   ],
 });
 
