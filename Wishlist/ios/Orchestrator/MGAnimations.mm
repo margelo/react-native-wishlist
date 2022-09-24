@@ -74,7 +74,7 @@ using namespace facebook::react;
 @end
 
 const float notFound = -12345;
-const float maxVelocity = 20; // TODO (it should be adjusted)
+const float maxVelocity = 2000; // TODO (it should be adjusted)
 const float stiffness = 1;
 const float mass = 3.5;
 const float damping = 5;
@@ -116,32 +116,41 @@ const float damping = 5;
             return;
         }
     }
-    _targetIndex = notFound;
+    _targetOffset = notFound;
 }
 
-// It won't work if we will change sizes of items during scrollTo.
+// TODO Should be clamped on ends
+// TODO It won't work if we will change sizes of items during scrollTo.
 // inspired by https://blog.maximeheckel.com/posts/the-physics-behind-spring-animations/
 - (CGFloat)getDiffWithTimestamp:(double)timestamp {
+    timestamp *= 1000.0;
     [self tryToFindTargetOffset];
+    
+    CGFloat timeDiff = fmax((timestamp - _lastTimestamp), 16 * 3);
     
     if (_targetOffset != notFound) {
         CGFloat k = -stiffness;
         CGFloat d = -damping;
         
-        CGFloat FSpring = k * (_targetOffset - _lastOffset);
+        CGFloat FSpring = k * (_targetOffset - _lastOffset) / 1000.0;
         CGFloat FDamping = d * _velocity;
         
         CGFloat a = (FSpring + FDamping) / mass;
-        _velocity += a * (timestamp - _lastTimestamp);
+        _velocity += a * timeDiff / 1000.0;
+        NSLog(@"bababa dodaje %f", a * timeDiff);
+        NSLog(@"bababa distance %f", _targetOffset - _lastOffset);
+        _velocity = fmin(abs(_velocity), abs(maxVelocity)) * ((_velocity < 0) ? -1.0 : 1.0);
     } else {
         if (_viewportObserver->window[0].index > _targetIndex) {
-            _velCoef *= -1;
+            _velCoef = -1;
+        } else {
+            _velCoef = 1;
         }
         _velocity = _velCoef * maxVelocity;
     }
     
     
-    CGFloat diff = _velocity * (timestamp - _lastTimestamp);
+    CGFloat diff = _velocity * timeDiff / 1000.0;
     _lastOffset += diff;
     _lastTimestamp = timestamp;
     
@@ -149,7 +158,9 @@ const float damping = 5;
         _isFinished = YES;
     }
    
-    return diff;
+    NSLog(@"babab scrollTo diff %f", diff);
+    
+    return -diff;
 }
 
 - (BOOL)isFinished {
@@ -161,8 +172,9 @@ const float damping = 5;
 }
 
 - (void)setupWithTimestamp:(double)timestamp {
+    timestamp *= 1000.0;
     _needsSetup = false;
-    _lastTimestamp = timestamp;
+    _lastTimestamp = timestamp - 16;
 }
 
 @end

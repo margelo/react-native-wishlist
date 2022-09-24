@@ -94,6 +94,7 @@
     if (_currentAnimation != nil) {
         if ([_currentAnimation needsSetup]) {
             [_currentAnimation setupWithTimestamp:displayLink.timestamp];
+            NSLog(@"aaa start Animation");
         }
         yDiff += [_currentAnimation getDiffWithTimestamp:displayLink.timestamp];
         if ([_currentAnimation isFinished]) {
@@ -186,7 +187,7 @@
     if (_doWeHaveOngoingEvent) {
         return;
     }
-    _currentAnimation = [[MGScrollToItemAnimation alloc] initWithIndex:index offset:_scrollView.currentOffset viewportObserver:_viewportObserver];
+    _currentAnimation = [[MGScrollToItemAnimation alloc] initWithIndex:index offset:_scrollView.contentOffset.y viewportObserver:_viewportObserver];
 
     [self maybeRegisterForNextVSync];
 }
