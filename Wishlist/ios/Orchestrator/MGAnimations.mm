@@ -62,7 +62,7 @@ using namespace facebook::react;
 }
 
 - (BOOL)needsSetup {
-    return _isInitialized;
+    return !_isInitialized;
 }
 
 - (void)setupWithTimestamp:(double)timestamp {
