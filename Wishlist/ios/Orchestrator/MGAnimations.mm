@@ -153,7 +153,7 @@ const float damping = 5;
     _lastOffset += diff;
     _lastTimestamp = timestamp;
     
-    if (diff < 0.1) {
+    if (abs(diff) < 0.1) {
         _isFinished = YES;
     }
    
