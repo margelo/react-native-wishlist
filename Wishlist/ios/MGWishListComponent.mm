@@ -26,6 +26,7 @@ using namespace facebook::react;
     bool alreadyRendered;
     std::string inflatorId;
     MGScrollViewOrchestrator * _orchestrator;
+    std::shared_ptr<const WishlistEventEmitter> _emitter;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -125,6 +126,11 @@ using namespace facebook::react;
   self.containerView.frame = CGRect{RCTCGPointFromPoint(data.contentBoundingRect.origin), contentSize};
 }
 
+- (void)updateEventEmitter:(EventEmitter::Shared const &)eventEmitter
+{
+    _emitter = std::static_pointer_cast<WishlistEventEmitter const>(eventEmitter);
+}
+
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
     if (_sharedState == nullptr) {
@@ -162,15 +168,15 @@ using namespace facebook::react;
 }
 
 - (void)onEndReached {
-    if (_eventEmitter) {
-        std::static_pointer_cast<WishlistEventEmitter const>(_eventEmitter)->onEndReached({});
+    if (_emitter) {
+        _emitter->onEndReached({});
     }
 
 }
 
 - (void)onStartReached {
-    if (_eventEmitter) {
-        std::static_pointer_cast<WishlistEventEmitter const>(_eventEmitter)->onStartReached({});
+    if (_emitter) {
+        _emitter->onStartReached({});
     }
 }
 
