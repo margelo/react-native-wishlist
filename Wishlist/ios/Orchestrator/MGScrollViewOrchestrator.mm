@@ -131,7 +131,6 @@
     NSLog(@"aaa topViewportEdge %f", topViewportEdge);
     NSLog(@"aaa bottomViewPortEdge %f", bottomViewPortEdge);
 
-    
     // ugly casework
     // topElementY < topViewportEdge (possibly new elementsOnTheTop)
         /* stop overscrollAnimation */
