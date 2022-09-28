@@ -23,8 +23,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@protocol MGScrollViewOrchestratorDelegate <NSObject>
+
+- (void)onStartReached;
+- (void)onEndReached;
+
+@end
+
 
 @interface MGScrollViewOrchestrator : NSObject
+
+@property (nonatomic, weak) id<MGScrollViewOrchestratorDelegate> delegate;
 
 - (instancetype)initWith:(UIScrollView*)scrollView templates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates names:(std::vector<std::string>)names viewportObserver:(std::shared_ptr<ViewportObserver>)vo inflatorId:(std::string)inflatorId;
 - (void)notifyAboutEvent:(PanEvent *)event;
