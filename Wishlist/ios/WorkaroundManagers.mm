@@ -96,6 +96,9 @@ RCT_EXPORT_MODULE(MGWishListComponentManager)
 
 RCT_CUSTOM_VIEW_PROPERTY(inflatorId, NSString* , UIView){}
 
+RCT_EXPORT_VIEW_PROPERTY(onStartReached, RCTDirectEventBlock)
+RCT_EXPORT_VIEW_PROPERTY(onEndReached, RCTDirectEventBlock)
+
 - (UIView *)view
 {
   return [[UIView alloc] init];
