@@ -21,6 +21,7 @@ struct ViewportObserver {
     float windowHeight;
     float windowWidth;
     int surfaceId;
+    int initialIndex;
     static thread_local bool isPushingChildren;
     
     std::shared_ptr<ComponentsPool> componentsPool = std::make_shared<ComponentsPool>();
@@ -41,6 +42,8 @@ struct ViewportObserver {
         
         std::cout << "aaa boot" << std::endl;
         
+        initialIndex = originItem;
+        
         componentsPool->registeredViews = registeredViews;
         componentsPool->setNames(names);
         
@@ -57,6 +60,7 @@ struct ViewportObserver {
         this->windowHeight = windowHeight;
         
         window.push_back(itemProvider->provide(originItem));
+        std::cout << "BBB initial index  " << originItem << std::endl;
         window.back().offset = originItemOffset;
         updateWindow(true);
     }
