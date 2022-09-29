@@ -14,12 +14,6 @@ import React from 'react';
 import {ViewProps} from 'react-native';
 import codegenNativeComponent, { NativeComponentType } from 'react-native/Libraries/Utilities/codegenNativeComponent';
 import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
-import type {
-  HostComponent,
-  PartialViewConfig,
-} from 'react-native/Libraries/Renderer/shims/ReactNativeTypes';
-import * as NativeComponentRegistry from 'react-native/Libraries/NativeComponent/NativeComponentRegistry';
-'use strict';
 
 import {NativeModules} from 'react-native';
 NativeModules.Workaround.registerList();

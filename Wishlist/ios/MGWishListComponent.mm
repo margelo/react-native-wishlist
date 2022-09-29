@@ -47,7 +47,9 @@ using namespace facebook::react;
 }
 
 -(void) setInflatorId:(std::string)nextInflatorId {
-  inflatorId = nextInflatorId;
+    inflatorId = nextInflatorId;
+}
+
 - (void)layoutSubviews
 {
     
@@ -72,13 +74,6 @@ using namespace facebook::react;
     return NO;
 }
 
-#pragma mark - RCTComponentViewProtocol
-
-+ (ComponentDescriptorProvider)componentDescriptorProvider
-{
-  return concreteComponentDescriptorProvider<WishlistComponentDescriptor>();
-}
-
 -(void) setTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates withNames:(std::vector<std::string>)names
 {
     if (!alreadyRendered && names.size() > 0 && names.size() == templates.size()) {
@@ -101,7 +96,9 @@ using namespace facebook::react;
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
 {
-  return concreteComponentDescriptorProvider<WishlistComponentDescriptor>();
+    return concreteComponentDescriptorProvider<WishlistComponentDescriptor>();
+}
+
 - (void)drawRect:(CGRect)rect
 {
     [super drawRect:rect];
@@ -150,7 +147,7 @@ using namespace facebook::react;
 {
     // TODO here you can intercept uiManager by registering fake surface
     //bridge.surfacePresentsr
-};
+}
 
 - (void)handleCommand:(const NSString *)commandName args:(const NSArray *)args {
     MGWishlistHandleCommand(self, commandName, args);
@@ -171,7 +168,6 @@ using namespace facebook::react;
     if (_emitter) {
         _emitter->onEndReached({});
     }
-
 }
 
 - (void)onStartReached {
@@ -179,6 +175,5 @@ using namespace facebook::react;
         _emitter->onStartReached({});
     }
 }
-
 
 @end
