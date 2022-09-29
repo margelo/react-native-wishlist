@@ -69,10 +69,7 @@ using namespace facebook::react;
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
     auto inflatorId = std::dynamic_pointer_cast<const MGTemplateInterceptorComponentProps>(props)->inflatorId;
-    if(_wishlist != nullptr) {
-      // Why isn't
-      [_wishlist setInflatorId:inflatorId];
-    }
+
     //[super updateProps:props oldProps:oldProps];
    // _eventEmitter = nil;
 }

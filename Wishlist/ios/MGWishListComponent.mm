@@ -88,7 +88,7 @@ using namespace facebook::react;
         _orchestrator.delegate = self;
         
     } else {
-        [_orchestrator notifyAboutNewTemplates:templates withNames:names];
+        [_orchestrator notifyAboutNewTemplates:templates withNames:names inflatorId:inflatorId];
     }
 }
 
@@ -107,12 +107,10 @@ using namespace facebook::react;
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
     inflatorId = std::dynamic_pointer_cast<const WishlistProps>(props)->inflatorId;
-    _eventEmitter = nil;
 }
 
 - (void)updateState:(State::Shared const &)state oldState:(State::Shared const &)oldState
 {
-    _eventEmitter = nil; // temporary TODO fix this
     if (state == nullptr) return;
     auto newState = std::static_pointer_cast<WishlistShadowNode::ConcreteState const>(state);
     auto &data = newState->getData();
