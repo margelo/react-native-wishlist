@@ -107,9 +107,17 @@ using namespace facebook::react;
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
-    std::shared_ptr<const WishlistProps> wProps = std::dynamic_pointer_cast<const WishlistProps>(props);
+    std::shared_ptr<const WishlistProps> wProps = std::static_pointer_cast<const WishlistProps>(props);
+    inflatorId = wProps->inflatorId;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-missing-super-calls"
+- (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
+{
+  std::shared_ptr<const WishlistProps> wProps = std::static_pointer_cast<const WishlistProps>(props);
     inflatorId = wProps->inflatorId;
     _initialIndex = wProps->initialIndex;
+}
+#pragma clang diagnostic pop
 }
 
 - (void)updateState:(State::Shared const &)state oldState:(State::Shared const &)oldState
