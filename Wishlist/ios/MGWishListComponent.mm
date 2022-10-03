@@ -51,11 +51,6 @@ using namespace facebook::react;
     inflatorId = nextInflatorId;
 }
 
-- (void)layoutSubviews
-{
-    
-}
-
 - (void)handlePan:(UIPanGestureRecognizer *)gesture
 {
     if (_orchestrator != nil) {
@@ -63,9 +58,6 @@ using namespace facebook::react;
         panEvent.state = gesture.state;
         panEvent.velocity = [gesture velocityInView:self].y;
         panEvent.translation = [gesture translationInView:self.scrollView].y;
-        if (panEvent.state == UIGestureRecognizerStateEnded) {
-            NSLog(@"aaa velocity %f", panEvent.velocity);
-        }
         [_orchestrator notifyAboutEvent:panEvent];
     }
 }
@@ -135,8 +127,6 @@ using namespace facebook::react;
     if (_sharedState == nullptr) {
         return;
     }
-    //_sharedState->getData().viewportObserver->reactToOffsetChange(scrollView.contentOffset.y);
-
 }
 
 - (void)prepareForRecycle
