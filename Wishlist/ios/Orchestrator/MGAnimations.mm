@@ -37,7 +37,6 @@ using namespace facebook::react;
 {
     double d = 1000.0 * log(_decRate);
     _destination = - (_intialVelocity / d);
-    NSLog(@"aaa dest %f", _destination);
 }
 
 - (CGFloat)getValueAtTimestamp:(double)timestamp {
@@ -48,7 +47,6 @@ using namespace facebook::react;
 - (CGFloat)getDiffWithTimestamp:(double)timestamp {
     double nextVal = [self getValueAtTimestamp:timestamp];
     double diff = nextVal - _totalDistanceTraveled;
-    NSLog(@"aaa diff %f", diff);
     _totalDistanceTraveled = nextVal;
     if (_lastTimestamp != timestamp && abs(diff) < 0.1) {
         _isFinished = YES;
@@ -137,8 +135,6 @@ const float damping = 5;
         
         CGFloat a = (FSpring + FDamping) / mass;
         _velocity += a * timeDiff / 1000.0;
-        NSLog(@"bababa dodaje %f", a * timeDiff);
-        NSLog(@"bababa distance %f", _targetOffset - _lastOffset);
         _velocity = fmin(abs(_velocity), abs(maxVelocity)) * ((_velocity < 0) ? -1.0 : 1.0);
     } else {
         if (_viewportObserver->window[0].index > _targetIndex) {
@@ -156,8 +152,6 @@ const float damping = 5;
     if (abs(diff) < 0.1) {
         _isFinished = YES;
     }
-   
-    NSLog(@"babab scrollTo diff %f", diff);
     
     return -diff;
 }
