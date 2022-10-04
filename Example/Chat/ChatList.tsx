@@ -28,7 +28,7 @@ export const ChatListView: React.FC<Props> = ({data, onLikeItem, style}) => {
   return (
     <WishList.Component
       style={style}
-      initialIndex={10}
+      initialIndex={0}
       onItemNeeded={index => {
         'worklet';
         return data[index];
