@@ -1,26 +1,26 @@
 import React from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
+import {ChatItem} from './Data';
+import {WishList} from 'wishlist';
+
+const {Template} = WishList;
 
 interface Props {
   type: 'me' | 'other';
+  item: ChatItem;
 }
 
-export const ChatItemView: React.FC<Props> = ({type}) => {
+export const ChatItemView: React.FC<Props> = ({type, item}) => {
   return (
     <View style={[styles.container, type === 'me' ? styles.me : styles.other]}>
       <View style={styles.imageAndAuthor}>
-        <Image
+        <Template.Image
           style={styles.avatarImage}
           nativeID="avatar"
-          source={{
-            uri: 'https://picsum.photos/100',
-          }}
+          source={{uri: item.avatarUrl}}
         />
         <View style={styles.authorContainer}>
-          <Text style={styles.authorText} nativeID="author">
-            {/*  FIXME: We shouldnt need placeholders - but currently we need'em */}
-            Author
-          </Text>
+          <Template.Text style={styles.authorText}>{item.author}</Template.Text>
           {type === 'other' ? (
             <View nativeID="likeButton">
               <Text nativeID="likes">❤️</Text>
@@ -30,9 +30,7 @@ export const ChatItemView: React.FC<Props> = ({type}) => {
       </View>
 
       <View style={styles.messageContainer}>
-        <Text style={styles.messageText} nativeID="content">
-          Simple Message
-        </Text>
+        <Template.Text style={styles.messageText}>{item.message}</Template.Text>
       </View>
     </View>
   );
