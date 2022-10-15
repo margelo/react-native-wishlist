@@ -2,6 +2,7 @@ import React from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
 import {ChatItem} from './Data';
 import {WishList} from 'wishlist';
+import {useTemplateValue} from 'wishlist';
 
 const {Template} = WishList;
 
@@ -11,19 +12,24 @@ interface Props {
 }
 
 export const ChatItemView: React.FC<Props> = ({type, item}) => {
+  const likeText = useTemplateValue((item: ChatItem) => {
+    'worklet';
+
+    return item.likes > 0 ? '♥️' : '🖤';
+  });
+
   return (
     <View style={[styles.container, type === 'me' ? styles.me : styles.other]}>
       <View style={styles.imageAndAuthor}>
         <Template.Image
           style={styles.avatarImage}
-          nativeID="avatar"
           source={{uri: item.avatarUrl}}
         />
         <View style={styles.authorContainer}>
           <Template.Text style={styles.authorText}>{item.author}</Template.Text>
           {type === 'other' ? (
             <View nativeID="likeButton">
-              <Text nativeID="likes">❤️</Text>
+              <Template.Text>{likeText}</Template.Text>
             </View>
           ) : null}
         </View>

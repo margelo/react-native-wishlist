@@ -231,6 +231,24 @@ function useMappingContext() {
   return context;
 }
 
+class TemplateValue {
+  _mapper: any;
+
+  constructor(mapper: any) {
+    this._mapper = mapper;
+  }
+
+  getMapper() {
+    return this._mapper;
+  }
+}
+
+export function useTemplateValue<T, K>(mapper: (item: T) => K) {
+  return useMemo(() => {
+   return new TemplateValue(mapper);
+  }, [mapper]) as unknown as K
+}
+
 function getInObject(obj: any, path: string[]) {
   'worklet';
 
@@ -256,7 +274,7 @@ function traverseObject(obj: any, callback: (path: string[], value: any) => void
   const stack: {path: string[], value: any}[] = [{path: [], value: obj}];
   while (stack.length > 0) {
     const {path, value} = stack.pop()!;
-    if (value && typeof value === 'object' && !value.__isTemplateProxy) {
+    if (value && typeof value === 'object' && !value.__isTemplateProxy && !(value instanceof TemplateValue)) {
       Object.keys(value).forEach((key) => {
         stack.push({path: [...path, key], value: value[key]});
       });
@@ -274,16 +292,25 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
     const {inflatorId} = useMappingContext();
 
     const proxyValues: {valuePath: string[], targetPath: string[]}[] = [];
+    const templateValues: {mapper: any, targetPath: string[]}[] = [];
     const otherProps = {};
     traverseObject(props, (path, value) => {
-      if ((value as TemplateProxy).__isTemplateProxy) {
-        proxyValues.push({targetPath: path, valuePath: (value as TemplateProxy).__templatePath});
-
+      const applyHacks = () => {
         // Text component needs to receive a string child to work properly.
         // @ts-ignore
         if (path[0] === 'children' && Component === Text) {
           setInObject(otherProps, path, ' ');
         }
+      };
+
+      if ((value as TemplateProxy).__isTemplateProxy) {
+        proxyValues.push({targetPath: path, valuePath: (value as TemplateProxy).__templatePath});
+
+        applyHacks();
+      } else if (value instanceof TemplateValue) {
+        templateValues.push({mapper: value.getMapper(), targetPath: path});
+
+        applyHacks();
       } else {
         setInObject(otherProps, path, value);
       }
@@ -297,6 +324,9 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
         const propsToSet = {};
         for (const {valuePath, targetPath} of proxyValues) {
           setInObject(propsToSet, targetPath, getInObject(value, valuePath));
+        }
+        for (const {mapper, targetPath} of templateValues) {
+          setInObject(propsToSet, targetPath, mapper(value));
         }
         if (addProps) {
           addProps(templateItem, propsToSet);
