@@ -1,49 +1,41 @@
 import React from 'react';
-import {Image, StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
+import {useTemplateValue, WishList} from 'wishlist';
 import {ChatItem} from './Data';
-import {WishList} from 'wishlist';
-import {useTemplateValue} from 'wishlist';
-
-const {Template} = WishList;
 
 interface Props {
   type: 'me' | 'other';
-  item: ChatItem;
 }
 
-export const ChatItemView: React.FC<Props> = ({type, item}) => {
-  const likeText = useTemplateValue((item: ChatItem) => {
-    'worklet';
-
-    return item.likes > 0 ? '♥️' : '🖤';
-  });
-  const likeOpacity = useTemplateValue((item: ChatItem) => {
-    'worklet';
-
-    return item.likes > 0 ? 1 : 0.4;
-  });
+export const ChatItemView: React.FC<Props> = ({type}) => {
+  const author = useTemplateValue((item: ChatItem) => item.author);
+  const avatarUrl = useTemplateValue((item: ChatItem) => item.avatarUrl);
+  const message = useTemplateValue((item: ChatItem) => item.message);
+  const likeText = useTemplateValue((item: ChatItem) =>
+    item.likes > 0 ? '♥️' : '🖤',
+  );
+  const likeOpacity = useTemplateValue((item: ChatItem) =>
+    item.likes > 0 ? 1 : 0.4,
+  );
 
   return (
     <View style={[styles.container, type === 'me' ? styles.me : styles.other]}>
       <View style={styles.imageAndAuthor}>
-        <Template.Image
-          style={styles.avatarImage}
-          source={{uri: item.avatarUrl}}
-        />
+        <WishList.Image style={styles.avatarImage} source={{uri: avatarUrl}} />
         <View style={styles.authorContainer}>
-          <Template.Text style={styles.authorText}>{item.author}</Template.Text>
+          <WishList.Text style={styles.authorText}>{author}</WishList.Text>
           {type === 'other' ? (
             <View nativeID="likeButton">
-              <Template.Text style={{opacity: likeOpacity}}>
+              <WishList.Text style={{opacity: likeOpacity}}>
                 {likeText}
-              </Template.Text>
+              </WishList.Text>
             </View>
           ) : null}
         </View>
       </View>
 
       <View style={styles.messageContainer}>
-        <Template.Text style={styles.messageText}>{item.message}</Template.Text>
+        <WishList.Text style={styles.messageText}>{message}</WishList.Text>
       </View>
     </View>
   );
