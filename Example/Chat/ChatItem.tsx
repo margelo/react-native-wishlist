@@ -1,6 +1,6 @@
 import React from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
-import {ChatItem} from './Data';
+import {ChatItem, ReactionItem} from './Data';
 import {WishList} from 'wishlist';
 import {useTemplateValue} from 'wishlist';
 
@@ -11,27 +11,53 @@ interface Props {
   item: ChatItem;
 }
 
-export const ChatItemView: React.FC<Props> = ({type, item}) => {
-  const likeText = useTemplateValue((item: ChatItem) => {
+export const Reaction = () => {
+  const emoji = useTemplateValue((item: ReactionItem) => {
     'worklet';
 
-    return item.likes > 0 ? '♥️' : '🖤';
+    return item.emoji;
   });
-  const likeOpacity = useTemplateValue((item: ChatItem) => {
+
+  return <Template.Text>{emoji}</Template.Text>;
+};
+
+const Content = () => {
+  const message = useTemplateValue((item: ChatItem) => {
     'worklet';
 
-    return item.likes > 0 ? 1 : 0.4;
+    return item.message;
   });
+  return (
+    <View style={styles.messageContainer}>
+      <Template.Text style={styles.messageText}>{message}</Template.Text>
+    </View>
+  );
+};
+
+export const ChatItemView: React.FC<Props> = ({type}) => {
+  const {author, reactions, likeText, likeOpacity} = useTemplateValues(
+    (item: ChatItem) => ({
+      author: item.author,
+    }),
+  );
+  const reactions = useTemplateValue((item: ChatItem) => item.reactions);
+  const likeText = useTemplateValue((item: ChatItem) =>
+    item.likes > 0 ? '♥️' : '🖤',
+  );
+  const likeOpacity = useTemplateValue((item: ChatItem) =>
+    item.likes > 0 ? 1 : 0.4,
+  );
 
   return (
     <View style={[styles.container, type === 'me' ? styles.me : styles.other]}>
       <View style={styles.imageAndAuthor}>
+        <ForEach items={reactions} template="reaction" />
         <Template.Image
           style={styles.avatarImage}
           source={{uri: item.avatarUrl}}
         />
         <View style={styles.authorContainer}>
-          <Template.Text style={styles.authorText}>{item.author}</Template.Text>
+          <Template.Text style={styles.authorText}>{author}</Template.Text>
           {type === 'other' ? (
             <View nativeID="likeButton">
               <Template.Text style={{opacity: likeOpacity}}>
@@ -41,10 +67,7 @@ export const ChatItemView: React.FC<Props> = ({type, item}) => {
           ) : null}
         </View>
       </View>
-
-      <View style={styles.messageContainer}>
-        <Template.Text style={styles.messageText}>{item.message}</Template.Text>
-      </View>
+      <Content />
     </View>
   );
 };

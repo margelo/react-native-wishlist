@@ -29,6 +29,7 @@ export const ChatListView: React.FC<Props> = ({data, onLikeItem, style}) => {
     <WishList.Component
       style={style}
       initialIndex={0}
+      keyExtractor={(item: ChatItem) => item.id}
       onItemNeeded={index => {
         'worklet';
         return data[index];
@@ -45,10 +46,13 @@ export const ChatListView: React.FC<Props> = ({data, onLikeItem, style}) => {
         }}
       />
       <WishList.Template type="me">
-        {(item: ChatItem) => <ChatItemView type="me" item={item} />}
+        <ChatItemView type="me" />
       </WishList.Template>
       <WishList.Template type="other">
-        {(item: ChatItem) => <ChatItemView type="other" item={item} />}
+        <ChatItemView type="other" />
+      </WishList.Template>
+      <WishList.Template type="reaction">
+        <Reaction type="other" />
       </WishList.Template>
     </WishList.Component>
   );
