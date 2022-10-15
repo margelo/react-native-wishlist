@@ -24,7 +24,15 @@ const maybeInit = () => {
               return result;
             }
             const [item, value] = result;
-            const mapping = mappings.get(id);
+            
+            return global.InflatorRegistry.useMappings(item, value, id);
+          } else {
+            console.log("Inflator not found for id: " + id);
+            return undefined;
+          }
+        },
+        useMappings: (item, value, id) => {
+          const mapping = mappings.get(id);
             if (mapping) {
               for (const [nativeId, inflate] of mapping.entries()) {
                 const templateItem = item.getByWishId(nativeId);
@@ -34,10 +42,6 @@ const maybeInit = () => {
               }
             }
             return item;
-          } else {
-            console.log("Inflator not found for id: " + id);
-            return undefined;
-          }
         },
         registerInflator: (id, inflateMethod) => {
           console.log("InflatorRegistry::register", id);

@@ -1,3 +1,7 @@
+export type ReactionItem = {
+  emoji: string;
+};
+
 export type ChatItem = {
   id: number;
   author: string;
@@ -5,14 +9,15 @@ export type ChatItem = {
   message: string;
   avatarUrl?: string;
   likes: number;
+  reactions: ReactionItem[];
 };
 
-const SampleText = `Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
-Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, 
-when an unknown printer took a galley of type and scrambled it to make a type specimen book. 
-It has survived not only five centuries, but also the leap into electronic typesetting, 
-remaining essentially unchanged. 
-It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, 
+const SampleText = `Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+It has survived not only five centuries, but also the leap into electronic typesetting,
+remaining essentially unchanged.
+It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
 and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.`;
 
 const authors = ['John', 'Bob', 'Szymon', 'Marc', 'Elon Musk', 'Me'];
@@ -35,6 +40,7 @@ const createChatItem = (index: number): ChatItem => {
       authors[Math.round(index % authors.length)]
     }`,
     likes: Math.random() > 0.7 ? Math.floor(Math.random() * 8) : 0,
+    reactions: [],
   };
 };
 

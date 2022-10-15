@@ -362,4 +362,27 @@ export const WishList = {
     item.RawText.addProps({text: children});
     item.addProps(other);
   }),
+
+  IF: createTemplateComponent(View, (item, props) => {
+    'worklet';
+
+    if (props.condition) {
+      item.addProps({display: 'flex'});
+    } else {
+      item.addProps({display: 'none'});
+    }
+  }),
+
+  ForEach: createTemplateComponent(View, (item, props, inflatorId, componentRegistry) => {
+    'worklet';
+
+    const subItems = props.subItems;
+    const items = subItems.map((subItem) => {
+      const [item, value] = [componentRegistry.getComponent(props.template), subItem];
+      const child = global.InflatorRegistry.useMappings(item, value, inflatorId);
+    });
+
+    item.setChildren(items);
+  })
+
 };

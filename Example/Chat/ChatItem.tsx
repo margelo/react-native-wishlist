@@ -7,6 +7,16 @@ interface Props {
   type: 'me' | 'other';
 }
 
+export const Reaction = () => {
+  const emoji = useTemplateValue((item: ReactionItem) => {
+    'worklet';
+
+    return item.emoji;
+  });
+
+  return <Template.Text>{emoji}</Template.Text>;
+};
+
 export const ChatItemView: React.FC<Props> = ({type}) => {
   const author = useTemplateValue((item: ChatItem) => item.author);
   const avatarUrl = useTemplateValue((item: ChatItem) => item.avatarUrl);
@@ -37,6 +47,8 @@ export const ChatItemView: React.FC<Props> = ({type}) => {
       <View style={styles.messageContainer}>
         <WishList.Text style={styles.messageText}>{message}</WishList.Text>
       </View>
+
+      <Wishlist.ForEach items={reactions} template="reaction" />
     </View>
   );
 };
