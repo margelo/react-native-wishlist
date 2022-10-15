@@ -23,6 +23,7 @@ class WishlistProps final : public ViewProps {
 
 #pragma mark - Props
 
+  int initialIndex;
   std::string inflatorId;
   std::vector<std::string> names{};
 };

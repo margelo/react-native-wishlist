@@ -14,7 +14,6 @@ import React from 'react';
 import {ViewProps} from 'react-native';
 import codegenNativeComponent, { NativeComponentType } from 'react-native/Libraries/Utilities/codegenNativeComponent';
 import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
-'use strict';
 
 import {NativeModules} from 'react-native';
 NativeModules.Workaround.registerList();
@@ -23,32 +22,25 @@ export type EventInFile = Readonly<{
   value: Double;
 }>;
 
-export type Boolean = boolean;
-
-export type Int = Int32;
-
-export type Void = void;
-
-export type WishlistProps = Readonly<ViewProps & {
+export interface WishlistProps extends ViewProps {
   reanimatedRuntime: Double,
   inflatorId: string;
-  onBubblingEventDefinedInline: BubblingEventHandler<EventInFile>;
-  onBubblingEventDefinedInlineWithPaperName: BubblingEventHandler<EventInFile, 'paperBubblingEventDefinedInlineWithPaperName'>;
-  onDirectEventDefinedInline: DirectEventHandler<EventInFile>;
-  onDirectEventDefinedInlineWithPaperName: DirectEventHandler<EventInFile, 'paperDirectEventDefinedInlineWithPaperName'>;
-}>;
+  initialIndex: number;
+  onStartReached: DirectEventHandler<Readonly<{}>>;
+  onEndReached: DirectEventHandler<Readonly<{}>>;
+}
 
 type NativeType = NativeComponentType<WishlistProps>;
 
-export type ScrollTo = (viewRef: React.ElementRef<NativeType>, y: Int, animated: Boolean) => Void;
+export type ScrollToItem = (viewRef: React.ElementRef<NativeType>, index: Int32, animated: boolean) => void;
 
 interface NativeCommands {
-  readonly scrollTo: ScrollTo;
+  readonly scrollToItem: ScrollToItem;
 }
 
-export const Commands = codegenNativeCommands<NativeCommands>({
+export const WishlistCommands = codegenNativeCommands<NativeCommands>({
   supportedCommands: [
-    'scrollTo'
+    'scrollToItem'
   ],
 });
 

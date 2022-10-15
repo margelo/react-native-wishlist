@@ -1,6 +1,6 @@
 import React, {useCallback, useMemo} from 'react';
 import {ViewProps} from 'react-native';
-import {WishList} from 'Wishlist';
+import {WishList} from 'wishlist';
 import {ChatItemView} from './ChatItem';
 import {ChatItem} from './Data';
 
@@ -28,6 +28,7 @@ export const ChatListView: React.FC<Props> = ({data, onLikeItem, style}) => {
   return (
     <WishList.Component
       style={style}
+      initialIndex={0}
       onItemNeeded={index => {
         'worklet';
         return data[index];

@@ -1,20 +1,20 @@
 {
-  "name": "Wishlist",
+  "name": "wishlist",
   "version": "1.0.0",
   "description": "The ultimate virtualised list solution",
   "main": "index.ts",
   "author": "Marc & Szymon",
   "license": "MIT",
   "private": true,
-  "scripts": {},
+  "scripts": {
+    "clang-format": "clang-format -i --glob='{ios,android,lib}/**/*.{h,cpp,m,mm}'"
+  },
   "devDependencies": {
     "@types/react-native": "^0.70.0",
-    "react-native-tscodegen": "^0.68.4",
-    "react-native-tscodegen-types": "^0.69.1"
+    "clang-format": "^1.8.0"
   },
   "peerDependencies": {
     "react-native": "^0.70.0"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }

@@ -6,7 +6,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MGWishListComponentManager : RCTViewManager
 @end
 
-@interface MGNativeTemplateContainerManager : RCTViewManager
+@interface MGTemplateContainerManager : RCTViewManager
 @end
 
 @interface MGTemplateInterceptorManager: RCTViewManager

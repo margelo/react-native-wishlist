@@ -74,7 +74,6 @@ RCT_EXPORT_METHOD(registerList)
 
 - (void)invalidate
 {
-    NSLog(@"SDFSDF");
     [_surfacePresenter.scheduler removeEventListener: _eventListener];
 }
 
@@ -95,6 +94,10 @@ RCT_EXPORT_METHOD(registerInterceptor)
 RCT_EXPORT_MODULE(MGWishListComponentManager)
 
 RCT_CUSTOM_VIEW_PROPERTY(inflatorId, NSString* , UIView){}
+RCT_CUSTOM_VIEW_PROPERTY(initialIndex, double, UIView){}
+
+RCT_EXPORT_VIEW_PROPERTY(onStartReached, RCTDirectEventBlock)
+RCT_EXPORT_VIEW_PROPERTY(onEndReached, RCTDirectEventBlock)
 
 - (UIView *)view
 {
@@ -103,7 +106,7 @@ RCT_CUSTOM_VIEW_PROPERTY(inflatorId, NSString* , UIView){}
 
 @end
 
-@implementation MGNativeTemplateContainerManager
+@implementation MGTemplateContainerManager
 
 RCT_EXPORT_MODULE(MGTemplateContainerComponentManager)
 
