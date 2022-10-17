@@ -10,13 +10,14 @@
 
 #pragma once
 
-#include "MGInterceptorShadowNodes.h"
 #include <react/renderer/core/ConcreteComponentDescriptor.h>
+#include "MGInterceptorShadowNodes.h"
 
 namespace facebook {
 namespace react {
 
-using MGTemplateInterceptorComponentComponentDescriptor = ConcreteComponentDescriptor<MGTemplateInterceptorComponentShadowNode>;
+using MGTemplateInterceptorComponentComponentDescriptor =
+    ConcreteComponentDescriptor<MGTemplateInterceptorComponentShadowNode>;
 
 } // namespace react
 } // namespace facebook

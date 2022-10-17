@@ -10,16 +10,16 @@
 
 #pragma once
 
-#include "WishlistEventEmitters.h"
-#include "WishlistProps.h"
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
-#include "LayoutContext.h"
-#include "LayoutConstraints.h"
-#include "ShadowNodeCopyMachine.h"
 #include <iostream>
 #include <memory>
-#include "WishlistState.h"
+#include "LayoutConstraints.h"
+#include "LayoutContext.h"
 #include "ReanimatedRuntimeHandler.hpp"
+#include "ShadowNodeCopyMachine.h"
+#include "WishlistEventEmitters.h"
+#include "WishlistProps.h"
+#include "WishlistState.h"
 
 namespace facebook {
 namespace react {
@@ -31,81 +31,79 @@ extern const char WishlistComponentName[];
  */
 
 class WishlistShadowNode : public ConcreteViewShadowNode<
-                                WishlistComponentName,
-                                WishlistProps,
-                                WishlistEventEmitter,
-                                WishlistState>, std::enable_shared_from_this<WishlistShadowNode> {
-public:
-    WishlistShadowNode(
-        ShadowNodeFragment const &fragment,
-        ShadowNodeFamily::Shared const &family,
-        ShadowNodeTraits traits)
-        : ConcreteViewShadowNode(fragment, family, traits) {
+                               WishlistComponentName,
+                               WishlistProps,
+                               WishlistEventEmitter,
+                               WishlistState>,
+                           std::enable_shared_from_this<WishlistShadowNode> {
+ public:
+  WishlistShadowNode(
+      ShadowNodeFragment const &fragment,
+      ShadowNodeFamily::Shared const &family,
+      ShadowNodeTraits traits)
+      : ConcreteViewShadowNode(fragment, family, traits) {}
 
+  WishlistShadowNode(
+      ShadowNode const &sourceShadowNode,
+      ShadowNodeFragment const &fragment)
+      : ConcreteViewShadowNode(sourceShadowNode, fragment) {
+    try {
+      const WishlistShadowNode &msn =
+          dynamic_cast<const WishlistShadowNode &>(sourceShadowNode);
+      registeredViews = msn.registeredViews;
+
+    } catch (std::bad_cast) {
+    }
+  }
+
+  void realAppendChild(ShadowNode::Shared const &childNode) {
+    if (childNode == nullptr) {
+      return;
+    }
+    ConcreteViewShadowNode::appendChild(childNode);
+  }
+
+  void appendChild(ShadowNode::Shared const &childNode) {
+    return;
+  }
+
+  void layout(LayoutContext layoutContext) {
+    auto state = getStateData();
+    if (!state.initialised) {
+      state.initialised = true;
+      state.viewportObserver->setInitialValues(
+          sharedThis.lock(), layoutContext);
+
+      setStateData(std::move(state));
+    }
+    // TODO update viewportObserver if needed
+
+    ConcreteViewShadowNode::layout(layoutContext);
+
+    // updateScrollContentOffsetIfNeeded();
+    updateStateIfNeeded();
+  }
+
+  void updateStateIfNeeded() {
+    ensureUnsealed();
+
+    auto contentBoundingRect = Rect{};
+    for (const auto &childNode : getLayoutableChildNodes()) {
+      contentBoundingRect.unionInPlace(childNode->getLayoutMetrics().frame);
     }
 
-    WishlistShadowNode(
-        ShadowNode const &sourceShadowNode,
-        ShadowNodeFragment const &fragment)
-        : ConcreteViewShadowNode(sourceShadowNode, fragment) {
-        try {
-            const WishlistShadowNode &msn = dynamic_cast<const WishlistShadowNode&>(sourceShadowNode);
-            registeredViews = msn.registeredViews;
-            
-        }
-        catch (std::bad_cast) {
-              
-        }
-    }
-    
-    void realAppendChild(ShadowNode::Shared const &childNode) {
-      if(childNode == nullptr) {
-        return;
-      }
-      ConcreteViewShadowNode::appendChild(childNode);
-    }
-    
-    void appendChild(ShadowNode::Shared const &childNode) {
-        return;
-    }
-                                    
-    void layout(LayoutContext layoutContext) {
-        auto state = getStateData();
-        if (!state.initialised) {
-            state.initialised = true;
-            state.viewportObserver->setInitialValues(sharedThis.lock(), layoutContext);
-            
-            setStateData(std::move(state));
-        }
-            // TODO update viewportObserver if needed
-            
-        ConcreteViewShadowNode::layout(layoutContext);
-            
-          //updateScrollContentOffsetIfNeeded();
-        updateStateIfNeeded();
-    }
-                                    
-    void updateStateIfNeeded() {
-      ensureUnsealed();
+    auto state = getStateData();
 
-      auto contentBoundingRect = Rect{};
-      for (const auto &childNode : getLayoutableChildNodes()) {
-        contentBoundingRect.unionInPlace(childNode->getLayoutMetrics().frame);
-      }
-
-      auto state = getStateData();
-
-      if (state.contentBoundingRect != contentBoundingRect) {
-        state.contentBoundingRect = contentBoundingRect;
-        setStateData(std::move(state));
-      }
+    if (state.contentBoundingRect != contentBoundingRect) {
+      state.contentBoundingRect = contentBoundingRect;
+      setStateData(std::move(state));
     }
+  }
 
-    
-    virtual ~WishlistShadowNode(){}
-    
-    std::vector<std::shared_ptr<ShadowNode const>> registeredViews;
-    std::weak_ptr<WishlistShadowNode> sharedThis;
+  virtual ~WishlistShadowNode() {}
+
+  std::vector<std::shared_ptr<ShadowNode const>> registeredViews;
+  std::weak_ptr<WishlistShadowNode> sharedThis;
 };
 
 } // namespace react

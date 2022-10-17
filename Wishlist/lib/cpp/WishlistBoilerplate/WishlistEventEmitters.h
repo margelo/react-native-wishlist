@@ -18,13 +18,9 @@ class WishlistEventEmitter : public ViewEventEmitter {
  public:
   using ViewEventEmitter::ViewEventEmitter;
 
-  struct OnStartReached {
-      
-    };
+  struct OnStartReached {};
 
-  struct OnEndReached {
-      
-    };
+  struct OnEndReached {};
 
   void onStartReached(OnStartReached value) const;
 
