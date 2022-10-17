@@ -18,7 +18,10 @@ namespace react {
 class MGTemplateInterceptorComponentProps final : public ViewProps {
  public:
   MGTemplateInterceptorComponentProps() = default;
-  MGTemplateInterceptorComponentProps(const PropsParserContext& context, const MGTemplateInterceptorComponentProps &sourceProps, const RawProps &rawProps);
+  MGTemplateInterceptorComponentProps(
+      const PropsParserContext &context,
+      const MGTemplateInterceptorComponentProps &sourceProps,
+      const RawProps &rawProps);
 
 #pragma mark - Props
 

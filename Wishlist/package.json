@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "The ultimate virtualised list solution",
   "main": "index.ts",
-  "author": "Marc & Szymon",
+  "author": "Marc & Szymon & Christian & Janic",
   "license": "MIT",
   "private": true,
   "scripts": {

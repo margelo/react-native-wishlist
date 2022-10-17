@@ -10,55 +10,58 @@
 
 #pragma once
 
-#include "WishlistShadowNodes.h"
 #include <react/renderer/core/ConcreteComponentDescriptor.h>
+#include "WishlistShadowNodes.h"
 
 namespace facebook {
 namespace react {
 
-class WishlistComponentDescriptor : public ConcreteComponentDescriptor<WishlistShadowNode> {
-public:
-    WishlistComponentDescriptor(ComponentDescriptorParameters const &parameters): ConcreteComponentDescriptor(parameters) {
-        
-    }
-    
-    // TODO think about it 
-    virtual ShadowNode::Shared createShadowNode(
-        const ShadowNodeFragment &fragment,
-        ShadowNodeFamily::Shared const &family) const override {
-        
-        auto shadowNode =
-            std::make_shared<WishlistShadowNode>(ShadowNodeFragment{fragment.props, nullptr, fragment.state}, family, getTraits());
-        shadowNode->sharedThis = shadowNode;
+class WishlistComponentDescriptor
+    : public ConcreteComponentDescriptor<WishlistShadowNode> {
+ public:
+  WishlistComponentDescriptor(ComponentDescriptorParameters const &parameters)
+      : ConcreteComponentDescriptor(parameters) {}
 
-      adopt(shadowNode);
+  // TODO think about it
+  virtual ShadowNode::Shared createShadowNode(
+      const ShadowNodeFragment &fragment,
+      ShadowNodeFamily::Shared const &family) const override {
+    auto shadowNode = std::make_shared<WishlistShadowNode>(
+        ShadowNodeFragment{fragment.props, nullptr, fragment.state},
+        family,
+        getTraits());
+    shadowNode->sharedThis = shadowNode;
 
-      return shadowNode;
-    }
-    
-    // TODO fix this
-    virtual ShadowNode::Unshared cloneShadowNode(
-        const ShadowNode &sourceShadowNode,
-        const ShadowNodeFragment &fragment) const override {
-        
-        ShadowNode::Unshared shadowNode(nullptr);
-        if (ViewportObserver::isPushingChildren) {
-            shadowNode = std::make_shared<WishlistShadowNode>(sourceShadowNode, fragment);
-        } else {
-            shadowNode = std::make_shared<WishlistShadowNode>(sourceShadowNode, ShadowNodeFragment{});
-        }
-        
-        std::shared_ptr<WishlistShadowNode> wishlistShadowNode = std::static_pointer_cast<WishlistShadowNode>(shadowNode);
-        /*wishlistShadowNode->registeredViews = static_cast<const WishlistShadowNode&>(sourceShadowNode).registeredViews;*/
-            wishlistShadowNode->sharedThis = wishlistShadowNode;
+    adopt(shadowNode);
 
-        adopt(shadowNode);
-        return shadowNode;
+    return shadowNode;
+  }
+
+  // TODO fix this
+  virtual ShadowNode::Unshared cloneShadowNode(
+      const ShadowNode &sourceShadowNode,
+      const ShadowNodeFragment &fragment) const override {
+    ShadowNode::Unshared shadowNode(nullptr);
+    if (ViewportObserver::isPushingChildren) {
+      shadowNode =
+          std::make_shared<WishlistShadowNode>(sourceShadowNode, fragment);
+    } else {
+      shadowNode = std::make_shared<WishlistShadowNode>(
+          sourceShadowNode, ShadowNodeFragment{});
     }
-    
-    virtual ~WishlistComponentDescriptor(){}
+
+    std::shared_ptr<WishlistShadowNode> wishlistShadowNode =
+        std::static_pointer_cast<WishlistShadowNode>(shadowNode);
+    /*wishlistShadowNode->registeredViews = static_cast<const
+     * WishlistShadowNode&>(sourceShadowNode).registeredViews;*/
+    wishlistShadowNode->sharedThis = wishlistShadowNode;
+
+    adopt(shadowNode);
+    return shadowNode;
+  }
+
+  virtual ~WishlistComponentDescriptor() {}
 };
-
 
 } // namespace react
 } // namespace facebook

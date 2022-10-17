@@ -19,7 +19,10 @@ namespace react {
 class WishlistProps final : public ViewProps {
  public:
   WishlistProps() = default;
-  WishlistProps(const PropsParserContext& context, const WishlistProps &sourceProps, const RawProps &rawProps);
+  WishlistProps(
+      const PropsParserContext &context,
+      const WishlistProps &sourceProps,
+      const RawProps &rawProps);
 
 #pragma mark - Props
 
