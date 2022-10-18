@@ -218,7 +218,8 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
             if (sibiling->getComponentName() == type) {
               if (i == index) {
                 return jsi::Object::createFromHostObject(
-                    rt, std::make_shared<ShadowNodeBinding>(sibiling, parent));
+                    rt,
+                    std::make_shared<ShadowNodeBinding>(sibiling, wcp, parent));
               }
               i++;
             }
@@ -231,7 +232,9 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
   for (auto child : sn->getChildren()) {
     if (child->getComponentName() == name) {
       return jsi::Object::createFromHostObject(
-          rt, std::make_shared<ShadowNodeBinding>(child, shared_from_this()));
+          rt,
+          std::make_shared<ShadowNodeBinding>(
+              child, this->wcp, shared_from_this()));
     }
   }
 

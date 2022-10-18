@@ -52,7 +52,7 @@ struct ShadowNodeBinding : public jsi::HostObject,
       std::shared_ptr<ShadowNodeBinding> p) {
     for (auto child : p->sn->getChildren()) {
       // Create binding
-      auto bc = std::make_shared<ShadowNodeBinding>(child, p);
+      auto bc = std::make_shared<ShadowNodeBinding>(child, wcp, p);
 
       // Test against native id
       if (child->getProps()->nativeId == nativeId) {
@@ -152,7 +152,7 @@ struct ComponentsPool : std::enable_shared_from_this<ComponentsPool> {
               auto sn = blockWcp.lock()->getNodeForType(componentName);
 
               return jsi::Object::createFromHostObject(
-                  rt, std::make_shared<ShadowNodeBinding>(blockWcp, sn));
+                  rt, std::make_shared<ShadowNodeBinding>(sn, blockWcp));
             });
       }
 
