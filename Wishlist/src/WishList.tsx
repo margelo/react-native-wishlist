@@ -278,7 +278,7 @@ function traverseObject(
 
 export function createTemplateComponent<T extends React.ComponentType<any>>(
   Component: T,
-  addProps?: (templateItem, props: any) => void,
+  addProps?: (templateItem, props: any, inflatorId: string, componentRegistry: any) => void
 ): T {
   const WishListComponent = forwardRef<any, any>(({style, ...props}, ref) => {
     const {inflatorId} = useMappingContext();
@@ -309,7 +309,7 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
       InflatorRepository.registerMapping(
         inflatorId,
         nativeId,
-        (value, templateItem) => {
+        (value, templateItem, pool) => {
           'worklet';
           const propsToSet: any = {};
           for (const {mapper, targetPath} of templateValues) {
@@ -319,7 +319,7 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
           const {style, ...otherPropsToSet} = propsToSet;
           const finalPropsToSet = {...otherPropsToSet, ...style};
           if (addProps) {
-            addProps(templateItem, finalPropsToSet);
+            addProps(templateItem, finalPropsToSet, inflatorId, pool);
           } else {
             templateItem.addProps(finalPropsToSet);
           }
@@ -379,7 +379,8 @@ export const WishList = {
     const subItems = props.subItems;
     const items = subItems.map((subItem) => {
       const [item, value] = [componentRegistry.getComponent(props.template), subItem];
-      const child = global.InflatorRegistry.useMappings(item, value, inflatorId);
+      const child = global.InflatorRegistry.useMappings(item, value, inflatorId, componentRegistry);
+      return child;
     });
 
     item.setChildren(items);
