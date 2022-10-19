@@ -24,15 +24,20 @@ const DATA = [
   },
 ];
 
-const Item = ({title}) => (
+const Item = ({title}: any) => (
   <View style={styles.item}>
     <Text style={styles.title}>{title}</Text>
-    <Button title="click me" onPress={() => {alert('log')}} />
+    <Button
+      title="click me"
+      onPress={() => {
+        alert('log');
+      }}
+    />
   </View>
 );
 
 const App = () => {
-  const renderItem = ({item}) => <Item title={item.title} />;
+  const renderItem = ({item}: any) => <Item title={item.title} />;
 
   return (
     <SafeAreaView style={styles.container}>
