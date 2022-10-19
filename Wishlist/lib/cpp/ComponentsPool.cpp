@@ -112,9 +112,8 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
             newChildren->push_back(child->sn);
             child->parent = shared_from_this();
           }
-                
-                
-                std::cout << "new Children len " << newChildren->size() << std::endl;
+
+          std::cout << "new Children len " << newChildren->size() << std::endl;
 
           auto clonedShadowNode = cd.cloneShadowNode(
               *sn,
@@ -122,14 +121,14 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
                   nullptr,
                   newChildren,
               });
-                
-            /*auto oldChildren = sn->getChildren();
-            auto cp = this->wcp.lock();
-            for (int i = 0; i < oldChildren.size(); ++i) {
-              if (cp) {
-                cp->returnToPool(oldChildren[i]);
-              }
-            }*/
+
+          /*auto oldChildren = sn->getChildren();
+          auto cp = this->wcp.lock();
+          for (int i = 0; i < oldChildren.size(); ++i) {
+            if (cp) {
+              cp->returnToPool(oldChildren[i]);
+            }
+          }*/
 
           sn = clonedShadowNode;
 
