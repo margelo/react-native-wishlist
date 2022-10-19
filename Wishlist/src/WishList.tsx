@@ -37,6 +37,7 @@ type Mapping = {
 };
 
 const MappingContext = createContext<{inflatorId: string} | null>(null);
+const TemplateContext = createContext<{templateType: string} | null> (null);
 
 function getTemplatesFromChildren(children, width) {
   const nextTemplates = {
@@ -200,7 +201,11 @@ const Component = forwardRef<any, Props>(
             key={Math.random().toString()}
             collapsable={false}>
             {Object.keys(templatesRef.current).map((c, i) => (
-              <View key={keys[i]}>{templatesRef.current[c]}</View>
+              <View key={keys[i]}>
+                <TemplateContext.Provider value={{templateType: c}}>
+                  {templatesRef.current[c]}
+                </TemplateContext.Provider>
+              </View>
             ))}
           </NativeTemplateContainer>
         </NativeTemplateInterceptor>
@@ -222,6 +227,14 @@ let nativeIdGenerator = 0;
 
 function useMappingContext() {
   const context = useContext(MappingContext);
+  if (!context) {
+    throw Error('Must be rendered inside a Template component.');
+  }
+  return context;
+}
+
+function useTemplateContext() {
+  const context = useContext(TemplateContext);
   if (!context) {
     throw Error('Must be rendered inside a Template component.');
   }
@@ -286,6 +299,7 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
 ): T {
   const WishListComponent = forwardRef<any, any>(({style, ...props}, ref) => {
     const {inflatorId} = useMappingContext();
+    const {templateType} = useTemplateContext();
     const resolvedStyle = StyleSheet.flatten(style);
     const templateValues: {mapper: any; targetPath: string[]}[] = [];
     const otherProps = {};
@@ -323,8 +337,10 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
       InflatorRepository.registerMapping(
         inflatorId,
         nativeId,
+        templateType,
         (value, templateItem, pool) => {
           'worklet';
+          console.log('mapping regis ', value);
           const propsToSet: any = {};
           for (const {mapper, targetPath} of templateValues) {
             setInObject(propsToSet, targetPath, mapper(value));
@@ -401,7 +417,7 @@ export const WishList = {
       const childItem = pool.getComponent(props.template);
       const childValue = subItem;
       console.log('value', childValue);
-      const child = global.InflatorRegistry.useMappings(childItem, childValue, inflatorId, pool);
+      const child = global.InflatorRegistry.useMappings(childItem, childValue, props.template, inflatorId, pool);
       return child;
     });
 
