@@ -5,6 +5,8 @@ import React, {
   useImperativeHandle,
   useMemo,
   useRef,
+  useEffect,
+  useState,
 } from 'react';
 import {
   Image,
@@ -25,8 +27,8 @@ import NativeWishList, {
 const OffsetComponent = '__offsetComponent';
 let InflatorId = 1000;
 
-const ForEachBase = forwardRef<any, any> ((props, ref) => {
-  return (<View {...props} ref={ref} />)
+const ForEachBase = forwardRef<any, any>((props, ref) => {
+  return <View {...props} ref={ref} />;
 });
 
 type Mapping = {
@@ -37,7 +39,7 @@ type Mapping = {
 };
 
 const MappingContext = createContext<{inflatorId: string} | null>(null);
-const TemplateContext = createContext<{templateType: string} | null> (null);
+const TemplateContext = createContext<{templateType: string} | null>(null);
 
 function getTemplatesFromChildren(children, width) {
   const nextTemplates = {
@@ -73,6 +75,8 @@ type Props = ViewProps & {
   onItemNeeded?: (index: number) => any;
 };
 
+let nestedTemplates = {};
+
 const Component = forwardRef<any, Props>(
   ({inflateItem, onItemNeeded, children, style, ...rest}, ref) => {
     const nativeWishlist = useRef(null); // TODO type it properly
@@ -96,12 +100,17 @@ const Component = forwardRef<any, Props>(
       throw Error('Either inflateItem or onItemNeeded must be defined');
     }
 
-    const templatesRef = useRef<{[key: string]: React.ReactElement}>({});
+    const [templates, setTemplates] = useState<{
+      [key: string]: React.ReactElement;
+    }>({});
     const mappingRef = useRef<Mapping>({});
 
     // Template registration and tracking
-    useMemo(() => {
-      templatesRef.current = getTemplatesFromChildren(children, width);
+    console.log('before useMemo');
+    useEffect(() => {
+      console.log('useMemo');
+      const templates = getTemplatesFromChildren(children, width);
+      setTemplates(prev => Object.assign({}, prev, templates, nestedTemplates));
     }, [children, width]);
 
     // Mapping registration and tracking
@@ -168,7 +177,7 @@ const Component = forwardRef<any, Props>(
       }
     }, [resolvedInflater]);
 
-    const keys = Object.keys(templatesRef.current);
+    const keys = Object.keys(templates);
     console.log('@@@ Render WishList', inflatorIdRef.current, keys.join(', '));
 
     const mappingContext = useMemo(
@@ -177,6 +186,8 @@ const Component = forwardRef<any, Props>(
       }),
       [inflatorIdRef.current],
     );
+
+    // console.log(templatesRef.current);
 
     return (
       <MappingContext.Provider value={mappingContext}>
@@ -200,10 +211,10 @@ const Component = forwardRef<any, Props>(
             inflatorId={inflatorIdRef.current!}
             key={Math.random().toString()}
             collapsable={false}>
-            {Object.keys(templatesRef.current).map((c, i) => (
+            {Object.keys(templates).map((c, i) => (
               <View key={keys[i]}>
                 <TemplateContext.Provider value={{templateType: c}}>
-                  {templatesRef.current[c]}
+                  {templates[c]}
                 </TemplateContext.Provider>
               </View>
             ))}
@@ -219,8 +230,12 @@ type TemplateProps = {
   children: React.ReactElement;
 };
 
-function Template({children}: TemplateProps) {
-  return children;
+function Template({children, type, nested}: TemplateProps) {
+  console.log('Template type', type, children);
+
+  nestedTemplates[type] = children;
+
+  return nested ? null : children;
 }
 
 let nativeIdGenerator = 0;
@@ -295,7 +310,7 @@ function traverseObject(
 
 export function createTemplateComponent<T extends React.ComponentType<any>>(
   Component: T,
-  addProps?: (templateItem, props: any, inflatorId: string, pool: any) => void
+  addProps?: (templateItem, props: any, inflatorId: string, pool: any) => void,
 ): T {
   const WishListComponent = forwardRef<any, any>(({style, ...props}, ref) => {
     const {inflatorId} = useMappingContext();
@@ -324,7 +339,7 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
               'worklet';
               return templateType;
             },
-            targetPath: path
+            targetPath: path,
           });
         }
         setInObject(otherProps, path, value);
@@ -340,7 +355,7 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
         templateType,
         (value, templateItem, pool) => {
           'worklet';
-          console.log('mapping regis ', value);
+          // console.log('mapping regis ', value);
           const propsToSet: any = {};
           for (const {mapper, targetPath} of templateValues) {
             setInObject(propsToSet, targetPath, mapper(value));
@@ -402,28 +417,35 @@ export const WishList = {
       item.addProps({display: 'none'});
     }
   }),
-  
 
   /**
    * TODO(Szymon) It's just a prototype we have to think about matching new and old children
    * TODO(Szymon) implement setChildren
    */
-  ForEach: createTemplateComponent(ForEachBase, (item, props, inflatorId, pool) => {
-    'worklet';
+  ForEach: createTemplateComponent(
+    ForEachBase,
+    (item, props, inflatorId, pool) => {
+      'worklet';
 
-    const subItems = props.items;
-    console.log('subItems', subItems);
-    const items = subItems.map((subItem) => { 
-      const childItem = pool.getComponent(props.template);
-      const childValue = subItem;
-      console.log('value', childValue);
-      const child = global.InflatorRegistry.useMappings(childItem, childValue, props.template, inflatorId, pool);
-      return child;
-    });
+      const subItems = props.items;
+      console.log('subItems', subItems);
+      const items = subItems.map(subItem => {
+        const childItem = pool.getComponent(props.template);
+        const childValue = subItem;
+        // console.log('value', childValue);
+        const child = global.InflatorRegistry.useMappings(
+          childItem,
+          childValue,
+          props.template,
+          inflatorId,
+          pool,
+        );
+        return child;
+      });
 
-    console.log('len', items.length);
+      // console.log('len', items.length);
 
-    item.setChildren(items);
-  })
-
+      item.setChildren(items);
+    },
+  ),
 };

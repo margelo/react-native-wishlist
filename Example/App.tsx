@@ -4,7 +4,7 @@ import {ChatListView} from './Chat/ChatList';
 import {ChatItem, fetchData} from './Chat/Data';
 
 export default function App() {
-  const [data, setData] = useState<ChatItem[]>([]);
+  const [data, setData] = useState<ChatItem[]>(() => fetchData(200));
   console.log('@@@@ Render APP');
   const handleLikeItem = useCallback(
     (item: ChatItem) => {
@@ -22,7 +22,7 @@ export default function App() {
 
   // Load data
   useEffect(() => {
-    setData(fetchData(200));
+    // setData(fetchData(200));
   }, []);
 
   return (
