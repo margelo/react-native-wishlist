@@ -28,7 +28,7 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
         });
   }
 
-  if (name == "setChildren") { // TODO implement that
+  if (name == "addProps") { // TODO implement that
     return jsi::Function::createFromHostFunction(
         rt,
         nameProp,
@@ -90,7 +90,7 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
         });
   }
 
-  if (name == "addProps") {
+  if (name == "setChildren") {
     return jsi::Function::createFromHostFunction(
         rt,
         nameProp,
