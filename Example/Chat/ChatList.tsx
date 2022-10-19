@@ -29,7 +29,6 @@ export const ChatListView: React.FC<Props> = ({data, onLikeItem, style}) => {
     <WishList.Component
       style={style}
       initialIndex={0}
-      keyExtractor={(item: ChatItem) => item.id}
       onItemNeeded={index => {
         'worklet';
         return data[index];

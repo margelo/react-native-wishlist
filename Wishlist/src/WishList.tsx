@@ -381,7 +381,7 @@ export const WishList = {
   ForEach: createTemplateComponent(View, (item, props, inflatorId, pool) => {
     'worklet';
 
-    const subItems = props.subItems;
+    const subItems = props.items;
     const items = subItems.map((subItem) => { 
       const [item, value] = [pool.getComponent(props.template), subItem];
       const child = global.InflatorRegistry.useMappings(item, value, inflatorId, pool);
