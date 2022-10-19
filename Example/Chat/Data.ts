@@ -12,6 +12,14 @@ export type ChatItem = {
   reactions: ReactionItem[];
 };
 
+// https://stackoverflow.com/a/12646864
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
 const SampleText = `Lorem Ipsum is simply dummy text of the printing and typesetting industry.
 Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
 when an unknown printer took a galley of type and scrambled it to make a type specimen book.
@@ -21,6 +29,14 @@ It was popularised in the 1960s with the release of Letraset sheets containing L
 and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.`;
 
 const authors = ['John', 'Bob', 'Szymon', 'Marc', 'Elon Musk', 'Me'];
+
+const emoticons = ['🙂', '⚡️', '😵‍💫', '💩'];
+
+function getRandomReactions() {
+  const number = Math.floor(Math.random() * 5);
+  shuffleArray(emoticons);
+  return [...emoticons].splice(0, number);
+}
 
 const createChatItem = (index: number): ChatItem => {
   const len = SampleText.length;
@@ -40,9 +56,9 @@ const createChatItem = (index: number): ChatItem => {
       authors[Math.round(index % authors.length)]
     }`,
     likes: Math.random() > 0.7 ? Math.floor(Math.random() * 8) : 0,
-    reactions: [],
+    reactions: getRandomReactions().map(ele => ({emoji: ele})),
   };
-};
+}; 
 
 export const fetchData = (limit: number = 100) => {
   //   return new Promise<ChatItem[]>(resolve => {
