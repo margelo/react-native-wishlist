@@ -5,8 +5,6 @@ import React, {
   useImperativeHandle,
   useMemo,
   useRef,
-  useEffect,
-  useState,
 } from 'react';
 import {
   Image,
@@ -38,8 +36,15 @@ type Mapping = {
   };
 };
 
+type NestedTemplatesContextValue = {
+  templates: {[key: string]: any};
+  registerTemplate(type: string, component: any): void;
+};
+
 const MappingContext = createContext<{inflatorId: string} | null>(null);
 const TemplateContext = createContext<{templateType: string} | null>(null);
+const NestedTemplatesContext =
+  createContext<NestedTemplatesContextValue | null>(null);
 
 function getTemplatesFromChildren(children, width) {
   const nextTemplates = {
@@ -75,8 +80,6 @@ type Props = ViewProps & {
   onItemNeeded?: (index: number) => any;
 };
 
-let nestedTemplates = {};
-
 const Component = forwardRef<any, Props>(
   ({inflateItem, onItemNeeded, children, style, ...rest}, ref) => {
     const nativeWishlist = useRef(null); // TODO type it properly
@@ -100,20 +103,29 @@ const Component = forwardRef<any, Props>(
       throw Error('Either inflateItem or onItemNeeded must be defined');
     }
 
-    const [templates, setTemplates] = useState<{
-      [key: string]: React.ReactElement;
-    }>({});
-    const mappingRef = useRef<Mapping>({});
-
     // Template registration and tracking
-    console.log('before useMemo');
-    useEffect(() => {
-      console.log('useMemo');
-      const templates = getTemplatesFromChildren(children, width);
-      setTemplates(prev => Object.assign({}, prev, templates, nestedTemplates));
-    }, [children, width]);
+    const childrenTemplates = useMemo(
+      () => getTemplatesFromChildren(children, width),
+      [children, width],
+    );
+
+    const nestedTemplatesValue = useMemo<NestedTemplatesContextValue>(
+      () => ({
+        templates: {},
+        registerTemplate(type, component) {
+          if (this.templates[type]) {
+            return;
+          }
+
+          this.templates[type] = component;
+        },
+      }),
+      [],
+    );
 
     // Mapping registration and tracking
+    const mappingRef = useRef<Mapping>({});
+
     useMemo(() => {
       mappingRef.current = getMappingsFromChildren(children);
     }, [children, width]);
@@ -177,9 +189,6 @@ const Component = forwardRef<any, Props>(
       }
     }, [resolvedInflater]);
 
-    const keys = Object.keys(templates);
-    console.log('@@@ Render WishList', inflatorIdRef.current, keys.join(', '));
-
     const mappingContext = useMemo(
       () => ({
         inflatorId: inflatorIdRef.current!,
@@ -187,43 +196,81 @@ const Component = forwardRef<any, Props>(
       [inflatorIdRef.current],
     );
 
-    // console.log(templatesRef.current);
-
     return (
       <MappingContext.Provider value={mappingContext}>
-        <NativeTemplateInterceptor
-          inflatorId={inflatorIdRef.current!}
-          style={style}
-          collapsable={false}
-          removeClippedSubviews={false}>
-          <NativeWishList
-            style={{flex: 1}}
-            ref={nativeWishlist}
-            removeClippedSubviews={false}
-            inflatorId={inflatorIdRef.current!}
-            onEndReached={rest?.onEndReached}
-            onStartReached={rest?.onStartReached}
-            initialIndex={rest.initialIndex ?? 0}
-          />
+        <NestedTemplatesContext.Provider value={nestedTemplatesValue}>
+          <>
+            {/* Prerender templates to register all the nested templates */}
+            <View style={{display: 'none'}}>
+              {Object.keys(childrenTemplates).map((c, i) => (
+                <View key={c[i] + 'prerender'}>
+                  <TemplateContext.Provider value={{templateType: c}}>
+                    {childrenTemplates[c]}
+                  </TemplateContext.Provider>
+                </View>
+              ))}
+            </View>
 
-          <NativeTemplateContainer
-            names={keys}
-            inflatorId={inflatorIdRef.current!}
-            key={Math.random().toString()}
-            collapsable={false}>
-            {Object.keys(templates).map((c, i) => (
-              <View key={keys[i]}>
-                <TemplateContext.Provider value={{templateType: c}}>
-                  {templates[c]}
-                </TemplateContext.Provider>
-              </View>
-            ))}
-          </NativeTemplateContainer>
-        </NativeTemplateInterceptor>
+            <InnerComponent
+              inflatorId={inflatorIdRef.current!}
+              style={style}
+              nativeWishlist={nativeWishlist}
+              rest={rest}
+              templates={childrenTemplates}
+              nestedTemplates={nestedTemplatesValue.templates}
+            />
+          </>
+        </NestedTemplatesContext.Provider>
       </MappingContext.Provider>
     );
   },
 );
+
+function InnerComponent({
+  inflatorId,
+  style,
+  nativeWishlist,
+  rest,
+  templates,
+  nestedTemplates,
+}) {
+  const combinedTemplates = {...templates, ...nestedTemplates};
+
+  const keys = Object.keys(combinedTemplates);
+  console.log('@@@ Render WishList', inflatorId, keys.join(', '));
+
+  return (
+    <NativeTemplateInterceptor
+      inflatorId={inflatorId}
+      style={style}
+      collapsable={false}
+      removeClippedSubviews={false}>
+      <NativeWishList
+        style={{flex: 1}}
+        ref={nativeWishlist}
+        removeClippedSubviews={false}
+        inflatorId={inflatorId}
+        onEndReached={rest?.onEndReached}
+        onStartReached={rest?.onStartReached}
+        initialIndex={rest.initialIndex ?? 0}
+      />
+
+      <NativeTemplateContainer
+        names={keys}
+        inflatorId={inflatorId}
+        key={Math.random().toString()}
+        collapsable={false}>
+        {Object.keys(combinedTemplates).map((c, i) => (
+          <View key={keys[i]}>
+            <TemplateContext.Provider value={{templateType: c}}>
+              {combinedTemplates[c]}
+            </TemplateContext.Provider>
+          </View>
+        ))}
+      </NativeTemplateContainer>
+    </NativeTemplateInterceptor>
+  );
+}
 
 type TemplateProps = {
   type: string;
@@ -231,10 +278,10 @@ type TemplateProps = {
 };
 
 function Template({children, type, nested}: TemplateProps) {
-  console.log('Template type', type, children);
+  const nestedContext = useContext(NestedTemplatesContext);
 
-  nestedTemplates[type] = children;
-
+  nestedContext?.registerTemplate(type, children);
+  // TODO(terry): Get rid of this nested prop
   return nested ? null : children;
 }
 
