@@ -9,6 +9,38 @@ import {useTemplateContext} from './TemplateContext';
 import {TemplateValue} from './TemplateValue';
 import {useWishListContext} from './WishListContext';
 
+// This is based on types from @types/react-native createAnimatedComponent.
+
+type Nullable = undefined | null;
+type Primitive = string | number | boolean | symbol;
+type Builtin = Function | Date | Error | RegExp;
+
+interface WithTemplateArray<P> extends Array<WithTemplateValue<P>> {}
+type WithTemplateObject<T> = {
+  [K in keyof T]: WithTemplateValue<T[K]>;
+};
+
+type WithTemplateValue<T> = T extends Builtin | Nullable
+  ? T
+  : T extends Primitive
+  ? T | TemplateValue<T>
+  : T extends Array<infer P>
+  ? WithTemplateArray<P>
+  : T extends {}
+  ? WithTemplateObject<T>
+  : T;
+
+type NonTemplateProps = 'key' | 'ref';
+
+type TemplateProps<T> = {
+  [key in keyof T]: key extends NonTemplateProps
+    ? T[key]
+    : WithTemplateValue<T[key]>;
+};
+
+interface TemplateComponent<T extends React.ComponentType<any>>
+  extends React.FC<TemplateProps<React.ComponentPropsWithRef<T>>> {}
+
 let nativeIdGenerator = 0;
 
 function setInObject(obj: any, path: string[], value: any) {
@@ -43,15 +75,15 @@ function traverseObject(
   }
 }
 
-export function createTemplateComponent<PropsT extends {}>(
-  Component: React.ComponentType<PropsT>,
+export function createTemplateComponent<T extends React.ComponentType<any>>(
+  Component: T,
   addProps?: (
     templateItem: TemplateItem,
     props: any,
     inflatorId: string,
     pool: ComponentPool,
   ) => void,
-): React.ComponentType<PropsT> {
+): TemplateComponent<T> {
   const WishListComponent = forwardRef<any, any>(({style, ...props}, ref) => {
     const {inflatorId} = useWishListContext();
     const {templateType} = useTemplateContext();
@@ -72,6 +104,7 @@ export function createTemplateComponent<PropsT extends {}>(
 
         applyHacks();
       } else {
+        // @ts-expect-error TODO: fix this.
         if (Component === ForEachBase && path[0] === 'template') {
           const templateType = value;
           templateValues.push({
@@ -114,7 +147,7 @@ export function createTemplateComponent<PropsT extends {}>(
 
     // @ts-expect-error: this is ok.
     return <Component {...otherProps} ref={ref} nativeID={nativeId} />;
-  }) as unknown as React.ComponentType<PropsT>;
+  }) as unknown as TemplateComponent<T>;
 
   WishListComponent.displayName = `WishList(${Component.displayName})`;
 

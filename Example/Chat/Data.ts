@@ -7,16 +7,16 @@ export type ChatItem = {
   author: string;
   type: 'me' | 'other';
   message: string;
-  avatarUrl?: string;
+  avatarUrl: string;
   likes: number;
   reactions: ReactionItem[];
 };
 
 // https://stackoverflow.com/a/12646864
-function shuffleArray(array) {
+function shuffleArray(array: any[]) {
   for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
   }
 }
 
@@ -58,8 +58,7 @@ const createChatItem = (index: number): ChatItem => {
     likes: Math.random() > 0.7 ? Math.floor(Math.random() * 8) : 0,
     reactions: getRandomReactions().map(ele => ({emoji: ele})),
   };
-}; 
-
+};
 export const fetchData = (limit: number = 100) => {
   //   return new Promise<ChatItem[]>(resolve => {
   //     resolve(
