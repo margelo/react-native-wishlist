@@ -9,17 +9,12 @@ interface Props {
 
 export const Reaction = () => {
   const emoji = useTemplateValue((item: ReactionItem) => {
-    if (!item.emoji) {
-      console.log('lol', item);
-    } else {
-      console.log('non lol', item.emoji);
-    }
     return item.emoji || 'b';
   });
 
   return (
     <View>
-      <Wishlist.Text >{emoji}</Wishlist.Text>
+      <Wishlist.Text>{emoji}</Wishlist.Text>
     </View>
   );
 };
@@ -57,7 +52,15 @@ export const ChatItemView: React.FC<Props> = ({type}) => {
         <Wishlist.Text style={styles.messageText}>{message}</Wishlist.Text>
       </View>
 
-      <Wishlist.ForEach style={{flexDirection: 'row'}} items={reactions} template="reaction" />
+      <Wishlist.Template type="reaction">
+        <Reaction />
+      </Wishlist.Template>
+
+      <Wishlist.ForEach
+        style={{flexDirection: 'row'}}
+        items={reactions}
+        template="reaction"
+      />
     </View>
   );
 };

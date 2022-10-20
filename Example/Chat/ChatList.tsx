@@ -1,7 +1,7 @@
 import React, {useCallback, useMemo} from 'react';
 import type {ViewProps} from 'react-native';
 import {WishList} from 'wishlist';
-import {ChatItemView, Reaction} from './ChatItem';
+import {ChatItemView} from './ChatItem';
 import {ChatItem} from './Data';
 
 interface Props extends ViewProps {
@@ -49,9 +49,6 @@ export const ChatListView: React.FC<Props> = ({data, onLikeItem, style}) => {
       </WishList.Template>
       <WishList.Template type="other">
         <ChatItemView type="other" />
-      </WishList.Template>
-     <WishList.Template type="reaction">
-        <Reaction />
       </WishList.Template>
     </WishList.Component>
   );
