@@ -70,7 +70,7 @@ export const ChatItemView: React.FC<Props> = ({type}) => {
         style={{flexDirection: 'row'}}
         items={reactions}
         template="reaction">
-        <Wishlist.Template nested type="reaction">
+        <Wishlist.Template type="reaction">
           <Reaction />
         </Wishlist.Template>
       </ForEach>
