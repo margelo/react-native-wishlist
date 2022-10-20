@@ -6,33 +6,25 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
-import {
-  Image,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-  ViewProps,
-} from 'react-native';
+import {Image, Text, useWindowDimensions, View, ViewProps} from 'react-native';
+import {createTemplateComponent} from './createTemplateComponent';
 import {initEventHandler} from './EventHandler';
+import {ForEach} from './ForEach';
 import InflatorRepository, {
   ComponentPool,
   InflateMethod,
   MappingInflateMethod,
-  TemplateItem,
 } from './InflatorRepository';
 import NativeTemplateContainer from './NativeViews/NativeTemplateContainer';
 import NativeTemplateInterceptor from './NativeViews/NativeTemplateInterceptor';
 import NativeWishList, {
   WishlistCommands,
 } from './NativeViews/WishlistNativeComponent';
+import {TemplateContext} from './TemplateContext';
+import {WishListContext} from './WishListContext';
 
 const OffsetComponent = '__offsetComponent';
 let InflatorId = 1000;
-
-const ForEachBase = forwardRef<any, any>((props, ref) => {
-  return <View {...props} ref={ref} />;
-});
 
 type Mapping = {
   templateType?: string;
@@ -44,11 +36,6 @@ type NestedTemplatesContextValue = {
   registerTemplate(type: string, component: any): void;
 };
 
-const MappingContext = createContext<{inflatorId: string} | null>(null);
-const TemplateContext = createContext<{
-  templateType: string;
-  renderChildren?: boolean;
-} | null>(null);
 const TemplatesRegistryContext =
   createContext<NestedTemplatesContextValue | null>(null);
 
@@ -183,7 +170,7 @@ const Component = forwardRef(
               : true)
           ) {
             try {
-              mappingRef.current![key].onInflate(value, templateItem);
+              mappingRef.current![key].onInflate(value, templateItem, pool);
             } catch (err) {
               console.error(
                 'Error calling mapper for key / template',
@@ -223,7 +210,7 @@ const Component = forwardRef(
     );
 
     return (
-      <MappingContext.Provider value={mappingContext}>
+      <WishListContext.Provider value={mappingContext}>
         <TemplatesRegistryContext.Provider value={templatesRegistry}>
           <>
             {/* Prerender templates to register all the nested templates */}
@@ -248,7 +235,7 @@ const Component = forwardRef(
             />
           </>
         </TemplatesRegistryContext.Provider>
-      </MappingContext.Provider>
+      </WishListContext.Provider>
     );
   },
 );
@@ -257,11 +244,11 @@ type InnerComponentProps = ViewProps & {
   inflatorId: string;
   nativeWishlist: any;
   rest: any;
-  templates: { [key: string]: any };
-  nestedTemplates: { [key: string]: any };
-}
+  templates: {[key: string]: any};
+  nestedTemplates: {[key: string]: any};
+};
 
-function InnerComponent( {
+function InnerComponent({
   inflatorId,
   style,
   nativeWishlist,
@@ -321,149 +308,6 @@ function Template({children, type}: TemplateProps) {
   return templates?.renderChildren ? children : null;
 }
 
-let nativeIdGenerator = 0;
-
-function useMappingContext() {
-  const context = useContext(MappingContext);
-  if (!context) {
-    throw Error('Must be rendered inside a Template component.');
-  }
-  return context;
-}
-
-function useTemplateContext() {
-  const context = useContext(TemplateContext);
-  if (!context) {
-    throw Error('Must be rendered inside a Template component.');
-  }
-  return context;
-}
-
-type TemplateValueMapper<T, K> = (item: T) => K;
-
-class TemplateValue<T, K> {
-  _mapper: TemplateValueMapper<T, K>;
-
-  constructor(mapper: TemplateValueMapper<T, K>) {
-    this._mapper = mapper;
-  }
-
-  getMapper() {
-    return this._mapper;
-  }
-}
-
-export function useTemplateValue<T, K>(mapper: TemplateValueMapper<T, K>) {
-  return useMemo(() => {
-    return new TemplateValue(mapper);
-  }, [mapper]) as unknown as K;
-}
-
-function setInObject(obj: any, path: string[], value: any) {
-  'worklet';
-
-  let current = obj;
-  for (let i = 0; i < path.length - 1; i++) {
-    current[path[i]] = current[path[i]] ?? {};
-    current = current[path[i]];
-  }
-  current[path[path.length - 1]] = value;
-}
-
-function traverseObject(
-  obj: any,
-  callback: (path: string[], value: any) => void,
-) {
-  const stack: {path: string[]; value: any}[] = [{path: [], value: obj}];
-  while (stack.length > 0) {
-    const {path, value} = stack.pop()!;
-    if (
-      value &&
-      typeof value === 'object' &&
-      !(value instanceof TemplateValue)
-    ) {
-      Object.keys(value).forEach(key => {
-        stack.push({path: [...path, key], value: value[key]});
-      });
-    } else {
-      callback(path, value);
-    }
-  }
-}
-
-export function createTemplateComponent<PropsT extends {}>(
-  Component: React.ComponentType<PropsT>,
-  addProps?: (templateItem: TemplateItem, props: any, inflatorId: string, pool: any) => void,
-): React.ComponentType<PropsT> {
-  const WishListComponent = forwardRef<any, any>(({style, ...props}, ref) => {
-    const {inflatorId} = useMappingContext();
-    const {templateType} = useTemplateContext();
-    const resolvedStyle = StyleSheet.flatten(style);
-    const templateValues: {mapper: any; targetPath: string[]}[] = [];
-    const otherProps = {};
-    traverseObject({...props, style: resolvedStyle}, (path, value) => {
-      const applyHacks = () => {
-        // Text component needs to receive a string child to work properly.
-        // @ts-expect-error TODO: fix this.
-        if (path[0] === 'children' && Component === Text) {
-          setInObject(otherProps, path, ' ');
-        }
-      };
-
-      if (value instanceof TemplateValue) {
-        templateValues.push({mapper: value.getMapper(), targetPath: path});
-
-        applyHacks();
-      } else {
-        if (Component === ForEachBase && path[0] === 'template') {
-          const templateType = value;
-          templateValues.push({
-            mapper: () => {
-              'worklet';
-              return templateType;
-            },
-            targetPath: path,
-          });
-        }
-        setInObject(otherProps, path, value);
-      }
-    });
-
-    const nativeId = useMemo(() => `template_id_${nativeIdGenerator++}`, []);
-
-    useMemo(() => {
-      InflatorRepository.registerMapping(
-        inflatorId,
-        nativeId,
-        templateType,
-        (value, templateItem, pool) => {
-          'worklet';
-          // console.log('mapping regis ', value);
-          const propsToSet: any = {};
-          for (const {mapper, targetPath} of templateValues) {
-            setInObject(propsToSet, targetPath, mapper(value));
-          }
-          // Styles need to be passed as props.
-          const {style, ...otherPropsToSet} = propsToSet;
-          const finalPropsToSet = {...otherPropsToSet, ...style};
-          if (addProps) {
-            addProps(templateItem, finalPropsToSet, inflatorId, pool);
-          } else {
-            templateItem.addProps(finalPropsToSet);
-          }
-        },
-      );
-    }, [inflatorId, nativeId]);
-
-    // @ts-expect-error: this is ok.
-    return <Component {...otherProps} ref={ref} nativeID={nativeId} />;
-  }) as unknown as React.ComponentType<PropsT>;
-
-  WishListComponent.displayName = `WishList(${Component.displayName})`;
-
-  return WishListComponent;
-}
-
 type MappingProps = {
   nativeId: string;
   templateType?: string;
@@ -503,30 +347,5 @@ export const WishList = {
    * TODO(Szymon) It's just a prototype we have to think about matching new and old children
    * TODO(Szymon) implement setChildren
    */
-  ForEach: createTemplateComponent(
-    ForEachBase,
-    (item, props, inflatorId, pool) => {
-      'worklet';
-
-      const subItems = props.items;
-      // console.log('subItems', subItems);
-      const items = subItems.map(subItem => {
-        const childItem = pool.getComponent(props.template);
-        const childValue = subItem;
-        // console.log('value', childValue);
-        const child = global.InflatorRegistry.useMappings(
-          childItem,
-          childValue,
-          props.template,
-          inflatorId,
-          pool,
-        );
-        return child;
-      });
-
-      // console.log('len', items.length);
-
-      item.setChildren(items);
-    },
-  ),
+  ForEach,
 };
