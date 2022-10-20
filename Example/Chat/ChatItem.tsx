@@ -9,11 +9,6 @@ interface Props {
 
 export const Reaction = () => {
   const emoji = useTemplateValue((item: ReactionItem) => {
-    if (!item.emoji) {
-      // console.log('lol', item);
-    } else {
-      // console.log('non lol', item.emoji);
-    }
     return item.emoji || 'b';
   });
 
@@ -23,15 +18,6 @@ export const Reaction = () => {
     </View>
   );
 };
-
-function ForEach({children, ...props}) {
-  return (
-    <>
-      <Wishlist.ForEach {...props} />
-      {children}
-    </>
-  );
-}
 
 export const ChatItemView: React.FC<Props> = ({type}) => {
   const author = useTemplateValue((item: ChatItem) => item.author);
@@ -66,14 +52,15 @@ export const ChatItemView: React.FC<Props> = ({type}) => {
         <Wishlist.Text style={styles.messageText}>{message}</Wishlist.Text>
       </View>
 
-      <ForEach
+      <Wishlist.Template type="reaction">
+        <Reaction />
+      </Wishlist.Template>
+
+      <Wishlist.ForEach
         style={{flexDirection: 'row'}}
         items={reactions}
-        template="reaction">
-        <Wishlist.Template type="reaction">
-          <Reaction />
-        </Wishlist.Template>
-      </ForEach>
+        template="reaction"
+      />
     </View>
   );
 };
