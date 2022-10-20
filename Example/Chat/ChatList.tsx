@@ -2,7 +2,7 @@ import React, {useCallback, useMemo} from 'react';
 import type {ViewProps} from 'react-native';
 import {WishList} from 'wishlist';
 import {ChatItemView} from './ChatItem';
-import {ChatItem} from './Data';
+import type {ChatItem} from './Data';
 
 interface Props extends ViewProps {
   data: ChatItem[];
