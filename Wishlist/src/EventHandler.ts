@@ -1,6 +1,4 @@
-import React from 'react';
-
-const runOnUI = (...args) => {
+const runOnUI = (...args: any[]) => {
   const f = require('react-native-reanimated').runOnUI; //delay reanimated init
   return f(...args);
 };
@@ -10,16 +8,15 @@ const maybeInit = () => {
   if (!done) {
     done = true;
     runOnUI(() => {
-      'worklet'
-      global.handlers = {}; 
+      'worklet';
+      global.handlers = {};
 
-      global.handleEvent = (type, tag, payload) => {
+      global.handleEvent = (type, tag) => {
         const callback = global.handlers[tag.toString() + type];
         if (callback) {
           callback();
         }
-      }
-    
+      };
     })();
   }
 };
