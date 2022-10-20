@@ -1395,10 +1395,10 @@
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.5.tgz#5f19d2b85a98e9558036f6a3cacc8819420f05cf"
   integrity sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==
 
-"@types/react-native@^0.70.0":
-  version "0.70.4"
-  resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.70.4.tgz#316f0e9b4b51bbe5cecf09284555f01283afe3b2"
-  integrity sha512-z5tKfblHLG6jts2AQcioDw4N+F2EzflO9n495yNyqyMYRkSIVTLX64MHBeqMp5wfOY5mshy0GsOgnFSXrXKQSg==
+"@types/react-native@^0.70.5":
+  version "0.70.5"
+  resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.70.5.tgz#f963d6921deb901dc2be8b96d9179a77b5406a23"
+  integrity sha512-Z+NdP5EB1qGSHPSOcsrXqxXrxlFyp/GBllajUIEQ0+XVSFd1l/B+nmHBvACiZvDwRVE/l2hL2pBWeOUPi2C1JA==
   dependencies:
     "@types/react" "*"
 
@@ -1411,7 +1411,7 @@
     "@types/scheduler" "*"
     csstype "^3.0.2"
 
-"@types/react@^18.1.0":
+"@types/react@^18.0.12":
   version "18.0.21"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.21.tgz#b8209e9626bb00a34c76f55482697edd2b43cc67"
   integrity sha512-7QUCOxvFgnD5Jk8ZKlUAhVcRj7GuJRjnjjiY/IUBWKgOlnvDvTMLD4RTF7NPyVmbRhNrbomZiOepg7M/2Kj1mA==
@@ -6689,6 +6689,11 @@ typedarray-to-buffer@^3.1.5:
   integrity sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==
   dependencies:
     is-typedarray "^1.0.0"
+
+typescript@^4.8.4:
+  version "4.8.4"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.8.4.tgz#c464abca159669597be5f96b8943500b238e60e6"
+  integrity sha512-QCh+85mCy+h0IGff8r5XWzOVSbBO+KfeYrMQh7NJ58QujwcE22u+NUSmUxqF+un70P9GXKxa2HCNiTTMJknyjQ==
 
 uglify-es@^3.1.9:
   version "3.3.9"
