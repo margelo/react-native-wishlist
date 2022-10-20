@@ -30,12 +30,17 @@ import NativeWishList, {
 const OffsetComponent = '__offsetComponent';
 let InflatorId = 1000;
 
+const ForEachBase = forwardRef<any, any> ((props, ref) => {
+  return (<View {...props} ref={ref} />)
+});
+
 type Mapping = {
   templateType?: string;
   onInflate: MappingInflateMethod;
 };
 
 const MappingContext = createContext<{inflatorId: string} | null>(null);
+const TemplateContext = createContext<{templateType: string} | null> (null);
 
 function getTemplatesFromChildren(children: React.ReactNode, width: number) {
   const nextTemplates: {[key: string]: React.ReactElement} = {
@@ -218,7 +223,11 @@ const Component = forwardRef(
             key={Math.random().toString()}
             collapsable={false}>
             {Object.keys(templatesRef.current).map((c, i) => (
-              <View key={keys[i]}>{templatesRef.current[c]}</View>
+              <View key={keys[i]}>
+                <TemplateContext.Provider value={{templateType: c}}>
+                  {templatesRef.current[c]}
+                </TemplateContext.Provider>
+              </View>
             ))}
           </NativeTemplateContainer>
         </NativeTemplateInterceptor>
@@ -240,6 +249,14 @@ let nativeIdGenerator = 0;
 
 function useMappingContext() {
   const context = useContext(MappingContext);
+  if (!context) {
+    throw Error('Must be rendered inside a Template component.');
+  }
+  return context;
+}
+
+function useTemplateContext() {
+  const context = useContext(TemplateContext);
   if (!context) {
     throw Error('Must be rendered inside a Template component.');
   }
@@ -300,10 +317,11 @@ function traverseObject(
 
 export function createTemplateComponent<PropsT extends {}>(
   Component: React.ComponentType<PropsT>,
-  addProps?: (templateItem: TemplateItem, props: any) => void,
+  addProps?: (templateItem: TemplateItem, props: any, inflatorId: string, pool: any) => void,
 ): React.ComponentType<PropsT> {
   const WishListComponent = forwardRef<any, any>(({style, ...props}, ref) => {
     const {inflatorId} = useMappingContext();
+    const {templateType} = useTemplateContext();
     const resolvedStyle = StyleSheet.flatten(style);
     const templateValues: {mapper: any; targetPath: string[]}[] = [];
     const otherProps = {};
@@ -321,6 +339,16 @@ export function createTemplateComponent<PropsT extends {}>(
 
         applyHacks();
       } else {
+        if (Component === ForEachBase && path[0] === 'template') {
+          const templateType = value;
+          templateValues.push({
+            mapper: () => {
+              'worklet';
+              return templateType;
+            },
+            targetPath: path
+          });
+        }
         setInObject(otherProps, path, value);
       }
     });
@@ -331,8 +359,10 @@ export function createTemplateComponent<PropsT extends {}>(
       InflatorRepository.registerMapping(
         inflatorId,
         nativeId,
-        (value, templateItem) => {
+        templateType,
+        (value, templateItem, pool) => {
           'worklet';
+          console.log('mapping regis ', value);
           const propsToSet: any = {};
           for (const {mapper, targetPath} of templateValues) {
             setInObject(propsToSet, targetPath, mapper(value));
@@ -341,7 +371,7 @@ export function createTemplateComponent<PropsT extends {}>(
           const {style, ...otherPropsToSet} = propsToSet;
           const finalPropsToSet = {...otherPropsToSet, ...style};
           if (addProps) {
-            addProps(templateItem, finalPropsToSet);
+            addProps(templateItem, finalPropsToSet, inflatorId, pool);
           } else {
             templateItem.addProps(finalPropsToSet);
           }
@@ -382,4 +412,38 @@ export const WishList = {
     item.RawText?.addProps({text: children});
     item.addProps(other);
   }),
+
+  IF: createTemplateComponent(View, (item, props) => {
+    'worklet';
+
+    if (props.condition) {
+      item.addProps({display: 'flex'});
+    } else {
+      item.addProps({display: 'none'});
+    }
+  }),
+  
+
+  /**
+   * TODO(Szymon) It's just a prototype we have to think about matching new and old children
+   * TODO(Szymon) implement setChildren
+   */
+  ForEach: createTemplateComponent(ForEachBase, (item, props, inflatorId, pool) => {
+    'worklet';
+
+    const subItems = props.items;
+    console.log('subItems', subItems);
+    const items = subItems.map((subItem) => { 
+      const childItem = pool.getComponent(props.template);
+      const childValue = subItem;
+      console.log('value', childValue);
+      const child = global.InflatorRegistry.useMappings(childItem, childValue, props.template, inflatorId, pool);
+      return child;
+    });
+
+    console.log('len', items.length);
+
+    item.setChildren(items);
+  })
+
 };

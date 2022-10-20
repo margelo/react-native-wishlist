@@ -60,20 +60,25 @@ const maybeInit = () => {
               return result;
             }
             const [item, value] = result;
-            const mapping = mappings.get(id);
-            if (mapping) {
-              for (const [nativeId, inflate] of mapping.entries()) {
-                const templateItem = item.getByWishId(nativeId);
-                if (templateItem) {
-                  inflate(value, templateItem);
-                }
-              }
-            }
-            return item;
+            
+            return global.InflatorRegistry.useMappings(item, value, value.type, id, pool);
           } else {
             console.log('Inflator not found for id: ' + id);
             return undefined;
           }
+        },
+        useMappings: (item, value, templateType,  id, pool) => {
+          console.log('value mappings', value);
+          const mapping = mappings.get(id)?.get(templateType);
+          if (mapping) {
+            for (const [nativeId, inflate] of mapping.entries()) {
+              const templateItem = item.getByWishId(nativeId);
+              if (templateItem) {
+                inflate(value, templateItem, pool);
+              }
+            }
+          }
+          return item;
         },
         registerInflator: (id, inflateMethod) => {
           console.log('InflatorRegistry::register', id);
@@ -84,19 +89,12 @@ const maybeInit = () => {
           registry.delete(id);
           mappings.delete(id);
         },
-        registerMapping: (
-          inflatorId: string,
-          nativeId: string,
-          inflateMethod,
-        ) => {
-          console.log(
-            'InflatorRegistry::registerMapping',
-            inflatorId,
-            nativeId,
-            inflateMethod,
-          );
+        registerMapping: (inflatorId: string, nativeId: string, templateType: string, inflateMethod) => {
+          console.log("InflatorRegistry::registerMapping", inflatorId, nativeId, templateType, inflateMethod);
           const mapping = mappings.get(inflatorId) ?? new Map();
-          mapping.set(nativeId, inflateMethod);
+          const innerMapping = mapping.get(templateType) ?? new Map();
+          innerMapping.set(nativeId, inflateMethod);
+          mapping.set(templateType, innerMapping);
           mappings.set(inflatorId, mapping);
         },
       };
@@ -124,19 +122,11 @@ export default class InflatorRepository {
     })();
   }
 
-  static registerMapping(
-    inflatorId: string,
-    nativeId: string,
-    inflateMethod: MappingInflateMethod,
-  ) {
+  static registerMapping(inflatorId: string, nativeId: string, templateType: string, inflateMethod) {
     maybeInit();
     runOnUI(() => {
-      'worklet';
-      global.InflatorRegistry.registerMapping(
-        inflatorId,
-        nativeId,
-        inflateMethod,
-      );
+      "worklet";
+      global.InflatorRegistry.registerMapping(inflatorId, nativeId, templateType, inflateMethod);
     })();
   }
 }
