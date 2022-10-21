@@ -1,7 +1,7 @@
 // this is from trust wallet assets
 import tokenList from './tokenList.json';
 
-type Asset = {
+export type AssetItemType = {
   name: string;
   balance: string;
   nativeBalance: string;
@@ -9,11 +9,12 @@ type Asset = {
   network: 'ARBITRUM' | 'ERC20' | 'OPTIMISM' | 'POLYGON' | 'ETH';
   address?: string;
   icon?: string;
+  change?: string;
 };
 
 const ethNativeBalance = Math.floor(Math.random() * 1000);
 
-const ethToken: Asset = {
+const ethToken: AssetItemType = {
   name: 'Etherium',
   nativeBalance: ethNativeBalance.toString(),
   balance: (Math.floor(Math.random() * 100) * ethNativeBalance).toString(),
@@ -21,7 +22,7 @@ const ethToken: Asset = {
   network: 'ETH',
 };
 
-const tokens: Asset[] = tokenList
+const tokens: AssetItemType[] = tokenList
   .map((token) => {
     const nativeBalance = Math.floor(Math.random() * 1000);
     const price = Math.floor(Math.random() * 100);
@@ -32,7 +33,7 @@ const tokens: Asset[] = tokenList
       balance: (nativeBalance * price).toString(),
       nativeBalance: nativeBalance.toString(),
       symbol: token.symbol,
-      network: token.type as Asset['network'],
+      network: token.type as AssetItemType['network'],
       icon: token.logoURI,
     };
   })
