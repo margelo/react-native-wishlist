@@ -27,7 +27,6 @@ export const AssetListExample: React.FC<{}> = () => {
   // Change this line to false show less by default
   const [isExpanded, setIsExpanded] = useState(true);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleEdit = useCallback(() => {
     setIsEditing((v) => !v);
   }, []);
@@ -37,20 +36,26 @@ export const AssetListExample: React.FC<{}> = () => {
   }, []);
 
   const list = useMemo<ListItemsType[]>(() => {
-    const arr = [{ type: 'asset-list-header' }].concat(tokens);
+    const arr = [{ type: 'asset-list-header', isExpanded }].concat(tokens);
 
-    const topItems = arr
-      .slice(0, 6)
-      .concat({ type: 'asset-list-separator' }) as ListItemsType[];
+    const topItems = arr.slice(0, 6).concat({
+      type: 'asset-list-separator',
+      isEditing,
+      isExpanded,
+    }) as ListItemsType[];
 
     if (!isExpanded) {
       return topItems;
     }
 
     return topItems.concat(arr.slice(6, arr.length) as ListItemsType[]);
-  }, [isExpanded]);
+  }, [isExpanded, isEditing]);
 
   const onItemNeeded = useWorkletCallback((index) => list[index], [list]);
+
+  const handleExpandWorklet = useWorkletCallback(() => {
+    console.log('TOUCH');
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -67,7 +72,7 @@ export const AssetListExample: React.FC<{}> = () => {
         <WishList.Template type="asset-list-separator">
           <AssetListSeparator
             isEditing={isEditing}
-            onExpand={handleExpand}
+            onExpandWorklet={handleExpandWorklet}
             isExpanded={isExpanded}
           />
         </WishList.Template>

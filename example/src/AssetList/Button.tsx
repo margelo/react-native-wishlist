@@ -1,16 +1,24 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { TemplateValue, WishList } from 'wishlist';
 
 type HeaderProps = {
-  onPress: () => void;
   active: boolean;
   disabled?: boolean;
-  text: string;
+  text: TemplateValue<any> | string;
+  onPressWorklet: () => void;
+  nativeId: string;
 };
 
-export function Button({ onPress, text, active, disabled }: HeaderProps) {
+export function Button({
+  onPressWorklet,
+  text,
+  active,
+  disabled,
+  nativeId,
+}: HeaderProps) {
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
+    <WishList.Pressable nativeId={nativeId} onPress={onPressWorklet}>
       <View
         style={[
           styles.button,
@@ -18,11 +26,13 @@ export function Button({ onPress, text, active, disabled }: HeaderProps) {
           disabled && styles.disabled,
         ]}
       >
-        <Text style={[styles.buttonText, active && styles.buttonTextActive]}>
+        <WishList.Text
+          style={[styles.buttonText, active && styles.buttonTextActive]}
+        >
           {text}
-        </Text>
+        </WishList.Text>
       </View>
-    </TouchableOpacity>
+    </WishList.Pressable>
   );
 }
 

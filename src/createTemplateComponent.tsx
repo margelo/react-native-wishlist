@@ -91,6 +91,10 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
     const nativeId = useMemo(() => `template_id_${nativeIdGenerator++}`, []);
 
     const otherPropsMemoized = useMemo(() => {
+      if (!inflatorId) {
+        return {};
+      }
+
       const resolvedStyle = StyleSheet.flatten(style);
       const templateValues: {
         mapper: TemplateValueMapper<any, any>;
