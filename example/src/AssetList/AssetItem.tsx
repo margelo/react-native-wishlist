@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTemplateValue, WishList } from 'wishlist';
 import type { AssetItemType } from './assets';
+import { ItemCheckbox } from './ItemCheckbox';
 const ethIcon = require('./eth.png');
 
 function AssetInfo() {
@@ -40,9 +41,15 @@ function AssetInfo() {
   );
 }
 
-export function AssetItem() {
+type AssetItemProps = {
+  isEditing: boolean;
+};
+
+export function AssetItem({ isEditing }: AssetItemProps) {
   return (
-    <View style={[styles.rootContainer, styles.nonEditMode]}>
+    <View style={[styles.rootContainer, !isEditing && styles.nonEditMode]}>
+      {isEditing && <ItemCheckbox />}
+
       <AssetInfo />
     </View>
   );
@@ -97,7 +104,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   rootContainer: {
-    // flex: 1,
+    alignItems: 'center',
     flexDirection: 'row',
     overflow: 'visible',
   },
