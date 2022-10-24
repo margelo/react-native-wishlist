@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTemplateValue, WishList } from 'wishlist';
+import { AssetIcon } from './AssetIcon';
 import type { AssetItemType } from './assets';
 import { ItemCheckbox } from './ItemCheckbox';
-const ethIcon = require('./eth.png');
 
 function AssetInfo() {
   const name = useTemplateValue((item: AssetItemType) => item.name);
@@ -14,16 +14,15 @@ function AssetInfo() {
   const change = useTemplateValue((item: AssetItemType) =>
     item.change ? `${item.change}%` : '-',
   );
-  // TODO(terry): Figure out why local images won't work
-  const uri = useTemplateValue((item: AssetItemType) =>
-    item.network === 'ETH' ? ethIcon : item.icon,
+
+  // TODO(terry): Why no color?
+  const changeColor = useTemplateValue((item: AssetItemType) =>
+    item.change && parseFloat(item.change) > 0 ? '#00D146' : '#9DA0A8',
   );
 
   return (
     <View style={styles.container}>
-      <View style={styles.iconContainer}>
-        <WishList.Image style={styles.icon} source={{ uri }} />
-      </View>
+      <AssetIcon />
 
       <View style={styles.content}>
         <View style={styles.row}>
@@ -34,7 +33,9 @@ function AssetInfo() {
           <WishList.Text style={styles.nativeBalance}>
             {nativeBalance}
           </WishList.Text>
-          <WishList.Text style={styles.change}>{change}</WishList.Text>
+          <WishList.Text style={[styles.change, { color: changeColor }]}>
+            {change}
+          </WishList.Text>
         </View>
       </View>
     </View>
@@ -70,7 +71,6 @@ const styles = StyleSheet.create({
   change: {
     textAlign: 'right',
     fontSize: 14,
-    color: '#9DA0A8',
   },
 
   container: {
@@ -84,12 +84,7 @@ const styles = StyleSheet.create({
   bottom: {
     marginTop: 2,
   },
-  iconContainer: {
-    elevation: 6,
-    height: 59,
-    overflow: 'visible',
-    paddingTop: 9,
-  },
+
   icon: {
     borderRadius: 20,
     height: 40,

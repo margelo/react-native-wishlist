@@ -24,7 +24,7 @@ export function AssetListSeparator({
       ) : (
         <Button
           active={false}
-          text={isExpanded ? 'Less ᐱ' : 'More ᐯ'}
+          text={isExpanded ? 'Less ↓' : 'More ↑'}
           onPress={onExpand}
         />
       )}

@@ -1,6 +1,26 @@
 
 # Assets List
 
+## TODO
+
+- [] Handle touch events on asset item to show alert with an address
+- [] Handle touch event on "more" button to show more items
+- [] Handle edit/normal state
+- [] Show pin/hide when in edit mode
+- [] Check/uncheck single item
+- [] Change pin/hide buttons based on checked items
+- [] Add pinned and hidden state
+- [] Local images as url
+- [] Text color based on template value
+
+What we can do later:
+
+- [] Button animation (Reanimated?)
+- [] Use real data
+- [] Sticky headers (Reanimated?)
+- [] Collectibles
+- [] Add fallback coin component
+
 ## User should be able
 
 - view the list of all wallet's assets

@@ -23,7 +23,7 @@ type ListItemsType =
   | { type: 'asset-list-header' };
 
 export const AssetListExample: React.FC<{}> = () => {
-  const [isEditing, setIsEditing] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   // Change this line to false show less by default
   const [isExpanded, setIsExpanded] = useState(true);
 
@@ -37,11 +37,11 @@ export const AssetListExample: React.FC<{}> = () => {
   }, []);
 
   const list = useMemo<ListItemsType[]>(() => {
-    const arr: ListItemsType[] = [{ type: 'asset-list-header' }].concat(tokens);
+    const arr = [{ type: 'asset-list-header' }].concat(tokens);
 
-    const topItems: ListItemsType[] = arr
+    const topItems = arr
       .slice(0, 6)
-      .concat({ type: 'asset-list-separator' });
+      .concat({ type: 'asset-list-separator' }) as ListItemsType[];
 
     if (!isExpanded) {
       return topItems;
