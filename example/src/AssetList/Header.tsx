@@ -1,25 +1,15 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View, Image } from 'react-native';
 
-type HeaderProps = {
-  onEditPress: () => void;
-  isEditing: boolean;
-};
+type HeaderProps = {};
 
-export function Header({ onEditPress, isEditing }: HeaderProps) {
+const VITALIK_AVATAR =
+  'https://gateway.ipfs.io/ipfs/QmSP4nq9fnN9dAiCj42ug9Wa79rqmQerZXZch82VqpiH7U/image.gif';
+
+export function Header({}: HeaderProps) {
   return (
     <View style={styles.container}>
-      <View style={styles.avatar} />
-
-      <TouchableOpacity onPress={onEditPress} activeOpacity={0.8}>
-        <View style={[styles.button, isEditing && styles.buttonActive]}>
-          <Text
-            style={[styles.buttonText, isEditing && styles.buttonTextActive]}
-          >
-            {isEditing ? 'Done' : 'Edit'}
-          </Text>
-        </View>
-      </TouchableOpacity>
+      <Image style={styles.avatar} source={{ uri: VITALIK_AVATAR }} />
     </View>
   );
 }
@@ -38,25 +28,5 @@ const styles = StyleSheet.create({
     height: 34,
     borderRadius: 17,
     backgroundColor: '#9DA0A8',
-  },
-  button: {
-    borderRadius: 15,
-    height: 30,
-    backgroundColor: '#9DA0A8',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonActive: {
-    backgroundColor: '#1F87FF',
-  },
-  buttonText: {
-    color: '#55585c',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  buttonTextActive: {
-    color: 'white',
   },
 });
