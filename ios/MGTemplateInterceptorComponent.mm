@@ -1,8 +1,9 @@
 #import "MGTemplateInterceptorComponent.h"
-#import "MGInterceptorComponentDescriptors.h"
-#import "MGInterceptorProps.h"
+#import <react/renderer/components/wishlist/ComponentDescriptors.h>
+#import <react/renderer/components/wishlist/Props.h>
 #import "MGTemplateContainerComponent.h"
 #import "MGWishListComponent.h"
+#import "RCTFabricComponentsPlugins.h"
 
 using namespace facebook::react;
 
@@ -15,7 +16,7 @@ using namespace facebook::react;
 + (facebook::react::ComponentDescriptorProvider)componentDescriptorProvider
 {
   return facebook::react::concreteComponentDescriptorProvider<
-      facebook::react::MGTemplateInterceptorComponentComponentDescriptor>();
+      facebook::react::MGTemplateInterceptorComponentDescriptor>();
 }
 
 /*
@@ -56,10 +57,15 @@ using namespace facebook::react;
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
-  auto inflatorId = std::static_pointer_cast<const MGTemplateInterceptorComponentProps>(props)->inflatorId;
+  auto inflatorId = std::static_pointer_cast<const MGTemplateInterceptorProps>(props)->inflatorId;
 
   //[super updateProps:props oldProps:oldProps];
   // _eventEmitter = nil;
 }
 
 @end
+
+Class<RCTComponentViewProtocol> MGTemplateInterceptorCls(void)
+{
+  return MGTemplateInterceptorComponent.class;
+}
