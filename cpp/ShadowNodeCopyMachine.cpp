@@ -1,5 +1,5 @@
 #include "ShadowNodeCopyMachine.h"
-#include "WishlistComponentDescriptors.h"
+#include "MGWishlistComponentDescriptor.h"
 
 namespace facebook {
 namespace react {

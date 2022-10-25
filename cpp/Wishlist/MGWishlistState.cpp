@@ -1,25 +1,25 @@
-#include "WishlistState.h"
+#include "MGWishlistState.h"
 
 namespace facebook {
 namespace react {
 
-WishlistState::~WishlistState() {}
+MGWishlistState::~MGWishlistState() {}
 
 #ifdef ANDROID
 
-WishlistState::WishlistState() {
+MGWishlistState::MGWishlistState() {
   this->viewportObserver = std::make_shared<ViewportObserver>();
 };
 
-WishlistState::WishlistState(
-    WishlistState const &previousState,
+MGWishlistState::MGWishlistState(
+    MGWishlistState const &previousState,
     folly::dynamic data){};
 
-folly::dynamic WishlistState::getDynamic() const {
+folly::dynamic MGWishlistState::getDynamic() const {
   return folly::dynamic::object("contentOffsetLeft", 5);
 };
 
-MapBuffer WishlistState::getMapBuffer() const {
+MapBuffer MGWishlistState::getMapBuffer() const {
   return MapBufferBuilder::EMPTY();
 };
 
