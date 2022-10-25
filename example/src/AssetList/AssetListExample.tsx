@@ -23,14 +23,13 @@ type ListItemsType =
   | { type: 'asset-list-header' };
 
 export const AssetListExample: React.FC<{}> = () => {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing] = useState(false);
   // Change this line to false show less by default
   const [isExpanded, setIsExpanded] = useState(true);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleEdit = useCallback(() => {
-    setIsEditing((v) => !v);
-  }, []);
+  // const handleEdit = useCallback(() => {
+  //   setIsEditing((v) => !v);
+  // }, []);
 
   const handleExpand = useCallback(() => {
     setIsExpanded((v) => !v);
