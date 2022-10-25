@@ -1,5 +1,6 @@
 import React, { forwardRef } from 'react';
 import { View } from 'react-native';
+import { createTemplateComponent } from './createTemplateComponent';
 import { useTemplateCallback } from './EventHandler';
 
 type PressableProps = {
@@ -7,8 +8,12 @@ type PressableProps = {
   nativeId: string;
 };
 
-export const Pressable = forwardRef<PressableProps, any>((props, ref) => {
-  useTemplateCallback(props.onPress, props.nativeId);
+const TemplateView = createTemplateComponent(View);
 
-  return <View {...props} nativeID={props.nativeId} ref={ref} />;
+export const Pressable = forwardRef<PressableProps, any>((props, ref) => {
+  const value = useTemplateCallback(props.onPress);
+
+  return (
+    <TemplateView xyz={value} {...props} nativeID={props.nativeId} ref={ref} />
+  );
 });

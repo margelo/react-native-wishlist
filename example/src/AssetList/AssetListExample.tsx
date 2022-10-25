@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useWorkletCallback } from 'react-native-reanimated';
+import { runOnJS, useWorkletCallback } from 'react-native-reanimated';
 import { WishList } from 'wishlist';
 import { AssetItem } from './AssetItem';
 import { AssetListHeader } from './AssetListHeader';
@@ -54,7 +54,7 @@ export const AssetListExample: React.FC<{}> = () => {
   const onItemNeeded = useWorkletCallback((index) => list[index], [list]);
 
   const handleExpandWorklet = useWorkletCallback(() => {
-    console.log('TOUCH');
+    runOnJS(handleExpand)();
   }, []);
 
   return (
@@ -72,7 +72,7 @@ export const AssetListExample: React.FC<{}> = () => {
         <WishList.Template type="asset-list-separator">
           <AssetListSeparator
             isEditing={isEditing}
-            onExpandWorklet={handleExpandWorklet}
+            onExpand={handleExpandWorklet}
             isExpanded={isExpanded}
           />
         </WishList.Template>

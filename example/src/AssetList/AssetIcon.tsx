@@ -3,9 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { useTemplateValue, WishList } from 'wishlist';
 import type { AssetItemType } from './assets';
 
-const ethIcon =
-  'https://cdn4.iconfinder.com/data/icons/cryptocoins/227/ETH-alt-512.png';
-// const ethIcon = require('./assets/eth.png');
+const ethIcon = require('./assets/eth.png');
 // const optimismBadge = require('./assets/optimismBadge.png');
 
 type AssetIconProps = {};
@@ -13,7 +11,7 @@ type AssetIconProps = {};
 export function AssetIcon({}: AssetIconProps) {
   // TODO(terry): Figure out why local images won't work
   const iconSource = useTemplateValue((item: AssetItemType) =>
-    item.network === 'ETH' ? ethIcon : item.icon!,
+    item.network === 'ETH' ? ethIcon : { uri: item.icon },
   );
 
   // TODO(terry): Use local image for badge
@@ -28,7 +26,7 @@ export function AssetIcon({}: AssetIconProps) {
 
   return (
     <View style={styles.container}>
-      <WishList.Image style={styles.icon} source={{ uri: iconSource }} />
+      <WishList.Image style={styles.icon} source={iconSource} />
 
       {/* <WishList.IF condition={shouldDisplayBadge}> */}
       {/* <View style={styles.badgeContainer}> */}

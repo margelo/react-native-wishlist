@@ -56,7 +56,10 @@ const createChatItem = (index: number): ChatItem => {
       authors[Math.round(index % authors.length)]
     }`,
     likes: Math.random() > 0.7 ? Math.floor(Math.random() * 8) : 0,
-    reactions: getRandomReactions().map((ele) => ({ emoji: ele })),
+    reactions: getRandomReactions().map((ele, index) => ({
+      emoji: ele,
+      id: String(index),
+    })),
   };
 };
 export const fetchData = (limit: number = 100) => {

@@ -1,13 +1,18 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { processColor, StyleSheet, View } from 'react-native';
+import { useTemplateValue, WishList } from 'wishlist';
+
+const blue = processColor('#1F87FF');
 
 export function ItemCheckbox() {
-  const checked = false;
+  const checked = useTemplateValue((item) => item.checked);
 
   return (
     <View style={styles.container}>
       <View style={[styles.outerCircle, checked && styles.checked]}>
-        {checked && <View style={styles.innerCircle} />}
+        <WishList.IF condition={checked}>
+          <View style={styles.innerCircle} />
+        </WishList.IF>
       </View>
     </View>
   );

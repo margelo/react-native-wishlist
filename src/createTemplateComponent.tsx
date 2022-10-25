@@ -61,10 +61,12 @@ function traverseObject(
   const stack: { path: string[]; value: any }[] = [{ path: [], value: obj }];
   while (stack.length > 0) {
     const { path, value } = stack.pop()!;
+
     if (
       value &&
       typeof value === 'object' &&
-      !(value instanceof TemplateValue)
+      !(value instanceof TemplateValue) &&
+      (path.length === 0 || path[path.length - 1] !== 'children')
     ) {
       Object.keys(value).forEach((key) => {
         stack.push({ path: [...path, key], value: value[key] });
@@ -91,10 +93,6 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
     const nativeId = useMemo(() => `template_id_${nativeIdGenerator++}`, []);
 
     const otherPropsMemoized = useMemo(() => {
-      if (!inflatorId) {
-        return {};
-      }
-
       const resolvedStyle = StyleSheet.flatten(style);
       const templateValues: {
         mapper: TemplateValueMapper<any, any>;
@@ -126,6 +124,7 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
               targetPath: path,
             });
           }
+
           setInObject(otherProps, path, value);
         }
       });
@@ -133,18 +132,28 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
         inflatorId,
         nativeId,
         templateType,
-        (value, templateItem, pool) => {
+        (value, templateItem, pool, rootValue) => {
           'worklet';
 
           const propsToSet: any = {};
           for (const { mapper, targetPath } of templateValues) {
-            setInObject(propsToSet, targetPath, mapper(value));
+            setInObject(
+              propsToSet,
+              targetPath,
+              mapper(value, rootValue, templateItem),
+            );
           }
           // Styles need to be passed as props.
           const { style: styleForProps, ...otherPropsToSet } = propsToSet;
           const finalPropsToSet = { ...otherPropsToSet, ...styleForProps };
           if (addProps) {
-            addProps(templateItem, finalPropsToSet, inflatorId, pool);
+            addProps(
+              templateItem,
+              finalPropsToSet,
+              inflatorId,
+              pool,
+              rootValue,
+            );
           } else {
             templateItem.addProps(finalPropsToSet);
           }

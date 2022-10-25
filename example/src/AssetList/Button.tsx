@@ -6,19 +6,13 @@ type HeaderProps = {
   active: boolean;
   disabled?: boolean;
   text: TemplateValue<any> | string;
-  onPressWorklet: () => void;
+  onPress: () => void;
   nativeId: string;
 };
 
-export function Button({
-  onPressWorklet,
-  text,
-  active,
-  disabled,
-  nativeId,
-}: HeaderProps) {
+export function Button({ onPress, text, active, disabled, nativeId }: HeaderProps) {
   return (
-    <WishList.Pressable nativeId={nativeId} onPress={onPressWorklet}>
+    <WishList.Pressable nativeId={nativeId} onPress={onPress}>
       <View
         style={[
           styles.button,

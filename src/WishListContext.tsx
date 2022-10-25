@@ -7,9 +7,7 @@ export const WishListContext = createContext<{ inflatorId: string } | null>(
 export function useWishListContext() {
   const context = useContext(WishListContext);
   if (!context) {
-    return {
-      inflatorId: null,
-    };
+    throw Error('Must be rendered inside a Template component.');
   }
   return context;
 }

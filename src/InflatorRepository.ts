@@ -80,20 +80,21 @@ const maybeInit = () => {
               value.type,
               id,
               pool,
+              value, // rootValue
             );
           } else {
             console.log('Inflator not found for id: ' + id);
             return undefined;
           }
         },
-        useMappings: (item, value, templateType, id, pool) => {
-          // console.log('value mappings', value);
+        useMappings: (item, value, templateType, id, pool, rootValue) => {
+          console.log('value mappings', value);
           const mapping = mappings.get(id)?.get(templateType);
           if (mapping) {
             for (const [nativeId, inflate] of mapping.entries()) {
               const templateItem = item.getByWishId(nativeId);
               if (templateItem) {
-                inflate(value, templateItem, pool);
+                inflate(value, templateItem, pool, rootValue);
               }
             }
           }

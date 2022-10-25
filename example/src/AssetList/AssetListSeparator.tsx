@@ -2,11 +2,12 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button } from './Button';
 import { useTemplateValue } from 'wishlist';
+import { useWorkletCallback } from 'react-native-reanimated';
 
 type AssetListSeparatorProps = {
   isExpanded: boolean;
   isEditing: boolean;
-  onExpandWorklet: () => void;
+  onExpand: () => void;
 };
 
 type AssetListSeparatorType = {
@@ -15,16 +16,17 @@ type AssetListSeparatorType = {
   isEditing: boolean;
 };
 
-export function AssetListSeparator({
-  isEditing,
-  onExpandWorklet,
-}: AssetListSeparatorProps) {
+export function AssetListSeparator({ isEditing, onExpand }: AssetListSeparatorProps) {
   const expandButtonText = useTemplateValue((item: AssetListSeparatorType) =>
     item.isExpanded ? 'Less ↑' : 'More ↓',
   );
   const editButtonText = useTemplateValue((item: AssetListSeparatorType) =>
     item.isEditing ? 'Done' : 'Edit',
   );
+
+  const onPin = useWorkletCallback(() => {});
+  const onHide = useWorkletCallback(() => {});
+  const onEdit = useWorkletCallback(() => {});
 
   return (
     <View style={styles.container}>
@@ -33,6 +35,7 @@ export function AssetListSeparator({
           <Button
             nativeId="asset-list-pin"
             disabled
+            onPress={onPin}
             text="Pin"
             active={false}
           />
@@ -40,6 +43,7 @@ export function AssetListSeparator({
           <Button
             nativeId="asset-list-hide"
             disabled
+            onPress={onHide}
             text="Hide"
             active={false}
           />
@@ -49,7 +53,7 @@ export function AssetListSeparator({
           active={false}
           text={expandButtonText}
           nativeId="asset-list-expand"
-          onPressWorklet={onExpandWorklet}
+          onPress={onExpand}
         />
       )}
 
@@ -58,6 +62,7 @@ export function AssetListSeparator({
       <Button
         nativeId="asset-list-edit"
         text={editButtonText}
+        onPress={onEdit}
         active={isEditing}
       />
     </View>
