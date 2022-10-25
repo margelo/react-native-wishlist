@@ -43,16 +43,22 @@ function AssetInfo() {
 }
 
 type AssetItemProps = {
-  isEditing: boolean;
+  onItemPress: (item: AssetItemType) => void;
 };
 
-export function AssetItem({ isEditing }: AssetItemProps) {
-  return (
-    <View style={[styles.rootContainer, !isEditing && styles.nonEditMode]}>
-      {isEditing && <ItemCheckbox />}
+export function AssetItem({ onItemPress }: AssetItemProps) {
+  const isEditing = useTemplateValue((item: any) => item.isEditing);
 
-      <AssetInfo />
-    </View>
+  return (
+    <WishList.Pressable onPress={onItemPress} nativeId="asset-pressable">
+      <View style={[styles.rootContainer, !isEditing && styles.nonEditMode]}>
+        <WishList.IF condition={isEditing}>
+          <ItemCheckbox />
+        </WishList.IF>
+
+        <AssetInfo />
+      </View>
+    </WishList.Pressable>
   );
 }
 

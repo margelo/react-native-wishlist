@@ -1,11 +1,9 @@
 import React from 'react';
-import { processColor, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useTemplateValue, WishList } from 'wishlist';
 
-const blue = processColor('#1F87FF');
-
 export function ItemCheckbox() {
-  const checked = useTemplateValue((item) => item.checked);
+  const checked = useTemplateValue((item) => item.isSelected);
 
   return (
     <View style={styles.container}>
