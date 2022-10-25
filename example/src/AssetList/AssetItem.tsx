@@ -1,9 +1,12 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { processColor, StyleSheet, View } from 'react-native';
 import { useTemplateValue, WishList } from 'wishlist';
 import { AssetIcon } from './AssetIcon';
 import type { AssetItemType } from './assets';
 import { ItemCheckbox } from './ItemCheckbox';
+
+const green = processColor('#00D146');
+const grey = processColor('#9DA0A8');
 
 function AssetInfo() {
   const name = useTemplateValue((item: AssetItemType) => item.name);
@@ -17,7 +20,7 @@ function AssetInfo() {
 
   // TODO(terry): Why no color?
   const changeColor = useTemplateValue((item: AssetItemType) =>
-    item.change && parseFloat(item.change) > 0 ? '#00D146' : '#9DA0A8',
+    item.change && parseFloat(item.change) > 0 ? green : grey,
   );
 
   return (
@@ -71,6 +74,7 @@ const styles = StyleSheet.create({
   change: {
     textAlign: 'right',
     fontSize: 14,
+    color: '#9DA0A8',
   },
 
   container: {

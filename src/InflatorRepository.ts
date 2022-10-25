@@ -87,7 +87,7 @@ const maybeInit = () => {
           }
         },
         useMappings: (item, value, templateType, id, pool) => {
-          console.log('value mappings', value);
+          // console.log('value mappings', value);
           const mapping = mappings.get(id)?.get(templateType);
           if (mapping) {
             for (const [nativeId, inflate] of mapping.entries()) {

@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { AssetListExample } from './AssetList/AssetListExample';
 // import { ChatListView } from './ChatList';
-import { ChatItem, fetchData } from './Data';
+// import { ChatItem, fetchData } from './Data';
 
 export default function App() {
   // const [data, setData] = useState<ChatItem[]>([]);
