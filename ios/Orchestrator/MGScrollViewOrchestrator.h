@@ -1,10 +1,10 @@
 #import <Foundation/Foundation.h>
+#import <react/renderer/components/wishlist/Props.h>
+#import <react/renderer/components/wishlist/ShadowNodes.h>
 #import <memory>
 #import <string>
 #import <vector>
 #import "MGAnimations.h"
-#import "WishlistProps.h"
-#import "WishlistShadowNodes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
