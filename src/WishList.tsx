@@ -343,6 +343,7 @@ export const WishList = {
   Template,
   Mapping,
   Pressable,
+  View: createTemplateComponent(View),
   Image: createTemplateComponent(Image),
   Text: createTemplateComponent(Text, (item, props) => {
     'worklet';

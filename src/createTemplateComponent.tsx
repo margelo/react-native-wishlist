@@ -1,5 +1,6 @@
 import React, { forwardRef, useMemo } from 'react';
 import { StyleSheet, Text } from 'react-native';
+import { TemplateCallback, TemplateCallbackWorklet } from './EventHandler';
 import { ForEachBase } from './ForEachBase';
 import InflatorRepository, {
   ComponentPool,
@@ -66,6 +67,7 @@ function traverseObject(
       value &&
       typeof value === 'object' &&
       !(value instanceof TemplateValue) &&
+      !(value instanceof TemplateCallback) &&
       (path.length === 0 || path[path.length - 1] !== 'children')
     ) {
       Object.keys(value).forEach((key) => {
@@ -94,10 +96,17 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
 
     const otherPropsMemoized = useMemo(() => {
       const resolvedStyle = StyleSheet.flatten(style);
+
       const templateValues: {
         mapper: TemplateValueMapper<any, any>;
         targetPath: string[];
       }[] = [];
+
+      const templateCallbacks: {
+        worklet: TemplateCallbackWorklet;
+        eventName: string;
+      }[] = [];
+
       const otherProps = {};
       traverseObject({ ...props, style: resolvedStyle }, (path, value) => {
         const applyHacks = () => {
@@ -112,6 +121,12 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
           templateValues.push({ mapper: value.getMapper(), targetPath: path });
 
           applyHacks();
+        } else if (value instanceof TemplateCallback) {
+          templateCallbacks.push({
+            worklet: value.getWorklet(),
+            // Callbacks should never be in objects.
+            eventName: path[0].replace(/^on/, 'top'),
+          });
         } else {
           // @ts-expect-error TODO: fix this.
           if (Component === ForEachBase && path[0] === 'template') {
@@ -143,6 +158,13 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
               mapper(value, rootValue, templateItem),
             );
           }
+
+          for (const { worklet, eventName } of templateCallbacks) {
+            templateItem.setCallback(eventName, () => {
+              worklet(value, rootValue);
+            });
+          }
+
           // Styles need to be passed as props.
           const { style: styleForProps, ...otherPropsToSet } = propsToSet;
           const finalPropsToSet = { ...otherPropsToSet, ...styleForProps };

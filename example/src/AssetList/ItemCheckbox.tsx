@@ -1,17 +1,24 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { processColor, StyleSheet, View } from 'react-native';
 import { useTemplateValue, WishList } from 'wishlist';
+
+const blue = processColor('#1F87FF');
+const gray = processColor('#ccd0d9');
 
 export function ItemCheckbox() {
   const checked = useTemplateValue((item) => item.isSelected);
 
+  const borderColor = useTemplateValue((item) =>
+    item.isSelected ? blue : gray,
+  );
+
   return (
     <View style={styles.container}>
-      <View style={[styles.outerCircle, checked && styles.checked]}>
+      <WishList.View style={[styles.outerCircle, { borderColor }]}>
         <WishList.IF condition={checked}>
           <View style={styles.innerCircle} />
         </WishList.IF>
-      </View>
+      </WishList.View>
     </View>
   );
 }
@@ -30,7 +37,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    borderColor: '#ccd0d9',
+    // borderColor: '#ccd0d9',
     borderWidth: 2,
     backgroundColor: 'white',
     justifyContent: 'center',
