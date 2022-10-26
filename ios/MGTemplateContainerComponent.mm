@@ -1,20 +1,17 @@
 #import "MGTemplateContainerComponent.h"
-#import <react/renderer/components/wishlist/ComponentDescriptors.h>
-#import "MGTemplateContainerComponentDescriptor.h"
-#import "MGTemplateContainerShadowNode.h"
-#import "RCTFabricComponentsPlugins.h"
+#import "MGContainerComponentDescriptors.h"
+#import "MGContainerProps.h"
 
 using namespace facebook::react;
 
 @implementation MGTemplateContainerComponent {
-  MGTemplateContainerShadowNode::ConcreteState::Shared _state;
   MGWishListComponent *_wishList;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
   if (self = [super initWithFrame:frame]) {
-    static const auto defaultProps = std::make_shared<const MGTemplateContainerProps>();
+    static const auto defaultProps = std::make_shared<const MGTemplateContainerComponentProps>();
     _props = defaultProps;
   }
 
@@ -24,7 +21,8 @@ using namespace facebook::react;
 - (void)setWishlist:(MGWishListComponent *)wishList
 {
   _wishList = wishList;
-  [self updateWishlist];
+  auto props = *std::static_pointer_cast<const MGTemplateContainerComponentProps>(_props);
+  [_wishList setTemplates:props.templates withNames:props.names];
 }
 
 #pragma mark - RCTComponentViewProtocol
@@ -32,43 +30,18 @@ using namespace facebook::react;
 + (facebook::react::ComponentDescriptorProvider)componentDescriptorProvider
 {
   return facebook::react::concreteComponentDescriptorProvider<
-      facebook::react::MGTemplateContainerComponentDescriptor>();
+      facebook::react::MGTemplateContainerComponentComponentDescriptor>();
 }
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
-  [super updateProps:props oldProps:oldProps];
-  [self updateWishlist];
-}
-
-- (void)updateState:(State::Shared const &)state oldState:(State::Shared const &)oldState
-{
-  auto templateState = std::static_pointer_cast<MGTemplateContainerShadowNode::ConcreteState const>(state);
-  _state = templateState;
-  [self updateWishlist];
-}
-
-- (void)prepareForRecycle
-{
-  [super prepareForRecycle];
-
-  _wishList = nil;
-  _state.reset();
-}
-
-- (void)updateWishlist
-{
-  if (!_wishList || !_state) {
-    return;
+  const auto &newProps = *std::static_pointer_cast<const MGTemplateContainerComponentProps>(props);
+  if (_wishList != NULL) {
+    [_wishList setInflatorId:newProps.inflatorId];
+    [_wishList setTemplates:newProps.templates withNames:newProps.names];
   }
-  auto props = *std::static_pointer_cast<const MGTemplateContainerProps>(_props);
-  auto state = std::static_pointer_cast<MGTemplateContainerShadowNode::ConcreteState const>(_state);
-  [_wishList setTemplates:state->getData().getTemplates() withNames:props.names];
+
+  [super updateProps:props oldProps:oldProps];
 }
 
 @end
-
-Class<RCTComponentViewProtocol> MGTemplateContainerCls(void)
-{
-  return MGTemplateContainerComponent.class;
-}
