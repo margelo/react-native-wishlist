@@ -26,7 +26,7 @@ import InflatorRepository, {
 import NativeTemplateContainer from './NativeViews/NativeTemplateContainer';
 import NativeTemplateInterceptor from './NativeViews/NativeTemplateInterceptor';
 import NativeWishList, {
-  Commands as WishlistCommands,
+  WishlistCommands,
 } from './NativeViews/WishlistNativeComponent';
 import { TemplateContext } from './TemplateContext';
 import { WishListContext } from './WishListContext';

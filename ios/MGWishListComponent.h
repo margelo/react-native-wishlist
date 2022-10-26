@@ -1,13 +1,12 @@
 #import <Foundation/Foundation.h>
 #import <React-RCTFabric/React/RCTScrollViewComponentView.h>
 #import <React-RCTFabric/React/RCTViewComponentView.h>
-#include <react/renderer/components/wishlist/RCTComponentViewHelpers.h>
 #import "MGScrollViewOrchestrator.h"
+#import "WishlistRCTComponentViewHelpers.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MGWishListComponent
-    : RCTScrollViewComponentView <RCTMGWishlistViewProtocol, MGScrollViewOrchestratorDelegate>
+@interface MGWishListComponent : RCTScrollViewComponentView <MGWishlistViewProtocol, MGScrollViewOrchestratorDelegate>
 
 - (void)setTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates
            withNames:(std::vector<std::string>)names;
