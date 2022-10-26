@@ -3,7 +3,7 @@ export type TemplateItem = {
 } & {
   getByWishId: (id: string) => TemplateItem | undefined;
   addProps: (props: any) => void;
-  addCallback: (callback: () => void) => void;
+  setCallback: (eventName: string, callback: () => void) => void;
   describe: () => string;
   setChildren: (children: TemplateItem[]) => void;
 };
@@ -21,6 +21,7 @@ export type MappingInflateMethod = (
   value: any,
   templateItem: TemplateItem,
   pool: ComponentPool,
+  rootValue: any,
 ) => void;
 
 export type UIInflatorRegistry = {
@@ -43,6 +44,7 @@ export type UIInflatorRegistry = {
     templateType: string,
     id: string,
     pool: ComponentPool,
+    rootValue: any,
   ) => TemplateItem;
 };
 
@@ -88,7 +90,6 @@ const maybeInit = () => {
           }
         },
         useMappings: (item, value, templateType, id, pool, rootValue) => {
-          console.log('value mappings', value);
           const mapping = mappings.get(id)?.get(templateType);
           if (mapping) {
             for (const [nativeId, inflate] of mapping.entries()) {

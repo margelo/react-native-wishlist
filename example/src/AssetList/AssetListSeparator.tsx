@@ -3,29 +3,31 @@ import { StyleSheet, View } from 'react-native';
 import { Button } from './Button';
 import { useTemplateValue, WishList } from 'wishlist';
 import { useWorkletCallback } from 'react-native-reanimated';
+import type { AssetListSeparatorWithState } from './AssetListExample';
 
 type AssetListSeparatorProps = {
   onExpand: () => void;
   onEdit: () => void;
 };
 
-type AssetListSeparatorType = {
-  type: 'asset-list-separator';
-};
-
 export function AssetListSeparator({
   onExpand,
   onEdit,
 }: AssetListSeparatorProps) {
-  const isEditing = useTemplateValue((item) => item.isEditing);
-  const isNotEditing = useTemplateValue((item) => !item.isEditing);
-  const expandButtonText = useTemplateValue((item: AssetListSeparatorType) =>
-    item.isExpanded ? 'Less ↑' : 'More ↓',
+  const isEditing = useTemplateValue(
+    (item: AssetListSeparatorWithState) => item.isEditing,
+  );
+  const isNotEditing = useTemplateValue(
+    (item: AssetListSeparatorWithState) => !item.isEditing,
+  );
+  const expandButtonText = useTemplateValue(
+    (item: AssetListSeparatorWithState) =>
+      item.isExpanded ? 'Less ↑' : 'More ↓',
   );
   const isExpanded = useTemplateValue(
-    (item: AssetListSeparatorType) => item.isExpanded,
+    (item: AssetListSeparatorWithState) => item.isExpanded,
   );
-  const editButtonText = useTemplateValue((item: AssetListSeparatorType) =>
+  const editButtonText = useTemplateValue((item: AssetListSeparatorWithState) =>
     item.isEditing ? 'Done' : 'Edit',
   );
 
@@ -51,7 +53,7 @@ export function AssetListSeparator({
       {/* TODO: Replace with IF */}
 
       <WishList.IF condition={isExpanded}>
-        <Button text={editButtonText} onPress={onEdit} active={isEditing} />
+        <Button text={editButtonText} onPress={onEdit} active={false} />
       </WishList.IF>
     </View>
   );

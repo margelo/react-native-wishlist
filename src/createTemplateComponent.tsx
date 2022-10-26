@@ -86,6 +86,7 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
     props: any,
     inflatorId: string,
     pool: ComponentPool,
+    rootValue: any,
   ) => void,
 ): TemplateComponent<T> {
   const WishListComponent = forwardRef<any, any>(({ style, ...props }, ref) => {
@@ -152,15 +153,11 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
 
           const propsToSet: any = {};
           for (const { mapper, targetPath } of templateValues) {
-            setInObject(
-              propsToSet,
-              targetPath,
-              mapper(value, rootValue, templateItem),
-            );
+            setInObject(propsToSet, targetPath, mapper(value, rootValue));
           }
 
           for (const { worklet, eventName } of templateCallbacks) {
-            templateItem.setCallback(eventName, () => {
+            templateItem?.setCallback(eventName, () => {
               worklet(value, rootValue);
             });
           }

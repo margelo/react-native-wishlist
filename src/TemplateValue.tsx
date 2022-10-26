@@ -1,6 +1,9 @@
 import { useMemo } from 'react';
 
-export type TemplateValueMapper<ItemT, ValueT> = (item: ItemT) => ValueT;
+export type TemplateValueMapper<ItemT, ValueT> = (
+  item: ItemT,
+  rootValue: any,
+) => ValueT;
 
 export class TemplateValue<ValueT> {
   _mapper: TemplateValueMapper<any, ValueT>;

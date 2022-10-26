@@ -1,14 +1,17 @@
 import React from 'react';
 import { processColor, StyleSheet, View } from 'react-native';
 import { useTemplateValue, WishList } from 'wishlist';
+import type { AssetListItemWithState } from './AssetListExample';
 
 const blue = processColor('#1F87FF');
 const gray = processColor('#ccd0d9');
 
 export function ItemCheckbox() {
-  const checked = useTemplateValue((item) => item.isSelected);
+  const checked = useTemplateValue(
+    (item: AssetListItemWithState) => item.isSelected,
+  );
 
-  const borderColor = useTemplateValue((item) =>
+  const borderColor = useTemplateValue((item: AssetListItemWithState) =>
     item.isSelected ? blue : gray,
   );
 

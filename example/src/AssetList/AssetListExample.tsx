@@ -17,10 +17,22 @@ const tokens: AssetListItemType[] = data.map((item) => ({
   type: 'asset',
 }));
 
+type AssetListState = {
+  isEditing: boolean;
+  isSelected: boolean;
+  isExpanded: boolean;
+};
+
+export type AssetListItemWithState = AssetListItemType & AssetListState;
+
+export type AssetListSeparatorWithState = {
+  type: 'asset-list-separator';
+} & AssetListState;
+
 type ListItemsType =
-  | AssetListItemType
-  | { type: 'asset-list-separator' }
-  | { type: 'asset-list-header' };
+  | AssetListItemWithState
+  | AssetListSeparatorWithState
+  | ({ type: 'asset-list-header' } & AssetListState);
 
 export const AssetListExample: React.FC<{}> = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -35,11 +47,12 @@ export const AssetListExample: React.FC<{}> = () => {
     setIsExpanded((v) => !v);
   }, []);
 
-  const [data, setData] = useState(tokens);
+  const [data, setData] = useState<ListItemsType[]>(tokens as ListItemsType[]);
 
   const list = useMemo<ListItemsType[]>(() => {
     const arr = [{ type: 'asset-list-header', isExpanded }].concat(data);
 
+    // @ts-expect-error
     const topItems = arr
       .slice(0, 6)
       .concat({
@@ -78,9 +91,10 @@ export const AssetListExample: React.FC<{}> = () => {
     Alert.alert(address);
   };
 
-  const toggleSelectedItem = (item: AssetItemType) => {
+  const toggleSelectedItem = (item: ListItemsType) => {
     setData((items) =>
       items.map((i) =>
+        // @ts-expect-error
         i.id === item.id
           ? {
               ...i,
@@ -91,7 +105,7 @@ export const AssetListExample: React.FC<{}> = () => {
     );
   };
 
-  const handleItemPress = useWorkletCallback((item: AssetItemType) => {
+  const handleItemPress = useWorkletCallback((item: AssetListItemWithState) => {
     if (item.isEditing) {
       runOnJS(toggleSelectedItem)(item);
     } else {

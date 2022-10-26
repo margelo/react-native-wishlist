@@ -159,7 +159,6 @@ const Component = forwardRef(
 
       return (index: number, pool: ComponentPool) => {
         'worklet';
-
         const value = onItemNeeded(index);
         if (!value) {
           return undefined;
@@ -169,6 +168,8 @@ const Component = forwardRef(
         if (!item) {
           return undefined;
         }
+
+        const rootValue = value; // TODO(terry): use proxy for this
 
         Object.keys(mappingRef.current!).forEach((key) => {
           const templateItem = item.getByWishId(key);
@@ -183,7 +184,7 @@ const Component = forwardRef(
                 value,
                 templateItem,
                 pool,
-                value,
+                rootValue,
               );
             } catch (err) {
               console.error(
@@ -197,7 +198,7 @@ const Component = forwardRef(
         });
 
         return [item, value];
-      };
+      };;
     }, [inflateItem, onItemNeeded]);
 
     const inflatorIdRef = useRef<string | null>(null);

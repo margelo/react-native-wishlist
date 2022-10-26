@@ -1,9 +1,13 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { processColor, StyleSheet, View } from 'react-native';
 import { useTemplateValue, WishList } from 'wishlist';
 import { AssetIcon } from './AssetIcon';
+import type { AssetListItemWithState } from './AssetListExample';
 import type { AssetItemType } from './assets';
 import { ItemCheckbox } from './ItemCheckbox';
+
+const green = processColor('#00D146');
+const gray = processColor('#9DA0A8');
 
 function AssetInfo() {
   const name = useTemplateValue((item: AssetItemType) => item.name);
@@ -17,7 +21,7 @@ function AssetInfo() {
 
   // TODO(terry): Why no color?
   const changeColor = useTemplateValue((item: AssetItemType) =>
-    item.change && parseFloat(item.change) > 0 ? '#00D146' : '#9DA0A8',
+    item.change && parseFloat(item.change) > 0 ? green : gray,
   );
 
   return (
@@ -43,21 +47,27 @@ function AssetInfo() {
 }
 
 type AssetItemProps = {
-  onItemPress: (item: AssetItemType) => void;
+  onItemPress: (item: AssetListItemWithState) => void;
 };
 
 export function AssetItem({ onItemPress }: AssetItemProps) {
-  const isEditing = useTemplateValue((item: any) => item.isEditing);
+  const isEditing = useTemplateValue(
+    (item: AssetListItemWithState) => item.isEditing,
+  );
+
+  const paddingLeft = useTemplateValue((item: AssetListItemWithState) =>
+    item.isEditing ? 0 : 10,
+  );
 
   return (
     <WishList.Pressable onPress={onItemPress} nativeId="asset-pressable">
-      <View style={[styles.rootContainer, !isEditing && styles.nonEditMode]}>
+      <WishList.View style={[styles.rootContainer, { paddingLeft }]}>
         <WishList.IF condition={isEditing}>
           <ItemCheckbox />
         </WishList.IF>
 
         <AssetInfo />
-      </View>
+      </WishList.View>
     </WishList.Pressable>
   );
 }
@@ -95,9 +105,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     height: 40,
     width: 40,
-  },
-  nonEditMode: {
-    paddingLeft: 10,
   },
   content: {
     flex: 1,
