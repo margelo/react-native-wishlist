@@ -17,6 +17,7 @@ import {
 import { createTemplateComponent } from './createTemplateComponent';
 import { initEventHandler } from './EventHandler';
 import { ForEach } from './ForEach';
+import { Pressable } from './Pressable';
 import InflatorRepository, {
   ComponentPool,
   InflateMethod,
@@ -29,6 +30,7 @@ import NativeWishList, {
 } from './NativeViews/WishlistNativeComponent';
 import { TemplateContext } from './TemplateContext';
 import { WishListContext } from './WishListContext';
+import { IF } from './IF';
 
 const OffsetComponent = '__offsetComponent';
 let InflatorId = 1000;
@@ -168,6 +170,8 @@ const Component = forwardRef(
           return undefined;
         }
 
+        const rootValue = value; // TODO(terry): use proxy for this
+
         Object.keys(mappingRef.current!).forEach((key) => {
           const templateItem = item.getByWishId(key);
           if (
@@ -177,7 +181,12 @@ const Component = forwardRef(
               : true)
           ) {
             try {
-              mappingRef.current![key].onInflate(value, templateItem, pool);
+              mappingRef.current![key].onInflate(
+                value,
+                templateItem,
+                pool,
+                rootValue,
+              );
             } catch (err) {
               console.error(
                 'Error calling mapper for key / template',
@@ -210,7 +219,12 @@ const Component = forwardRef(
       return inflatorIdRef.current!;
     }, [resolvedInflater]);
 
-    const mappingContext = useMemo(() => ({ inflatorId }), [inflatorId]);
+    const mappingContext = useMemo(
+      () => ({
+        inflatorId,
+      }),
+      [inflatorId],
+    );
 
     return (
       <WishListContext.Provider value={mappingContext}>
@@ -218,8 +232,8 @@ const Component = forwardRef(
           <>
             {/* Prerender templates to register all the nested templates */}
             <View style={styles.noDisplay}>
-              {Object.keys(childrenTemplates).map((c, i) => (
-                <View key={c[i] + 'prerender'}>
+              {Object.keys(childrenTemplates).map((c) => (
+                <View key={c + 'prerender'}>
                   <TemplateContext.Provider
                     value={{ templateType: c, renderChildren: true }}
                   >
@@ -288,8 +302,8 @@ function InnerComponent({
         key={Math.random().toString()}
         collapsable={false}
       >
-        {Object.keys(combinedTemplates).map((c, i) => (
-          <View key={keys[i]}>
+        {Object.keys(combinedTemplates).map((c) => (
+          <View key={c}>
             <TemplateContext.Provider value={{ templateType: c }}>
               {combinedTemplates[c]}
             </TemplateContext.Provider>
@@ -330,6 +344,8 @@ export const WishList = {
   Component,
   Template,
   Mapping,
+  Pressable,
+  View: createTemplateComponent(View),
   Image: createTemplateComponent(Image),
   Text: createTemplateComponent(Text, (item, props) => {
     'worklet';
@@ -339,15 +355,7 @@ export const WishList = {
     item.addProps(other);
   }),
 
-  IF: createTemplateComponent(View, (item, props) => {
-    'worklet';
-
-    if (props.condition) {
-      item.addProps({ display: 'flex' });
-    } else {
-      item.addProps({ display: 'none' });
-    }
-  }),
+  IF,
 
   /**
    * TODO(Szymon) It's just a prototype we have to think about matching new and old children

@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useTemplateValue, WishList as Wishlist } from 'wishlist';
+import { useWorkletCallback } from 'react-native-reanimated';
+import { useTemplateValue, WishList, WishList as Wishlist } from 'wishlist';
 import type { ChatItem, ReactionItem } from './Data';
 
 interface Props {
@@ -12,10 +13,16 @@ export const Reaction = () => {
     return item.emoji || 'b';
   });
 
+  const handler = useWorkletCallback((value, rootValue) => {
+    console.log('Touch', value, rootValue);
+  }, []);
+
   return (
-    <View>
-      <Wishlist.Text>{emoji}</Wishlist.Text>
-    </View>
+    <WishList.Pressable onPress={handler}>
+      <View>
+        <Wishlist.Text>{emoji}</Wishlist.Text>
+      </View>
+    </WishList.Pressable>
   );
 };
 

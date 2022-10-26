@@ -1,42 +1,60 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button } from './Button';
+import { useTemplateValue, WishList } from 'wishlist';
+import { useWorkletCallback } from 'react-native-reanimated';
+import type { AssetListSeparatorWithState } from './AssetListExample';
 
 type AssetListSeparatorProps = {
-  isExpanded: boolean;
-  isEditing: boolean;
   onExpand: () => void;
+  onEdit: () => void;
 };
 
 export function AssetListSeparator({
-  isExpanded,
-  isEditing,
   onExpand,
+  onEdit,
 }: AssetListSeparatorProps) {
+  const isEditing = useTemplateValue(
+    (item: AssetListSeparatorWithState) => item.isEditing,
+  );
+  const isNotEditing = useTemplateValue(
+    (item: AssetListSeparatorWithState) => !item.isEditing,
+  );
+  const expandButtonText = useTemplateValue(
+    (item: AssetListSeparatorWithState) =>
+      item.isExpanded ? 'Less ↑' : 'More ↓',
+  );
+  const isExpanded = useTemplateValue(
+    (item: AssetListSeparatorWithState) => item.isExpanded,
+  );
+  const editButtonText = useTemplateValue((item: AssetListSeparatorWithState) =>
+    item.isEditing ? 'Done' : 'Edit',
+  );
+
+  const pinTitle = useTemplateValue(() => 'Pin');
+  const hideTitle = useTemplateValue(() => 'Hide');
+
+  const onPin = useWorkletCallback(() => {});
+  const onHide = useWorkletCallback(() => {});
+
   return (
     <View style={styles.container}>
-      {isEditing ? (
+      <WishList.IF condition={isEditing}>
         <View style={styles.buttonGroup}>
-          <Button disabled text="Pin" active={false} onPress={onExpand} />
+          <Button disabled onPress={onPin} text={pinTitle} active={false} />
           <View style={styles.margin} />
-          <Button disabled text="Hide" active={false} onPress={onExpand} />
+          <Button disabled onPress={onHide} text={hideTitle} active={false} />
         </View>
-      ) : (
-        <Button
-          active={false}
-          text={isExpanded ? 'Less ↓' : 'More ↑'}
-          onPress={onExpand}
-        />
-      )}
+      </WishList.IF>
+      <WishList.IF condition={isNotEditing}>
+        <Button active={false} text={expandButtonText} onPress={onExpand} />
+      </WishList.IF>
 
       {/* TODO: Replace with IF */}
-      {isExpanded && (
-        <Button
-          text={isEditing ? 'Done' : 'Edit'}
-          active={isEditing}
-          onPress={onExpand}
-        />
-      )}
+
+      <WishList.IF condition={isExpanded}>
+        <Button text={editButtonText} onPress={onEdit} active={false} />
+      </WishList.IF>
     </View>
   );
 }
