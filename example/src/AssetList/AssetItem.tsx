@@ -19,9 +19,11 @@ function AssetInfo() {
     item.change ? `${item.change}%` : '-',
   );
 
-  // TODO(terry): Why no color?
-  const changeColor = useTemplateValue((item: AssetItemType) =>
-    item.change && parseFloat(item.change) > 0 ? green : gray,
+  const changeColor = useTemplateValue(
+    (item: AssetItemType) =>
+      (item.change && parseFloat(item.change) > 0
+        ? green
+        : gray) as any as string,
   );
 
   return (

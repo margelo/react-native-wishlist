@@ -30,6 +30,7 @@ import NativeWishList, {
 } from './NativeViews/WishlistNativeComponent';
 import { TemplateContext } from './TemplateContext';
 import { WishListContext } from './WishListContext';
+import { IF } from './IF';
 
 const OffsetComponent = '__offsetComponent';
 let InflatorId = 1000;
@@ -198,7 +199,7 @@ const Component = forwardRef(
         });
 
         return [item, value];
-      };;
+      };
     }, [inflateItem, onItemNeeded]);
 
     const inflatorIdRef = useRef<string | null>(null);
@@ -354,15 +355,7 @@ export const WishList = {
     item.addProps(other);
   }),
 
-  IF: createTemplateComponent(View, (item, props) => {
-    'worklet';
-
-    if (props.condition) {
-      item.addProps({ display: 'flex' });
-    } else {
-      item.addProps({ display: 'none' });
-    }
-  }),
+  IF,
 
   /**
    * TODO(Szymon) It's just a prototype we have to think about matching new and old children

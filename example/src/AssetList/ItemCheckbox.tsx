@@ -11,8 +11,9 @@ export function ItemCheckbox() {
     (item: AssetListItemWithState) => item.isSelected,
   );
 
-  const borderColor = useTemplateValue((item: AssetListItemWithState) =>
-    item.isSelected ? blue : gray,
+  const borderColor = useTemplateValue(
+    (item: AssetListItemWithState) =>
+      (item.isSelected ? blue : gray) as any as string,
   );
 
   return (
