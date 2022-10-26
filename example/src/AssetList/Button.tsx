@@ -7,12 +7,11 @@ type HeaderProps = {
   disabled?: boolean;
   text: TemplateValue<any> | string;
   onPress: () => void;
-  nativeId: string;
 };
 
-export function Button({ onPress, text, active, disabled, nativeId }: HeaderProps) {
+export function Button({ onPress, text, active, disabled }: HeaderProps) {
   return (
-    <WishList.Pressable nativeId={nativeId} onPress={onPress}>
+    <WishList.Pressable onPress={onPress}>
       <View
         style={[
           styles.button,

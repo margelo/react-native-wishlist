@@ -18,7 +18,7 @@ export const Reaction = () => {
   }, []);
 
   return (
-    <WishList.Pressable onPress={handler} nativeId="reaction-item">
+    <WishList.Pressable onPress={handler}>
       <View>
         <Wishlist.Text>{emoji}</Wishlist.Text>
       </View>

@@ -39,41 +39,19 @@ export function AssetListSeparator({
     <View style={styles.container}>
       <WishList.IF condition={isEditing}>
         <View style={styles.buttonGroup}>
-          <Button
-            nativeId="asset-list-pin"
-            disabled
-            onPress={onPin}
-            text={pinTitle}
-            active={false}
-          />
+          <Button disabled onPress={onPin} text={pinTitle} active={false} />
           <View style={styles.margin} />
-          <Button
-            nativeId="asset-list-hide"
-            disabled
-            onPress={onHide}
-            text={hideTitle}
-            active={false}
-          />
+          <Button disabled onPress={onHide} text={hideTitle} active={false} />
         </View>
       </WishList.IF>
       <WishList.IF condition={isNotEditing}>
-        <Button
-          active={false}
-          text={expandButtonText}
-          nativeId="asset-list-expand"
-          onPress={onExpand}
-        />
+        <Button active={false} text={expandButtonText} onPress={onExpand} />
       </WishList.IF>
 
       {/* TODO: Replace with IF */}
 
       <WishList.IF condition={isExpanded}>
-        <Button
-          nativeId="asset-list-edit"
-          text={editButtonText}
-          onPress={onEdit}
-          active={isEditing}
-        />
+        <Button text={editButtonText} onPress={onEdit} active={isEditing} />
       </WishList.IF>
     </View>
   );

@@ -5,15 +5,19 @@ import { useTemplateCallback } from './EventHandler';
 
 type PressableProps = {
   onPress: () => void;
-  nativeId: string;
 };
 
 const TemplateView = createTemplateComponent(View);
 
 export const Pressable = forwardRef<PressableProps, any>((props, ref) => {
-  const value = useTemplateCallback(props.onPress);
+  const onPress = useTemplateCallback(props.onPress);
 
   return (
-    <TemplateView xyz={value} {...props} nativeID={props.nativeId} ref={ref} />
+    <TemplateView
+      {...props}
+      pointerEvents="box-only"
+      onTouchEnd={onPress}
+      ref={ref}
+    />
   );
 });

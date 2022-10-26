@@ -50,7 +50,7 @@ export function AssetItem({ onItemPress }: AssetItemProps) {
   const isEditing = useTemplateValue((item: any) => item.isEditing);
 
   return (
-    <WishList.Pressable onPress={onItemPress} nativeId="asset-pressable">
+    <WishList.Pressable onPress={onItemPress}>
       <View style={[styles.rootContainer, !isEditing && styles.nonEditMode]}>
         <WishList.IF condition={isEditing}>
           <ItemCheckbox />
