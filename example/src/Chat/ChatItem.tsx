@@ -122,7 +122,9 @@ export const ChatItemView: React.FC<Props> = ({
           template="reaction"
         />
 
-        <AddReaction onAddReaction={onAddReaction} />
+        {type === 'other' ? (
+          <AddReaction onAddReaction={onAddReaction} />
+        ) : null}
       </View>
     </View>
   );
