@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { View } from 'react-native';
+import { View, ViewStyle } from 'react-native';
 import { createTemplateComponent } from './createTemplateComponent';
 import type { TemplateValue } from './TemplateValue';
 
@@ -8,6 +8,7 @@ const SwitchTemplateComponent = createTemplateComponent(View);
 type SwitchProps = {
   value: TemplateValue<unknown>;
   children: React.ReactElement<typeof Case>[];
+  style?: ViewStyle;
 };
 
 export function Switch(props: SwitchProps) {
@@ -41,6 +42,7 @@ const CaseTemplateComponent = createTemplateComponent(
 
 type CaseProps = React.PropsWithChildren<{
   value: TemplateValue<unknown> | string | boolean | number;
+  style?: ViewStyle;
 }>;
 
 export function Case(props: CaseProps) {
