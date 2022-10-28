@@ -6,6 +6,7 @@ import InflatorRepository, {
   ComponentPool,
   TemplateItem,
 } from './InflatorRepository';
+import { CaseBase } from './Switch';
 import { useTemplateContext } from './TemplateContext';
 import { TemplateValue, TemplateValueMapper } from './TemplateValue';
 import { useWishListContext } from './WishListContext';
@@ -79,6 +80,18 @@ function traverseObject(
   }
 }
 
+function convertToTemplateValue(value: unknown, path: string[]) {
+  let curTemplateType = value;
+
+  return {
+    mapper: () => {
+      'worklet';
+      return curTemplateType;
+    },
+    targetPath: path,
+  };
+}
+
 export function createTemplateComponent<T extends React.ComponentType<any>>(
   Component: T,
   addProps?: (
@@ -131,14 +144,16 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
         } else {
           // @ts-expect-error TODO: fix this.
           if (Component === ForEachBase && path[0] === 'template') {
-            const curTemplateType = value;
-            templateValues.push({
-              mapper: () => {
-                'worklet';
-                return curTemplateType;
-              },
-              targetPath: path,
-            });
+            templateValues.push(convertToTemplateValue(value, path));
+          }
+
+          if (
+            // @ts-expect-error TODO: fix this.
+            Component === CaseBase &&
+            path[0] === 'value' &&
+            !(value instanceof TemplateValue)
+          ) {
+            templateValues.push(convertToTemplateValue(value, path));
           }
 
           setInObject(otherProps, path, value);
