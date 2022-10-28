@@ -40,7 +40,7 @@ const CaseTemplateComponent = createTemplateComponent(
 );
 
 type CaseProps = React.PropsWithChildren<{
-  value: TemplateValue<unknown> | string | boolean;
+  value: TemplateValue<unknown> | string | boolean | number;
 }>;
 
 export function Case(props: CaseProps) {
