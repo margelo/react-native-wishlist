@@ -156,6 +156,15 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
             templateValues.push(convertToTemplateValue(value, path));
           }
 
+          if (
+            // @ts-expect-error TODO: fix this.
+            Component === Text &&
+            path[0] === 'children' &&
+            !(value instanceof TemplateValue)
+          ) {
+            templateValues.push(convertToTemplateValue(value, path));
+          }
+
           setInObject(otherProps, path, value);
         }
       });
