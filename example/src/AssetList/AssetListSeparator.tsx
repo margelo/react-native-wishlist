@@ -50,8 +50,6 @@ export function AssetListSeparator({
         </WishList.Case>
       </WishList.Switch>
 
-      {/* TODO: Replace with IF */}
-
       <WishList.IF condition={isExpanded}>
         <Button text={editButtonText} onPress={onEdit} active={false} />
       </WishList.IF>

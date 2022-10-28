@@ -1,13 +1,20 @@
 import React, { forwardRef } from 'react';
 import { View } from 'react-native';
 import { createTemplateComponent } from './createTemplateComponent';
+import type { TemplateValue } from './TemplateValue';
 
 const SwitchTemplateComponent = createTemplateComponent(View);
 
-export function Switch(props: any) {
+type SwitchProps = {
+  value: TemplateValue<unknown>;
+  children: React.ReactElement<typeof Case>[];
+};
+
+export function Switch(props: SwitchProps) {
   const children = React.Children.map(props.children, (item) =>
     React.cloneElement(item, {
       ...item.props,
+      // @ts-expect-error this is hidden property
       switchValue: props.value,
     }),
   );
@@ -32,6 +39,10 @@ const CaseTemplateComponent = createTemplateComponent(
   },
 );
 
-export function Case(props: any) {
+type CaseProps = React.PropsWithChildren<{
+  value: TemplateValue<unknown> | string | boolean;
+}>;
+
+export function Case(props: CaseProps) {
   return <CaseTemplateComponent {...props} />;
 }
