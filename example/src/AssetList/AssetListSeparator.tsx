@@ -28,9 +28,6 @@ export function AssetListSeparator({
     item.isEditing ? 'Done' : 'Edit',
   );
 
-  const pinTitle = useTemplateValue(() => 'Pin');
-  const hideTitle = useTemplateValue(() => 'Hide');
-
   const onPin = useWorkletCallback(() => {});
   const onHide = useWorkletCallback(() => {});
 
@@ -39,9 +36,9 @@ export function AssetListSeparator({
       <WishList.Switch value={isEditing}>
         <WishList.Case value={true}>
           <View style={styles.buttonGroup}>
-            <Button disabled onPress={onPin} text={pinTitle} active={false} />
+            <Button disabled onPress={onPin} text="Pin" active={false} />
             <View style={styles.margin} />
-            <Button disabled onPress={onHide} text={hideTitle} active={false} />
+            <Button disabled onPress={onHide} text="Hide" active={false} />
           </View>
         </WishList.Case>
 
