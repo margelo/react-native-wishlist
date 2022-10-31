@@ -77,8 +77,6 @@ export const AssetListExample: React.FC<{}> = () => {
     );
   }, [data, isExpanded, isEditing]);
 
-  const onItemNeeded = useWorkletCallback((index) => list[index], [list]);
-
   const handleExpandWorklet = useWorkletCallback(() => {
     runOnJS(handleExpand)();
   }, []);
@@ -118,9 +116,9 @@ export const AssetListExample: React.FC<{}> = () => {
       <Header />
 
       <WishList.Component
+        data={list}
         style={styles.listContainer}
         initialIndex={0}
-        onItemNeeded={onItemNeeded}
       >
         <WishList.Template type="asset-list-header">
           <AssetListHeader />

@@ -1,6 +1,7 @@
 import React, {
   createContext,
   forwardRef,
+  useCallback,
   useContext,
   useImperativeHandle,
   useMemo,
@@ -86,8 +87,9 @@ type WishListInstance = {
 export type BaseItem = { type: string };
 
 type Props<ItemT extends BaseItem> = ViewProps & {
+  data: ItemT[];
   inflateItem?: InflateMethod;
-  onItemNeeded: (index: number) => ItemT;
+  onItemNeeded?: (index: number) => ItemT;
   onStartReached?: () => void;
   onEndReached?: () => void;
   initialIndex?: number;
@@ -95,7 +97,7 @@ type Props<ItemT extends BaseItem> = ViewProps & {
 
 const Component = forwardRef(
   <T extends BaseItem>(
-    { inflateItem, onItemNeeded, children, style, ...rest }: Props<T>,
+    { inflateItem, onItemNeeded, children, style, data, ...rest }: Props<T>,
     ref: React.Ref<WishListInstance>,
   ) => {
     const nativeWishlist = useRef(null); // TODO type it properly
@@ -122,9 +124,26 @@ const Component = forwardRef(
     const { width } = useWindowDimensions();
     useMemo(() => initEventHandler(), []);
 
-    if (inflateItem === undefined && onItemNeeded === undefined) {
-      throw Error('Either inflateItem or onItemNeeded must be defined');
+    if (
+      inflateItem === undefined &&
+      onItemNeeded === undefined &&
+      data === undefined
+    ) {
+      throw Error('Either inflateItem, onItemNeeded or data must be defined');
     }
+
+    const onItemNeededInternal = useCallback(
+      (index: number) => {
+        'worklet';
+
+        if (onItemNeeded) {
+          return onItemNeeded(index);
+        } else {
+          return data[index];
+        }
+      },
+      [onItemNeeded, data],
+    );
 
     // Template registration and tracking
     const childrenTemplates = useMemo(
@@ -161,7 +180,7 @@ const Component = forwardRef(
 
       return (index: number, pool: ComponentPool) => {
         'worklet';
-        const value = onItemNeeded(index);
+        const value = onItemNeededInternal(index);
         if (!value) {
           return undefined;
         }
@@ -201,7 +220,7 @@ const Component = forwardRef(
 
         return [item, value];
       };
-    }, [inflateItem, onItemNeeded]);
+    }, [inflateItem, onItemNeededInternal]);
 
     const inflatorIdRef = useRef<string | null>(null);
     const prevInflatorRef = useRef<typeof resolvedInflater>();
@@ -332,7 +351,6 @@ function Template({ children, type }: TemplateProps) {
 type MappingProps = {
   nativeId: string;
   templateType?: string;
-  onInflate: MappingInflateMethod;
 };
 
 const Mapping: React.FC<MappingProps> = () => null;

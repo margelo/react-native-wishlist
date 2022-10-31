@@ -1,41 +1,88 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { runOnJS, useWorkletCallback } from 'react-native-reanimated';
+import { ChatHeader } from './ChatHeader';
 import { ChatListView } from './ChatList';
-import { ChatItem, fetchData } from './Data';
+import { addSendedMessage, ChatItem, fetchData } from './Data';
+import { MessageInput } from './MessageInput';
+import { ReactionPicker } from './ReactionPicker';
 
 export default function App() {
   const [data, setData] = useState<ChatItem[]>([]);
-  const handleLikeItem = useCallback(
-    (item: ChatItem) => {
-      const index = data?.findIndex((i) => i.id === item.id);
-      if (index > -1) {
-        setData((p) => [
-          ...p.slice(0, index),
-          { ...item, likes: item.likes === 0 ? 1 : 0 },
-          ...p.slice(index + 1, p.length),
-        ]);
-      }
+
+  const handleLikeItem = useCallback((item: ChatItem) => {
+    setData((p) =>
+      p.map((i) =>
+        i.id === item.id ? { ...i, likes: i.likes === 0 ? 1 : 0 } : i,
+      ),
+    );
+  }, []);
+
+  const handleSend = useCallback(
+    (text: string) => {
+      setData((val) => addSendedMessage(val, text));
     },
-    [data],
+    [setData],
   );
 
   // Load data
   useEffect(() => {
-    setData(fetchData(200));
+    setTimeout(() => {
+      setData(fetchData(200));
+    }, 500);
   }, []);
 
+  const [activeMessageForReaction, setActiveReactionPicker] =
+    useState<ChatItem | null>(null);
+
+  const showAddReactionModal = useCallback((item: ChatItem) => {
+    setActiveReactionPicker(item);
+  }, []);
+
+  const onAddReaction = useWorkletCallback((item: ChatItem) => {
+    runOnJS(showAddReactionModal)(item);
+  });
+
+  const onPickReaction = (emoji: string) => {
+    console.log(emoji);
+    setActiveReactionPicker(null);
+  };
+
+  if (!data.length) {
+    return (
+      <>
+        <ChatHeader isLoading />
+        <View style={[styles.container, styles.center]}>
+          <ActivityIndicator size="small" />
+        </View>
+      </>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <ChatListView
-        style={styles.list}
-        data={data}
-        onLikeItem={handleLikeItem}
-      />
-    </View>
+    <>
+      <View style={styles.container}>
+        <ChatHeader isLoading={false} />
+        <ChatListView
+          style={styles.list}
+          data={data}
+          onLikeItem={handleLikeItem}
+          onAddReaction={onAddReaction}
+        />
+        <MessageInput onSend={handleSend} />
+      </View>
+      {activeMessageForReaction && (
+        <ReactionPicker onPickReaction={onPickReaction} />
+      )}
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
   list: { flex: 1 },
+  center: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
