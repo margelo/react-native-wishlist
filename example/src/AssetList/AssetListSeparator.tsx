@@ -17,9 +17,6 @@ export function AssetListSeparator({
   const isEditing = useTemplateValue(
     (item: AssetListSeparatorWithState) => item.isEditing,
   );
-  const isNotEditing = useTemplateValue(
-    (item: AssetListSeparatorWithState) => !item.isEditing,
-  );
   const expandButtonText = useTemplateValue(
     (item: AssetListSeparatorWithState) =>
       item.isExpanded ? 'Less ↑' : 'More ↓',
@@ -31,26 +28,24 @@ export function AssetListSeparator({
     item.isEditing ? 'Done' : 'Edit',
   );
 
-  const pinTitle = useTemplateValue(() => 'Pin');
-  const hideTitle = useTemplateValue(() => 'Hide');
-
   const onPin = useWorkletCallback(() => {});
   const onHide = useWorkletCallback(() => {});
 
   return (
     <View style={styles.container}>
-      <WishList.IF condition={isEditing}>
-        <View style={styles.buttonGroup}>
-          <Button disabled onPress={onPin} text={pinTitle} active={false} />
-          <View style={styles.margin} />
-          <Button disabled onPress={onHide} text={hideTitle} active={false} />
-        </View>
-      </WishList.IF>
-      <WishList.IF condition={isNotEditing}>
-        <Button active={false} text={expandButtonText} onPress={onExpand} />
-      </WishList.IF>
+      <WishList.Switch value={isEditing}>
+        <WishList.Case value={true}>
+          <View style={styles.buttonGroup}>
+            <Button disabled onPress={onPin} text="Pin" active={false} />
+            <View style={styles.margin} />
+            <Button disabled onPress={onHide} text="Hide" active={false} />
+          </View>
+        </WishList.Case>
 
-      {/* TODO: Replace with IF */}
+        <WishList.Case value={false}>
+          <Button active={false} text={expandButtonText} onPress={onExpand} />
+        </WishList.Case>
+      </WishList.Switch>
 
       <WishList.IF condition={isExpanded}>
         <Button text={editButtonText} onPress={onEdit} active={false} />
