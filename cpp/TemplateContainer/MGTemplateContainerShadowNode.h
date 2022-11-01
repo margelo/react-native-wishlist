@@ -24,6 +24,10 @@ class JSI_EXPORT MGTemplateContainerShadowNode final
   using ConcreteViewShadowNode::ConcreteViewShadowNode;
 
  public:
+  MGTemplateContainerShadowNode(
+      ShadowNode const &sourceShadowNode,
+      ShadowNodeFragment const &fragment);
+
   std::vector<std::shared_ptr<ShadowNode const>> templates;
 
   void appendChild(ShadowNode::Shared const &childNode);

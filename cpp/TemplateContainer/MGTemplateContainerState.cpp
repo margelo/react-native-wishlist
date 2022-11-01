@@ -2,8 +2,8 @@
 
 namespace facebook::react {
 
-std::vector<std::shared_ptr<ShadowNode const>>
-MGTemplateContainerState::getTemplates() const {
+const std::vector<std::shared_ptr<ShadowNode const>>
+    &MGTemplateContainerState::getTemplates() const {
   return templates_;
 }
 
