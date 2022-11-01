@@ -18,7 +18,7 @@ class JSI_EXPORT MGTemplateContainerState final {
       std::vector<std::shared_ptr<ShadowNode const>> const &templates)
       : templates_(templates){};
 
-  std::vector<std::shared_ptr<ShadowNode const>> getTemplates() const;
+  const std::vector<std::shared_ptr<ShadowNode const>> &getTemplates() const;
 
 #ifdef ANDROID
   MGTemplateContainerState(

@@ -8,22 +8,18 @@ namespace react {
 
 extern const char MGTemplateContainerComponentName[] = "MGTemplateContainer";
 
+MGTemplateContainerShadowNode::MGTemplateContainerShadowNode(
+    ShadowNode const &sourceShadowNode,
+    ShadowNodeFragment const &fragment)
+    : ConcreteViewShadowNode(sourceShadowNode, fragment) {
+  auto &templateContainerSourceShadowNode =
+      static_cast<MGTemplateContainerShadowNode const &>(sourceShadowNode);
+  templates = templateContainerSourceShadowNode.templates;
+}
+
 void MGTemplateContainerShadowNode::appendChild(
     ShadowNode::Shared const &childNode) {
   this->templates.push_back(childNode);
-  std::shared_ptr<const MGTemplateContainerProps> props =
-      std::dynamic_pointer_cast<const MGTemplateContainerProps>(
-          this->getProps());
-  if (props->names.size() == this->templates.size()) { // last Child
-    PropsParserContext propsParserContext{
-        getSurfaceId(),
-        *this->getComponentDescriptor().getContextContainer().get()};
-    auto rawProps = RawProps();
-    rawProps.parse(RawPropsParser(), propsParserContext);
-    auto newProps = std::make_shared<MGTemplateContainerProps>(
-        propsParserContext, *props, rawProps);
-    props_ = newProps;
-  }
 }
 
 void MGTemplateContainerShadowNode::layout(LayoutContext layoutContext) {

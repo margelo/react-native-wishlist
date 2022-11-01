@@ -55,13 +55,19 @@ using namespace facebook::react;
   [super unmountChildComponentView:childComponentView index:index];
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-missing-super-calls"
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
-  auto inflatorId = std::static_pointer_cast<const MGTemplateInterceptorProps>(props)->inflatorId;
+  auto wProps = std::static_pointer_cast<const MGTemplateInterceptorProps>(props);
 
-  //[super updateProps:props oldProps:oldProps];
-  // _eventEmitter = nil;
+  if (_wishlist) {
+    [_wishlist setInflatorId:wProps->inflatorId];
+  }
+
+  _props = wProps;
 }
+#pragma clang diagnostic pop
 
 @end
 
