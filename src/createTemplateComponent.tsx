@@ -141,6 +141,9 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
             // Callbacks should never be in objects.
             eventName: path[0].replace(/^on/, 'top'),
           });
+          // Events have a boolean prop associated to know whether the
+          // function is set or not, so we still want to pass the prop.
+          setInObject(otherProps, path, () => {});
         } else {
           // @ts-expect-error TODO: fix this.
           if (Component === ForEachBase && path[0] === 'template') {
@@ -176,15 +179,15 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
           'worklet';
 
           const propsToSet: any = {};
-          for (const { mapper, targetPath } of templateValues) {
+          templateValues.forEach(({ mapper, targetPath }) => {
             setInObject(propsToSet, targetPath, mapper(value, rootValue));
-          }
+          });
 
-          for (const { worklet, eventName } of templateCallbacks) {
-            templateItem?.setCallback(eventName, () => {
-              worklet(value, rootValue);
+          templateCallbacks.forEach(({ eventName, worklet }) => {
+            templateItem.setCallback(eventName, (event) => {
+              worklet(event, value, rootValue);
             });
-          }
+          });
 
           // Styles need to be passed as props.
           const { style: styleForProps, ...otherPropsToSet } = propsToSet;

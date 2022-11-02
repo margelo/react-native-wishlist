@@ -13,17 +13,21 @@ const maybeInit = () => {
       'worklet';
       global.handlers = {};
 
-      global.handleEvent = (type: any, tag: any) => {
+      global.handleEvent = (type: string, tag: number, event: any) => {
         const callback = global.handlers[tag.toString() + type];
         if (callback) {
-          callback();
+          callback(event);
         }
       };
     })();
   }
 };
 
-export type TemplateCallbackWorklet = (value: any, rootValue: any) => unknown;
+export type TemplateCallbackWorklet = (
+  event: any,
+  value: any,
+  rootValue: any,
+) => unknown;
 
 export class TemplateCallback {
   _worklet: TemplateCallbackWorklet;
@@ -38,7 +42,7 @@ export class TemplateCallback {
 }
 
 export function useTemplateCallback(
-  worklet: (value: any, rootValue: any) => unknown,
+  worklet: (nativeEvent: any, value: any, rootValue: any) => unknown,
 ) {
   return useMemo(() => {
     return new TemplateCallback(worklet);

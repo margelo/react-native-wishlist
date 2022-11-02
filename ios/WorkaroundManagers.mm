@@ -48,8 +48,8 @@ RCT_EXPORT_MODULE(Workaround);
       try {
         jsi::Function f = rt->global().getPropertyAsObject(*rt, "global").getPropertyAsFunction(*rt, "handleEvent");
         f.call(*rt, jsi::String::createFromUtf8(*rt, type), tag, event.payloadFactory(*rt));
-      } catch (std::exception e) {
-        // do Nothing most likly the handler funciton is not registered yet
+      } catch (std::exception &error) {
+        RCTLogError(@"%@", [NSString stringWithUTF8String:error.what()]);
       }
     }
     return true;

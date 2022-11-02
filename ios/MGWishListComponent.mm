@@ -108,7 +108,7 @@ using namespace facebook::react;
   std::shared_ptr<const MGWishlistProps> wProps = std::static_pointer_cast<const MGWishlistProps>(props);
   inflatorId = wProps->inflatorId;
   _initialIndex = wProps->initialIndex;
-  
+
   _props = wProps;
 }
 #pragma clang diagnostic pop

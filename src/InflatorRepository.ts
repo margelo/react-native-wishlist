@@ -3,7 +3,7 @@ export type TemplateItem = {
 } & {
   getByWishId: (id: string) => TemplateItem | undefined;
   addProps: (props: any) => void;
-  setCallback: (eventName: string, callback: () => void) => void;
+  setCallback: (eventName: string, callback: (event: any) => void) => void;
   describe: () => string;
   setChildren: (children: TemplateItem[]) => void;
 };
