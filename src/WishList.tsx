@@ -351,6 +351,7 @@ function Template({ children, type }: TemplateProps) {
 type MappingProps = {
   nativeId: string;
   templateType?: string;
+  onInflate: MappingInflateMethod;
 };
 
 const Mapping: React.FC<MappingProps> = () => null;
