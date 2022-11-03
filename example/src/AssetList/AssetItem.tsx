@@ -62,7 +62,7 @@ export function AssetItem({ onItemPress }: AssetItemProps) {
   );
 
   return (
-    <WishList.Pressable onPress={onItemPress} nativeId="asset-pressable">
+    <WishList.Pressable onPress={onItemPress}>
       <WishList.View style={[styles.rootContainer, { paddingLeft }]}>
         <WishList.IF condition={isEditing}>
           <ItemCheckbox />
