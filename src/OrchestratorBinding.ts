@@ -1,9 +1,9 @@
 import { useWishlistId } from './WishlistIdContext';
 
-export useMarkItemsDirty() {
+export function useMarkItemsDirty() {
   const wishlistId = useWishlistId();
   return (items) => {
-    'worklet'
+    'worklet';
     const markItemsDirty = global.wishlists[wishlistId].markItemsDirty;
     return markItemsDirty(items);
   };

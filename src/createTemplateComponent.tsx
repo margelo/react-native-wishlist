@@ -181,6 +181,7 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
           }
 
           for (const { worklet, eventName } of templateCallbacks) {
+            console.log('register eventhandler for key', value.key);
             templateItem?.setCallback(eventName, () => {
               worklet(value, rootValue);
             });
