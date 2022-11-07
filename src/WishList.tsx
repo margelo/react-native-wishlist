@@ -190,6 +190,13 @@ const Component = forwardRef(
           return undefined;
         }
 
+        if (value.key == undefined) {
+          throw new Error("Every data cell has to contain unique key prop!");
+        }
+        // We set the key of the item here so that 
+        // viewportObserver knows what's the key and is able to rerender it later on
+        item.key = value.key;
+
         const rootValue = value; // TODO(terry): use proxy for this
 
         Object.keys(mappingRef.current!).forEach((key) => {
