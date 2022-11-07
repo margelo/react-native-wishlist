@@ -27,7 +27,13 @@ MGTemplateContainerComponentProps::MGTemplateContainerComponentProps(
           rawProps,
           "inflatorId",
           sourceProps.inflatorId,
-          {})) {
+          {})),
+                 wishlistId(convertRawProp(
+                     context,
+                     rawProps,
+                     "wishlistId",
+                     sourceProps.wishlistId,
+                     {})) {
   templates = sourceProps.templates;
 }
 

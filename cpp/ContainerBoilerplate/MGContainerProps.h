@@ -28,6 +28,7 @@ struct MGTemplateContainerComponentProps final : public ViewProps {
 #pragma mark - Props
 
   std::string inflatorId{};
+    std::string wishlistId{};
   std::vector<std::string> names{};
   std::vector<std::shared_ptr<ShadowNode const>> templates;
 };
