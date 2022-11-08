@@ -79,32 +79,6 @@ struct ShadowNodeBinding : public jsi::HostObject,
   }
 };
 
-// dirty hack don't do it at home
-class ShadowNodeFamilyHack final {
- public:
-  using Shared = std::shared_ptr<ShadowNodeFamily const>;
-  using Weak = std::weak_ptr<ShadowNodeFamily const>;
-
-  using AncestorList = butter::small_vector<
-      std::pair<
-          std::reference_wrapper<ShadowNode const> /* parentNode */,
-          int /* childIndex */>,
-      64>;
-
-  EventDispatcher::Weak eventDispatcher_;
-  mutable std::shared_ptr<State const> mostRecentState_;
-  mutable butter::shared_mutex mutex_;
-
-  Tag const tag_;
-  SurfaceId const surfaceId_;
-  SharedEventEmitter const eventEmitter_;
-  ComponentDescriptor const &componentDescriptor_;
-  ComponentHandle componentHandle_;
-  ComponentName componentName_;
-  mutable ShadowNodeFamily::Weak parent_{};
-  mutable bool hasParent_{false};
-};
-
 struct ComponentsPool : std::enable_shared_from_this<ComponentsPool> {
   std::map<std::string, int> nameToIndex;
   std::map<int, std::string> tagToType;

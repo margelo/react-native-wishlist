@@ -86,10 +86,8 @@ export const ChatItemView: React.FC<Props> = ({
       global.liked = {};
     }
     if (global.liked[item.key]) {
-      console.log('rerender like');
       return 1;
     } else {
-      console.log('rerender dislike');
       return 0.4;
     }
     // return item.likes > 0 ? 1 : 0.4,;
