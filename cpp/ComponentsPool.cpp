@@ -1,4 +1,5 @@
 #include "ComponentsPool.h"
+#include <iostream>
 using namespace facebook::react;
 using namespace jsi;
 
@@ -17,6 +18,7 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
           std::string callbackName = args[0].asString(rt).utf8(rt);
           int tag = this->sn->getTag();
           std::string eventName = std::to_string(tag) + callbackName;
+                std::cout << "register native for name " << eventName << std::endl;
           jsi::Function callback = args[1].asObject(rt).asFunction(rt);
 
           auto handlerRegistry = rt.global()
@@ -74,8 +76,6 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
                  std::make_shared<ShadowNode::ListOfShared>(children)});
             currentParent->sn = currentSN;
             currentParent = currentParent->parent;
-            std::cout << "is currentParent null " << (currentParent == nullptr)
-                      << std::endl;
           }
 
           return jsi::Value::undefined();

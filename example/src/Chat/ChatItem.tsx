@@ -140,11 +140,11 @@ export const ChatItemView: React.FC<Props> = ({
         <Wishlist.Text style={styles.messageText}>{message}</Wishlist.Text>
       </View>
 
-      <Wishlist.Template type="reaction">
+      {/*<Wishlist.Template type="reaction">
         <Reaction />
-      </Wishlist.Template>
+          </Wishlist.Template> */}
 
-      <View style={styles.reactionsContainer}>
+     {/*} <View style={styles.reactionsContainer}>
         <Wishlist.ForEach
           style={styles.row}
           items={reactions}
@@ -154,7 +154,7 @@ export const ChatItemView: React.FC<Props> = ({
         {type === 'other' ? (
           <AddReaction onAddReaction={onAddReaction} />
         ) : null}
-      </View>
+        </View> */}
     </View>
   );
 };
