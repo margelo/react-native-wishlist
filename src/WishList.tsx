@@ -193,9 +193,9 @@ const Component = forwardRef(
         }
 
         if (value.key == undefined) {
-          throw new Error("Every data cell has to contain unique key prop!");
+          throw new Error('Every data cell has to contain unique key prop!');
         }
-        // We set the key of the item here so that 
+        // We set the key of the item here so that
         // viewportObserver knows what's the key and is able to rerender it later on
         item.key = value.key;
 
@@ -255,7 +255,7 @@ const Component = forwardRef(
       [inflatorId],
     );
 
-    const wishlistId = useRef({id: `ID#${wishCtr++}`});
+    const wishlistId = useRef({ id: `ID#${wishCtr++}` });
 
     return (
       <WishlistIDContext.Provider value={wishlistId.current}>

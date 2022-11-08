@@ -73,7 +73,7 @@ export const ChatItemView: React.FC<Props> = ({
       global.liked = {};
     }
     if (global.liked[item.key]) {
-      console.log('rerender like')
+      console.log('rerender like');
       return '♥️';
     } else {
       console.log('rerender dislike');
@@ -86,7 +86,7 @@ export const ChatItemView: React.FC<Props> = ({
       global.liked = {};
     }
     if (global.liked[item.key]) {
-      console.log('rerender like')
+      console.log('rerender like');
       return 1;
     } else {
       console.log('rerender dislike');
@@ -144,7 +144,7 @@ export const ChatItemView: React.FC<Props> = ({
         <Reaction />
           </Wishlist.Template> */}
 
-     {/*} <View style={styles.reactionsContainer}>
+      {/*} <View style={styles.reactionsContainer}>
         <Wishlist.ForEach
           style={styles.row}
           items={reactions}
