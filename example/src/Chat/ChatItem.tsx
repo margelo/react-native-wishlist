@@ -22,11 +22,11 @@ export const Reaction = () => {
   });
 
   const count = useTemplateValue((item: ReactionItemCombined) => {
-    return String(item.ids.length);
+    return item.ids.length;
   });
 
-  const showCounter = useTemplateValue((item: ReactionItemCombined) => {
-    return item.ids.length > 1;
+  const showCounter = useTemplateValue(() => {
+    return count.value() > 1;
   });
 
   const handler = useWorkletCallback((value, rootValue) => {

@@ -1,9 +1,5 @@
 import { useMemo } from 'react';
-
-const runOnUI = (...args: any[]) => {
-  const f = require('react-native-reanimated').runOnUI; //delay reanimated init
-  return f(...args);
-};
+import { runOnUI } from './Utils';
 
 let done = false;
 const maybeInit = () => {
