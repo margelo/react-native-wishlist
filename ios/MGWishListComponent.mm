@@ -25,6 +25,7 @@ using namespace facebook::react;
   WishlistShadowNode::ConcreteState::Shared _sharedState;
   bool alreadyRendered;
   std::string inflatorId;
+  std::string _wishlistId;
   MGScrollViewOrchestrator *_orchestrator;
   std::shared_ptr<const WishlistEventEmitter> _emitter;
   int _initialIndex;
@@ -50,6 +51,11 @@ using namespace facebook::react;
 - (void)setInflatorId:(std::string)nextInflatorId
 {
   inflatorId = nextInflatorId;
+}
+
+- (void)setWishlistId:(std::string)wishlistId
+{
+  _wishlistId = wishlistId;
 }
 
 - (void)handlePan:(UIPanGestureRecognizer *)gesture
@@ -85,7 +91,8 @@ using namespace facebook::react;
                                                          names:names
                                               viewportObserver:_sharedState->getData().viewportObserver
                                                     inflatorId:inflatorId
-                                                  initialIndex:_initialIndex];
+                                                  initialIndex:_initialIndex
+                                                    wishlistId:_wishlistId];
 
     _orchestrator.delegate = self;
 
@@ -106,7 +113,6 @@ using namespace facebook::react;
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
   std::shared_ptr<const WishlistProps> wProps = std::static_pointer_cast<const WishlistProps>(props);
-  inflatorId = wProps->inflatorId;
   _initialIndex = wProps->initialIndex;
 }
 #pragma clang diagnostic pop
@@ -142,6 +148,7 @@ using namespace facebook::react;
 - (void)prepareForRecycle
 {
   _sharedState.reset();
+  _orchestrator = nil;
   [super prepareForRecycle];
 }
 

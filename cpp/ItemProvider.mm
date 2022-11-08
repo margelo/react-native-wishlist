@@ -37,5 +37,6 @@ struct
   wishItem.sn = std::static_pointer_cast<ShadowNode>(ysn);
   wishItem.height = sz.height;
   wishItem.index = index;
+  wishItem.key = shadowNodeWrapper->key;
   return wishItem;
 }

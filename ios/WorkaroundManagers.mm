@@ -119,6 +119,8 @@ RCT_EXPORT_MODULE(MGTemplateContainerComponentManager)
 
 RCT_CUSTOM_VIEW_PROPERTY(inflatorId, NSString *, UIView) {}
 
+RCT_CUSTOM_VIEW_PROPERTY(wishlistId, NSString *, UIView) {}
+
 RCT_CUSTOM_VIEW_PROPERTY(names, NSArray<NSString *> *, UIView) {}
 
 - (UIView *)view

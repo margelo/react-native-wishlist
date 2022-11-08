@@ -22,6 +22,8 @@ using namespace facebook::react;
 {
   _wishList = wishList;
   auto props = *std::static_pointer_cast<const MGTemplateContainerComponentProps>(_props);
+  [_wishList setWishlistId:props.wishlistId];
+  [_wishList setInflatorId:props.inflatorId];
   [_wishList setTemplates:props.templates withNames:props.names];
 }
 
@@ -37,6 +39,7 @@ using namespace facebook::react;
 {
   const auto &newProps = *std::static_pointer_cast<const MGTemplateContainerComponentProps>(props);
   if (_wishList != NULL) {
+    [_wishList setWishlistId:newProps.wishlistId];
     [_wishList setInflatorId:newProps.inflatorId];
     [_wishList setTemplates:newProps.templates withNames:newProps.names];
   }

@@ -10,6 +10,7 @@ import { NativeModules } from 'react-native';
 NativeModules.Workaround.registerContainer();
 export interface NativeTemplateContainerProps extends ViewProps {
   inflatorId: string;
+  wishlistId: string;
   names: ReadonlyArray<string>;
 }
 

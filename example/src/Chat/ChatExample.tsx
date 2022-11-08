@@ -10,14 +10,6 @@ import { ReactionPicker } from './ReactionPicker';
 export default function App() {
   const [data, setData] = useState<ChatItem[]>([]);
 
-  const handleLikeItem = useCallback((item: ChatItem) => {
-    setData((p) =>
-      p.map((i) =>
-        i.id === item.id ? { ...i, likes: i.likes === 0 ? 1 : 0 } : i,
-      ),
-    );
-  }, []);
-
   const handleSend = useCallback(
     (text: string) => {
       setData((val) => addSendedMessage(val, text));
@@ -66,7 +58,6 @@ export default function App() {
         <ChatListView
           style={styles.list}
           data={data}
-          onLikeItem={handleLikeItem}
           onAddReaction={onAddReaction}
         />
         <MessageInput onSend={handleSend} />

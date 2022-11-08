@@ -4,7 +4,7 @@ export type ReactionItem = {
 };
 
 export type ChatItem = {
-  id: number;
+  key: string;
   author: string;
   type: 'me' | 'other';
   message: string;
@@ -54,7 +54,7 @@ const createChatItem = (index: number): ChatItem => {
   const author = authors[index % authors.length];
 
   return {
-    id: index,
+    key: `id#${index}`,
     type: author === 'Me' ? 'me' : 'other',
     author,
     message,
@@ -72,7 +72,7 @@ const createChatItem = (index: number): ChatItem => {
 export const addSendedMessage = (data: ChatItem[], text: string) => {
   const myMessage = data.find((item) => item.type === 'me');
   const message: ChatItem = {
-    id: data.length,
+    key: `key#${data.length}`,
     type: 'me',
     author: myMessage?.author!,
     message: text,
