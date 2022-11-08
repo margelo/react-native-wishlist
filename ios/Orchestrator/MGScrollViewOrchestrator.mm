@@ -82,6 +82,17 @@
     _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + diff);
     bottomViewPortEdge += diff;
     topViewportEdge += diff;
+  }
+
+  // topElementY > topViewPortEdge (top overscroll)
+  if (topElementY > topViewportEdge) {
+    CGFloat diff = topElementY - topViewportEdge;
+    CGPoint oldOffset = _scrollView.contentOffset;
+
+    _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + diff);
+    bottomViewPortEdge += diff;
+    topViewportEdge += diff;
+    _currentAnimation = nil;
 
     _viewportObserver->reactToOffsetChange(_scrollView.contentOffset.y);
   }
