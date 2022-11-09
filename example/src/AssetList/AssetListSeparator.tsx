@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button } from './Button';
-import { useTemplateValue, WishList } from 'wishlist';
+import { useTemplateValue, Wishlist } from 'wishlist';
 import { useWorkletCallback } from 'react-native-reanimated';
 import type { AssetListSeparatorWithState } from './AssetListExample';
 
@@ -33,23 +33,23 @@ export function AssetListSeparator({
 
   return (
     <View style={styles.container}>
-      <WishList.Switch value={isEditing}>
-        <WishList.Case value={true}>
+      <Wishlist.Switch value={isEditing}>
+        <Wishlist.Case value={true}>
           <View style={styles.buttonGroup}>
             <Button disabled onPress={onPin} text="Pin" active={false} />
             <View style={styles.margin} />
             <Button disabled onPress={onHide} text="Hide" active={false} />
           </View>
-        </WishList.Case>
+        </Wishlist.Case>
 
-        <WishList.Case value={false}>
+        <Wishlist.Case value={false}>
           <Button active={false} text={expandButtonText} onPress={onExpand} />
-        </WishList.Case>
-      </WishList.Switch>
+        </Wishlist.Case>
+      </Wishlist.Switch>
 
-      <WishList.IF condition={isExpanded}>
+      <Wishlist.IF condition={isExpanded}>
         <Button text={editButtonText} onPress={onEdit} active={false} />
-      </WishList.IF>
+      </Wishlist.IF>
     </View>
   );
 }

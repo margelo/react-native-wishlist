@@ -26,7 +26,7 @@ import NativeWishList, {
   WishlistCommands,
 } from './NativeViews/WishlistNativeComponent';
 import { TemplateContext } from './TemplateContext';
-import { WishListContext } from './WishListContext';
+import { WishlistContext } from './WishlistContext';
 import { useWishlistId, WishlistIDContext } from './WishlistIdContext';
 
 const OffsetComponent = '__offsetComponent';
@@ -200,7 +200,7 @@ const Component = forwardRef(
 
     return (
       <WishlistIDContext.Provider value={wishlistId.current}>
-        <WishListContext.Provider value={mappingContext}>
+        <WishlistContext.Provider value={mappingContext}>
           <TemplatesRegistryContext.Provider value={templatesRegistry}>
             <>
               {/* Prerender templates to register all the nested templates */}
@@ -226,7 +226,7 @@ const Component = forwardRef(
               />
             </>
           </TemplatesRegistryContext.Provider>
-        </WishListContext.Provider>
+        </WishlistContext.Provider>
       </WishlistIDContext.Provider>
     );
   },
@@ -309,7 +309,7 @@ function Template({ children, type }: TemplateProps) {
 
 Template.displayName = 'WishListTemplate';
 
-export const WishList = {
+export const Wishlist = {
   Component,
   Template,
 

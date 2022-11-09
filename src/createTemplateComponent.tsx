@@ -9,7 +9,7 @@ import InflatorRepository, {
 import { CaseBase } from './Components/Switch';
 import { useTemplateContext } from './TemplateContext';
 import { TemplateValue, TemplateValueMapper } from './TemplateValue';
-import { useWishListContext } from './WishListContext';
+import { useWishlistContext } from './WishlistContext';
 
 // This is based on types from @types/react-native createAnimatedComponent.
 
@@ -103,7 +103,7 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
   ) => void,
 ): TemplateComponent<T> {
   const WishListComponent = forwardRef<any, any>(({ style, ...props }, ref) => {
-    const { inflatorId } = useWishListContext();
+    const { inflatorId } = useWishlistContext();
     const { templateType } = useTemplateContext();
 
     const nativeId = useMemo(() => `template_id_${nativeIdGenerator++}`, []);

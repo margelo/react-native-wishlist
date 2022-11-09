@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { useWorkletCallback } from 'react-native-reanimated';
-import { useTemplateValue, WishList, WishList as Wishlist } from 'wishlist';
+import { useTemplateValue, Wishlist } from 'wishlist';
 import { useMarkItemsDirty } from 'wishlist';
 import type { ChatItem, ReactionItem } from './Data';
 
@@ -34,14 +34,14 @@ export const Reaction = () => {
   }, []);
 
   return (
-    <WishList.Pressable onPress={handler}>
+    <Wishlist.Pressable onPress={handler}>
       <View style={styles.reactionItem}>
         <Wishlist.Text style={styles.reactionText}>{emoji}</Wishlist.Text>
-        <WishList.IF condition={showCounter}>
+        <Wishlist.IF condition={showCounter}>
           <Wishlist.Text style={styles.reactionCount}>{count}</Wishlist.Text>
-        </WishList.IF>
+        </Wishlist.IF>
       </View>
-    </WishList.Pressable>
+    </Wishlist.Pressable>
   );
 };
 
@@ -51,11 +51,11 @@ export const AddReaction = ({
   onAddReaction: (item: ChatItem) => void;
 }) => {
   return (
-    <WishList.Pressable onPress={onAddReaction}>
+    <Wishlist.Pressable onPress={onAddReaction}>
       <View style={styles.reactionItem}>
         <Image style={styles.addReactionImage} source={addReaction} />
       </View>
-    </WishList.Pressable>
+    </Wishlist.Pressable>
   );
 };
 
@@ -116,11 +116,11 @@ export const ChatItemView: React.FC<Props> = ({ type, onAddReaction }) => {
         <View style={styles.authorContainer}>
           <Wishlist.Text style={styles.authorText}>{author}</Wishlist.Text>
           {type === 'other' ? (
-            <WishList.Pressable onPress={likeItemListener}>
+            <Wishlist.Pressable onPress={likeItemListener}>
               <Wishlist.Text style={{ opacity: likeOpacity }}>
                 {likeText}
               </Wishlist.Text>
-            </WishList.Pressable>
+            </Wishlist.Pressable>
           ) : null}
         </View>
       </View>

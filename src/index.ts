@@ -1,4 +1,4 @@
 export { useTemplateValue, TemplateValue } from './TemplateValue';
 export { createTemplateComponent } from './createTemplateComponent';
-export { WishList } from './WishList';
+export { Wishlist } from './Wishlist';
 export { useMarkItemsDirty } from './OrchestratorBinding';
