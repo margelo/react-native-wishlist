@@ -40,8 +40,11 @@ void ViewportObserver::pushChildren()
         [&](RootShadowNode const &oldRootShadowNode) -> std::shared_ptr<RootShadowNode> {
       return std::static_pointer_cast<RootShadowNode>(
           oldRootShadowNode.cloneTree(sWishList->getFamily(), [&](const ShadowNode &sn) -> std::shared_ptr<ShadowNode> {
+            const auto &wsn = static_cast<const MGWishlistShadowNode &>(sn);
             auto children = std::make_shared<ShadowNode::ListOfShared>();
-
+            if (wsn.getRefreshControl()) {
+              children->push_back(wsn.getRefreshControl());
+            }
             children->push_back(getOffseter(window[0].offset));
 
             for (WishItem &wishItem : window) {

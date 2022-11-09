@@ -24,6 +24,16 @@ export default function App() {
     }, 500);
   }, []);
 
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setData(fetchData(200));
+      setRefreshing(false);
+    }, 2000);
+  }, []);
+
   const [activeMessageForReaction, setActiveReactionPicker] =
     useState<ChatItem | null>(null);
 
@@ -59,6 +69,8 @@ export default function App() {
           style={styles.list}
           data={data}
           onAddReaction={onAddReaction}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
         />
         <MessageInput onSend={handleSend} />
       </View>

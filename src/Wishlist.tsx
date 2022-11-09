@@ -7,7 +7,13 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
-import { StyleSheet, useWindowDimensions, View, ViewProps } from 'react-native';
+import {
+  RefreshControlProps,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+  ViewProps,
+} from 'react-native';
 import { ForEach } from './Components/ForEach';
 import { IF } from './Components/IF';
 import { Pressable } from './Components/Pressable';
@@ -26,8 +32,8 @@ import NativeWishList, {
   Commands as WishlistCommands,
 } from './NativeViews/WishlistNativeComponent';
 import { TemplateContext } from './TemplateContext';
-import { useWishlistContext, WishlistContext } from './WishlistContext';
 import { generateId } from './Utils';
+import { useWishlistContext, WishlistContext } from './WishlistContext';
 
 const OffsetComponent = '__offsetComponent';
 
@@ -59,18 +65,30 @@ type WishListInstance = {
 
 export type BaseItem = { type: string; key: string };
 
-type Props<ItemT extends BaseItem> = ViewProps & {
+export type WishlistProps<ItemT extends BaseItem> = ViewProps & {
   data: ItemT[];
   inflateItem?: InflateMethod;
   onItemNeeded?: (index: number) => ItemT;
   onStartReached?: () => void;
   onEndReached?: () => void;
   initialIndex?: number;
+  /**
+   * A RefreshControl component, used to provide pull-to-refresh
+   * functionality for the list.
+   */
+  refreshControl?: React.ReactElement<RefreshControlProps> | undefined;
 };
 
 const Component = forwardRef(
   <T extends BaseItem>(
-    { inflateItem, onItemNeeded, children, style, data, ...rest }: Props<T>,
+    {
+      inflateItem,
+      onItemNeeded,
+      children,
+      style,
+      data,
+      ...rest
+    }: WishlistProps<T>,
     ref: React.Ref<WishListInstance>,
   ) => {
     const nativeWishlist = useRef(null); // TODO type it properly
@@ -234,6 +252,7 @@ type InnerComponentProps = ViewProps & {
   rest: any;
   templates: { [key: string]: any };
   nestedTemplates: { [key: string]: any };
+  refreshControl?: React.ReactElement<RefreshControlProps> | undefined;
 };
 
 function InnerComponent({
@@ -263,10 +282,12 @@ function InnerComponent({
         ref={nativeWishlist}
         removeClippedSubviews={false}
         inflatorId={inflatorId}
-        onEndReached={rest?.onEndReached}
-        onStartReached={rest?.onStartReached}
+        onEndReached={rest.onEndReached}
+        onStartReached={rest.onStartReached}
         initialIndex={rest.initialIndex ?? 0}
-      />
+      >
+        {rest.refreshControl}
+      </NativeWishList>
 
       <NativeTemplateContainer
         names={keys}
