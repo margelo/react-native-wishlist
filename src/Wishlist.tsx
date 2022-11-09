@@ -26,8 +26,7 @@ import NativeWishList, {
   WishlistCommands,
 } from './NativeViews/WishlistNativeComponent';
 import { TemplateContext } from './TemplateContext';
-import { WishlistContext } from './WishlistContext';
-import { useWishlistId, WishlistIDContext } from './WishlistIdContext';
+import { useWishlistContext, WishlistContext } from './WishlistContext';
 
 const OffsetComponent = '__offsetComponent';
 let InflatorId = 1000;
@@ -186,48 +185,46 @@ const Component = forwardRef(
       return inflatorIdRef.current!;
     }, [resolvedInflater]);
 
-    const mappingContext = useMemo(
+    const wishlistId = useRef<string | null>(null);
+    if (!wishlistId.current) {
+      wishlistId.current = `ID#${wishCtr++}`;
+    }
+    const wishlistContext = useMemo(
       () => ({
+        id: wishlistId.current!,
         inflatorId,
       }),
       [inflatorId],
     );
 
-    const wishlistId = useRef<{ id: string } | null>(null);
-    if (!wishlistId.current) {
-      wishlistId.current = { id: `ID#${wishCtr++}` };
-    }
-
     return (
-      <WishlistIDContext.Provider value={wishlistId.current}>
-        <WishlistContext.Provider value={mappingContext}>
-          <TemplatesRegistryContext.Provider value={templatesRegistry}>
-            <>
-              {/* Prerender templates to register all the nested templates */}
-              <View style={styles.noDisplay}>
-                {Object.keys(childrenTemplates).map((c) => (
-                  <View key={c + 'prerender'}>
-                    <TemplateContext.Provider
-                      value={{ templateType: c, renderChildren: true }}
-                    >
-                      {childrenTemplates[c]}
-                    </TemplateContext.Provider>
-                  </View>
-                ))}
-              </View>
+      <WishlistContext.Provider value={wishlistContext}>
+        <TemplatesRegistryContext.Provider value={templatesRegistry}>
+          <>
+            {/* Prerender templates to register all the nested templates */}
+            <View style={styles.noDisplay}>
+              {Object.keys(childrenTemplates).map((c) => (
+                <View key={c + 'prerender'}>
+                  <TemplateContext.Provider
+                    value={{ templateType: c, renderChildren: true }}
+                  >
+                    {childrenTemplates[c]}
+                  </TemplateContext.Provider>
+                </View>
+              ))}
+            </View>
 
-              <InnerComponent
-                inflatorId={inflatorId}
-                style={style}
-                nativeWishlist={nativeWishlist}
-                rest={rest}
-                templates={childrenTemplates}
-                nestedTemplates={templatesRegistry.templates}
-              />
-            </>
-          </TemplatesRegistryContext.Provider>
-        </WishlistContext.Provider>
-      </WishlistIDContext.Provider>
+            <InnerComponent
+              inflatorId={inflatorId}
+              style={style}
+              nativeWishlist={nativeWishlist}
+              rest={rest}
+              templates={childrenTemplates}
+              nestedTemplates={templatesRegistry.templates}
+            />
+          </>
+        </TemplatesRegistryContext.Provider>
+      </WishlistContext.Provider>
     );
   },
 );
@@ -250,9 +247,7 @@ function InnerComponent({
 }: InnerComponentProps) {
   const combinedTemplates = { ...templates, ...nestedTemplates };
 
-  const wishlistId = useWishlistId();
-
-  console.log('wishlistIDDD js', wishlistId);
+  const { id } = useWishlistContext();
 
   const keys = Object.keys(combinedTemplates);
   // console.log('@@@ Render WishList', inflatorId, keys.join(', '));
@@ -277,7 +272,7 @@ function InnerComponent({
       <NativeTemplateContainer
         names={keys}
         inflatorId={inflatorId}
-        wishlistId={wishlistId}
+        wishlistId={id}
         key={Math.random().toString()}
         collapsable={false}
       >
