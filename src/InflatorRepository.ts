@@ -1,3 +1,6 @@
+import type { TemplateValueUIState } from './TemplateValue';
+import { runOnUI } from './Utils';
+
 export type TemplateItem = {
   [key: string]: TemplateItem | undefined;
 } & {
@@ -47,11 +50,11 @@ export type UIInflatorRegistry = {
     pool: ComponentPool,
     rootValue: any,
   ) => TemplateItem;
-};
-
-const runOnUI = (...args: any[]) => {
-  const f = require('react-native-reanimated').runOnUI; //delay reanimated init
-  return f(...args);
+  getTemplateValueState: (id: string) => TemplateValueUIState | undefined;
+  setTemplateValueState: (id: string, state: TemplateValueUIState) => void;
+  deleteTemplateValueState: (id: string) => void;
+  getCurrentValue: () => any;
+  getCurrentRootValue: () => any;
 };
 
 let done = false;
@@ -66,6 +69,9 @@ const maybeInit = () => {
         string,
         Map<string, Map<string, MappingInflateMethod>>
       >();
+      const templateValueStates = new Map<string, TemplateValueUIState>();
+      let currentValue: any;
+      let currentRootValue: any;
 
       const InflatorRegistry: UIInflatorRegistry = {
         inflateItem: (id, index, pool) => {
@@ -91,6 +97,12 @@ const maybeInit = () => {
           }
         },
         useMappings: (item, value, templateType, id, pool, rootValue) => {
+          // We need to save and restore current values to support things like ForEach
+          // where current value can change.
+          const previousValue = currentValue;
+          const previousRootValue = currentRootValue;
+          currentValue = value;
+          currentRootValue = rootValue;
           const mapping = mappings.get(id)?.get(templateType);
           if (mapping) {
             for (const [nativeId, inflate] of mapping.entries()) {
@@ -100,6 +112,8 @@ const maybeInit = () => {
               }
             }
           }
+          currentValue = previousValue;
+          currentRootValue = previousRootValue;
           return item;
         },
         registerInflator: (id, inflateMethod) => {
@@ -129,6 +143,21 @@ const maybeInit = () => {
           innerMapping.set(nativeId, inflateMethod);
           mapping.set(templateType, innerMapping);
           mappings.set(inflatorId, mapping);
+        },
+        getTemplateValueState: (id) => {
+          return templateValueStates.get(id);
+        },
+        setTemplateValueState: (id, state) => {
+          templateValueStates.set(id, state);
+        },
+        deleteTemplateValueState: (id) => {
+          templateValueStates.delete(id);
+        },
+        getCurrentValue: () => {
+          return currentValue;
+        },
+        getCurrentRootValue: () => {
+          return currentRootValue;
         },
       };
       global.InflatorRegistry = InflatorRegistry;

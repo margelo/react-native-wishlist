@@ -8,7 +8,13 @@ import InflatorRepository, {
 } from './InflatorRepository';
 import { CaseBase } from './Switch';
 import { useTemplateContext } from './TemplateContext';
-import { TemplateValue, TemplateValueMapper } from './TemplateValue';
+import {
+  createTemplateValue,
+  isTemplateValue,
+  TemplateValue,
+  TemplateValueInternal,
+} from './TemplateValue';
+import { generateId } from './Utils';
 import { useWishListContext } from './WishListContext';
 
 // This is based on types from @types/react-native createAnimatedComponent.
@@ -43,8 +49,6 @@ export type TemplateProps<T> = {
 export interface TemplateComponent<T extends React.ComponentType<any>>
   extends React.FC<TemplateProps<React.ComponentPropsWithRef<T>>> {}
 
-let nativeIdGenerator = 0;
-
 function setInObject(obj: any, path: string[], value: any) {
   'worklet';
 
@@ -67,7 +71,7 @@ function traverseObject(
     if (
       value &&
       typeof value === 'object' &&
-      !(value instanceof TemplateValue) &&
+      !isTemplateValue(value) &&
       !(value instanceof TemplateCallback) &&
       (path.length === 0 || path[path.length - 1] !== 'children')
     ) {
@@ -84,10 +88,11 @@ function convertToTemplateValue(value: unknown, path: string[]) {
   let curTemplateType = value;
 
   return {
-    mapper: () => {
+    // TODO(janic): Need to call remove for template values created here.
+    templateValue: createTemplateValue(() => {
       'worklet';
       return curTemplateType;
-    },
+    }),
     targetPath: path,
   };
 }
@@ -106,13 +111,13 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
     const { inflatorId } = useWishListContext();
     const { templateType } = useTemplateContext();
 
-    const nativeId = useMemo(() => `template_id_${nativeIdGenerator++}`, []);
+    const nativeId = useMemo(generateId, []);
 
     const otherPropsMemoized = useMemo(() => {
       const resolvedStyle = StyleSheet.flatten(style);
 
       const templateValues: {
-        mapper: TemplateValueMapper<any, any>;
+        templateValue: TemplateValueInternal<any>;
         targetPath: string[];
       }[] = [];
 
@@ -131,8 +136,8 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
           }
         };
 
-        if (value instanceof TemplateValue) {
-          templateValues.push({ mapper: value.getMapper(), targetPath: path });
+        if (isTemplateValue(value)) {
+          templateValues.push({ templateValue: value, targetPath: path });
 
           applyHacks();
         } else if (value instanceof TemplateCallback) {
@@ -151,7 +156,7 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
             // @ts-expect-error TODO: fix this.
             Component === CaseBase &&
             path[0] === 'value' &&
-            !(value instanceof TemplateValue)
+            !isTemplateValue(value)
           ) {
             templateValues.push(convertToTemplateValue(value, path));
           }
@@ -160,7 +165,7 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
             // @ts-expect-error TODO: fix this.
             Component === Text &&
             path[0] === 'children' &&
-            !(value instanceof TemplateValue)
+            !isTemplateValue(value)
           ) {
             templateValues.push(convertToTemplateValue(value, path));
           }
@@ -175,9 +180,13 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
         (value, templateItem, pool, rootValue) => {
           'worklet';
 
+          templateValues.forEach(({ templateValue }) => {
+            templateValue.__setDirty();
+          });
+
           const propsToSet: any = {};
-          for (const { mapper, targetPath } of templateValues) {
-            setInObject(propsToSet, targetPath, mapper(value, rootValue));
+          for (const { templateValue, targetPath } of templateValues) {
+            setInObject(propsToSet, targetPath, templateValue.value());
           }
 
           for (const { worklet, eventName } of templateCallbacks) {
