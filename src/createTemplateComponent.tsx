@@ -1,12 +1,12 @@
 import React, { forwardRef, useMemo } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { TemplateCallback, TemplateCallbackWorklet } from './EventHandler';
-import { ForEachBase } from './ForEachBase';
+import { ForEachBase } from './Components/ForEachBase';
 import InflatorRepository, {
   ComponentPool,
   TemplateItem,
 } from './InflatorRepository';
-import { CaseBase } from './Switch';
+import { CaseBase } from './Components/Switch';
 import { useTemplateContext } from './TemplateContext';
 import {
   createTemplateValue,
@@ -15,7 +15,7 @@ import {
   TemplateValueInternal,
 } from './TemplateValue';
 import { generateId } from './Utils';
-import { useWishListContext } from './WishListContext';
+import { useWishlistContext } from './WishlistContext';
 
 // This is based on types from @types/react-native createAnimatedComponent.
 
@@ -108,7 +108,7 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
   ) => void,
 ): TemplateComponent<T> {
   const WishListComponent = forwardRef<any, any>(({ style, ...props }, ref) => {
-    const { inflatorId } = useWishListContext();
+    const { inflatorId } = useWishlistContext();
     const { templateType } = useTemplateContext();
 
     const nativeId = useMemo(generateId, []);

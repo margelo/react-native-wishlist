@@ -1,6 +1,6 @@
-import { createTemplateComponent } from './createTemplateComponent';
+import { createTemplateComponent } from '../createTemplateComponent';
 import { ForEachBase } from './ForEachBase';
-import { getUIInflatorRegistry } from './InflatorRepository';
+import { getUIInflatorRegistry } from '../InflatorRepository';
 
 export const ForEach = createTemplateComponent(
   ForEachBase,

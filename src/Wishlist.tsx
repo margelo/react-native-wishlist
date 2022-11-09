@@ -7,22 +7,18 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
-import {
-  Image,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-  ViewProps,
-} from 'react-native';
-import { createTemplateComponent } from './createTemplateComponent';
+import { StyleSheet, useWindowDimensions, View, ViewProps } from 'react-native';
+import { ForEach } from './Components/ForEach';
+import { IF } from './Components/IF';
+import { Pressable } from './Components/Pressable';
+import { Case, Switch } from './Components/Switch';
+import { WishlistImage } from './Components/WishlistImage';
+import { WishlistText } from './Components/WishlistText';
+import { WishlistView } from './Components/WishlistView';
 import { initEventHandler } from './EventHandler';
-import { ForEach } from './ForEach';
-import { Pressable } from './Pressable';
 import InflatorRepository, {
   ComponentPool,
   InflateMethod,
-  MappingInflateMethod,
 } from './InflatorRepository';
 import NativeTemplateContainer from './NativeViews/NativeTemplateContainer';
 import NativeTemplateInterceptor from './NativeViews/NativeTemplateInterceptor';
@@ -30,18 +26,10 @@ import NativeWishList, {
   Commands as WishlistCommands,
 } from './NativeViews/WishlistNativeComponent';
 import { TemplateContext } from './TemplateContext';
-import { WishListContext } from './WishListContext';
-import { WishlistIDContext, useWishlistId } from './WishlistIdContext';
-import { IF } from './IF';
-import { Switch, Case } from './Switch';
+import { useWishlistContext, WishlistContext } from './WishlistContext';
 import { generateId } from './Utils';
 
 const OffsetComponent = '__offsetComponent';
-
-type Mapping = {
-  templateType?: string;
-  onInflate: MappingInflateMethod;
-};
 
 type NestedTemplatesContextValue = {
   templates: { [key: string]: any };
@@ -62,22 +50,6 @@ function getTemplatesFromChildren(children: React.ReactNode, width: number) {
     }
   });
   return nextTemplates;
-}
-
-function getMappingsFromChildren(children: React.ReactNode) {
-  const nextMappings: {
-    [key: string]: Mapping;
-  } = {};
-  React.Children.forEach(children, (c) => {
-    if ((c as any).type.displayName === 'WishListMapping') {
-      const mappingComponent = c as React.ReactElement<MappingProps>;
-      nextMappings[mappingComponent.props.nativeId] = {
-        onInflate: mappingComponent.props.onInflate,
-        templateType: mappingComponent.props.templateType,
-      };
-    }
-  });
-  return nextMappings;
 }
 
 type WishListInstance = {
@@ -166,13 +138,6 @@ const Component = forwardRef(
       [],
     );
 
-    // Mapping registration and tracking
-    const mappingRef = useRef<{ [key: string]: Mapping }>({});
-
-    useMemo(() => {
-      mappingRef.current = getMappingsFromChildren(children);
-    }, [children]);
-
     // Resolve inflator - either use the provided callback or use the mapping
     const resolvedInflater: InflateMethod = useMemo(() => {
       if (inflateItem) {
@@ -198,34 +163,6 @@ const Component = forwardRef(
         // viewportObserver knows what's the key and is able to rerender it later on
         item.key = value.key;
 
-        const rootValue = value; // TODO(terry): use proxy for this
-
-        Object.keys(mappingRef.current!).forEach((key) => {
-          const templateItem = item.getByWishId(key);
-          if (
-            templateItem &&
-            (mappingRef.current![key].templateType !== undefined
-              ? mappingRef.current![key].templateType === value.type
-              : true)
-          ) {
-            try {
-              mappingRef.current![key].onInflate(
-                value,
-                templateItem,
-                pool,
-                rootValue,
-              );
-            } catch (err) {
-              console.error(
-                'Error calling mapper for key / template',
-                key,
-                value.type,
-                err,
-              );
-            }
-          }
-        });
-
         return [item, value];
       };
     }, [inflateItem, onItemNeededInternal]);
@@ -247,48 +184,46 @@ const Component = forwardRef(
       return inflatorIdRef.current!;
     }, [resolvedInflater]);
 
-    const mappingContext = useMemo(
+    const wishlistId = useRef<string | null>(null);
+    if (!wishlistId.current) {
+      wishlistId.current = generateId();
+    }
+    const wishlistContext = useMemo(
       () => ({
+        id: wishlistId.current!,
         inflatorId,
       }),
       [inflatorId],
     );
 
-    const wishlistId = useRef<{ id: string } | null>(null);
-    if (!wishlistId.current) {
-      wishlistId.current = { id: generateId() };
-    }
-
     return (
-      <WishlistIDContext.Provider value={wishlistId.current}>
-        <WishListContext.Provider value={mappingContext}>
-          <TemplatesRegistryContext.Provider value={templatesRegistry}>
-            <>
-              {/* Prerender templates to register all the nested templates */}
-              <View style={styles.noDisplay}>
-                {Object.keys(childrenTemplates).map((c) => (
-                  <View key={c + 'prerender'}>
-                    <TemplateContext.Provider
-                      value={{ templateType: c, renderChildren: true }}
-                    >
-                      {childrenTemplates[c]}
-                    </TemplateContext.Provider>
-                  </View>
-                ))}
-              </View>
+      <WishlistContext.Provider value={wishlistContext}>
+        <TemplatesRegistryContext.Provider value={templatesRegistry}>
+          <>
+            {/* Prerender templates to register all the nested templates */}
+            <View style={styles.noDisplay}>
+              {Object.keys(childrenTemplates).map((c) => (
+                <View key={c + 'prerender'}>
+                  <TemplateContext.Provider
+                    value={{ templateType: c, renderChildren: true }}
+                  >
+                    {childrenTemplates[c]}
+                  </TemplateContext.Provider>
+                </View>
+              ))}
+            </View>
 
-              <InnerComponent
-                inflatorId={inflatorId}
-                style={style}
-                nativeWishlist={nativeWishlist}
-                rest={rest}
-                templates={childrenTemplates}
-                nestedTemplates={templatesRegistry.templates}
-              />
-            </>
-          </TemplatesRegistryContext.Provider>
-        </WishListContext.Provider>
-      </WishlistIDContext.Provider>
+            <InnerComponent
+              inflatorId={inflatorId}
+              style={style}
+              nativeWishlist={nativeWishlist}
+              rest={rest}
+              templates={childrenTemplates}
+              nestedTemplates={templatesRegistry.templates}
+            />
+          </>
+        </TemplatesRegistryContext.Provider>
+      </WishlistContext.Provider>
     );
   },
 );
@@ -311,7 +246,7 @@ function InnerComponent({
 }: InnerComponentProps) {
   const combinedTemplates = { ...templates, ...nestedTemplates };
 
-  const wishlistId = useWishlistId();
+  const { id } = useWishlistContext();
 
   const keys = Object.keys(combinedTemplates);
   // console.log('@@@ Render WishList', inflatorId, keys.join(', '));
@@ -336,7 +271,7 @@ function InnerComponent({
       <NativeTemplateContainer
         names={keys}
         inflatorId={inflatorId}
-        wishlistId={wishlistId}
+        wishlistId={id}
         key={Math.random().toString()}
         collapsable={false}
       >
@@ -366,37 +301,20 @@ function Template({ children, type }: TemplateProps) {
   return templates?.renderChildren ? children : null;
 }
 
-type MappingProps = {
-  nativeId: string;
-  templateType?: string;
-  onInflate: MappingInflateMethod;
-};
-
-const Mapping: React.FC<MappingProps> = () => null;
-
 Template.displayName = 'WishListTemplate';
 
-Mapping.displayName = 'WishListMapping';
-
-export const WishList = {
+export const Wishlist = {
   Component,
   Template,
-  Mapping,
-  Pressable,
-  View: createTemplateComponent(View),
-  Image: createTemplateComponent(Image),
-  Text: createTemplateComponent(Text, (item, props) => {
-    'worklet';
 
-    const { children, ...other } = props;
-    item.RawText?.addProps({ text: String(children) });
-    item.addProps(other);
-  }),
+  Pressable,
+  View: WishlistView,
+  Image: WishlistImage,
+  Text: WishlistText,
 
   IF,
   Switch,
   Case,
-
   /**
    * TODO(Szymon) It's just a prototype we have to think about matching new and old children
    * TODO(Szymon) implement setChildren

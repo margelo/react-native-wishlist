@@ -1,6 +1,6 @@
 import React from 'react';
 import { processColor, StyleSheet, View } from 'react-native';
-import { useTemplateValue, WishList } from 'wishlist';
+import { useTemplateValue, Wishlist } from 'wishlist';
 import { AssetIcon } from './AssetIcon';
 import type { AssetListItemWithState } from './AssetListExample';
 import type { AssetItemType } from './assets';
@@ -32,16 +32,16 @@ function AssetInfo() {
 
       <View style={styles.content}>
         <View style={styles.row}>
-          <WishList.Text style={styles.name}>{name}</WishList.Text>
-          <WishList.Text style={styles.balance}>{balance}</WishList.Text>
+          <Wishlist.Text style={styles.name}>{name}</Wishlist.Text>
+          <Wishlist.Text style={styles.balance}>{balance}</Wishlist.Text>
         </View>
         <View style={[styles.row, styles.bottom]}>
-          <WishList.Text style={styles.nativeBalance}>
+          <Wishlist.Text style={styles.nativeBalance}>
             {nativeBalance}
-          </WishList.Text>
-          <WishList.Text style={[styles.change, { color: changeColor }]}>
+          </Wishlist.Text>
+          <Wishlist.Text style={[styles.change, { color: changeColor }]}>
             {change}
-          </WishList.Text>
+          </Wishlist.Text>
         </View>
       </View>
     </View>
@@ -62,15 +62,15 @@ export function AssetItem({ onItemPress }: AssetItemProps) {
   );
 
   return (
-    <WishList.Pressable onPress={onItemPress} nativeId="asset-pressable">
-      <WishList.View style={[styles.rootContainer, { paddingLeft }]}>
-        <WishList.IF condition={isEditing}>
+    <Wishlist.Pressable onPress={onItemPress} nativeId="asset-pressable">
+      <Wishlist.View style={[styles.rootContainer, { paddingLeft }]}>
+        <Wishlist.IF condition={isEditing}>
           <ItemCheckbox />
-        </WishList.IF>
+        </Wishlist.IF>
 
         <AssetInfo />
-      </WishList.View>
-    </WishList.Pressable>
+      </Wishlist.View>
+    </Wishlist.Pressable>
   );
 }
 

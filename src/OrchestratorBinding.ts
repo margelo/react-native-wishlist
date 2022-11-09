@@ -1,11 +1,12 @@
-import { useWishlistId } from './WishlistIdContext';
+import { useWishlistContext } from './WishlistContext';
 
 export function useMarkItemsDirty() {
-  const wishlistId = useWishlistId();
+  const { id } = useWishlistContext();
   return (items: Array<string>) => {
     'worklet';
-    const markItemsDirty = global.wishlists[wishlistId]
-      .markItemsDirty as any as (items: Array<string>) => void;
+    const markItemsDirty = global.wishlists[id].markItemsDirty as any as (
+      items: Array<string>,
+    ) => void;
     return markItemsDirty(items);
   };
 }

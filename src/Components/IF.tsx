@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { createTemplateComponent } from './createTemplateComponent';
+import { createTemplateComponent } from '../createTemplateComponent';
 
 const IFTemplateComponent = createTemplateComponent(View, (item, props) => {
   'worklet';

@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 import { runOnJS, useWorkletCallback } from 'react-native-reanimated';
-import { WishList } from 'wishlist';
+import { Wishlist } from 'wishlist';
 import { AssetItem } from './AssetItem';
 import { AssetListHeader } from './AssetListHeader';
 import { AssetListSeparator } from './AssetListSeparator';
@@ -118,24 +118,24 @@ export const AssetListExample: React.FC<{}> = () => {
     <View style={styles.container}>
       <Header />
 
-      <WishList.Component
+      <Wishlist.Component
         data={list}
         style={styles.listContainer}
         initialIndex={0}
       >
-        <WishList.Template type="asset-list-header">
+        <Wishlist.Template type="asset-list-header">
           <AssetListHeader />
-        </WishList.Template>
-        <WishList.Template type="asset-list-separator">
+        </Wishlist.Template>
+        <Wishlist.Template type="asset-list-separator">
           <AssetListSeparator
             onEdit={handleEditWorklet}
             onExpand={handleExpandWorklet}
           />
-        </WishList.Template>
-        <WishList.Template type="asset">
+        </Wishlist.Template>
+        <Wishlist.Template type="asset">
           <AssetItem onItemPress={handleItemPress} />
-        </WishList.Template>
-      </WishList.Component>
+        </Wishlist.Template>
+      </Wishlist.Component>
     </View>
   );
 };

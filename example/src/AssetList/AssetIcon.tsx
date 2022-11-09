@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useTemplateValue, WishList } from 'wishlist';
+import { useTemplateValue, Wishlist } from 'wishlist';
 import type { AssetItemType } from './assets';
 
 const ethIcon = require('./assets/eth.png');
@@ -26,7 +26,7 @@ export function AssetIcon({}: AssetIconProps) {
 
   return (
     <View style={styles.container}>
-      <WishList.Image style={styles.icon} source={iconSource} />
+      <Wishlist.Image style={styles.icon} source={iconSource} />
 
       {/* <WishList.IF condition={shouldDisplayBadge}> */}
       {/* <View style={styles.badgeContainer}> */}
