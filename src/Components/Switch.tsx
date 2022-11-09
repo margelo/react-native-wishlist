@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import { View, ViewStyle } from 'react-native';
-import { createTemplateComponent } from './createTemplateComponent';
-import type { TemplateValue } from './TemplateValue';
+import { createTemplateComponent } from '../createTemplateComponent';
+import type { TemplateValue } from '../TemplateValue';
 
 const SwitchTemplateComponent = createTemplateComponent(View);
 

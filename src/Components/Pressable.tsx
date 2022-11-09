@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import { View, ViewProps } from 'react-native';
-import { createTemplateComponent } from './createTemplateComponent';
-import { useTemplateCallback } from './EventHandler';
+import { createTemplateComponent } from '../createTemplateComponent';
+import { useTemplateCallback } from '../EventHandler';
 
 type PressableProps = ViewProps & {
   onPress: () => void;

@@ -1,12 +1,12 @@
 import React, { forwardRef, useMemo } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { TemplateCallback, TemplateCallbackWorklet } from './EventHandler';
-import { ForEachBase } from './ForEachBase';
+import { ForEachBase } from './Components/ForEachBase';
 import InflatorRepository, {
   ComponentPool,
   TemplateItem,
 } from './InflatorRepository';
-import { CaseBase } from './Switch';
+import { CaseBase } from './Components/Switch';
 import { useTemplateContext } from './TemplateContext';
 import { TemplateValue, TemplateValueMapper } from './TemplateValue';
 import { useWishListContext } from './WishListContext';
