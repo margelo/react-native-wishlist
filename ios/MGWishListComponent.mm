@@ -7,11 +7,11 @@
 #import <React/RCTComponentViewFactory.h>
 #import <react/renderer/components/rncore/EventEmitters.h>
 #import <react/renderer/components/rncore/Props.h>
+#include <react/renderer/components/wishlist/Props.h>
+#include <react/renderer/components/wishlist/ShadowNodes.h>
 #import "MGScrollViewOrchestrator.h"
+#import "MGWishlistComponentDescriptor.h"
 #import "RCTFabricComponentsPlugins.h"
-#import "WishlistComponentDescriptors.h"
-#import "WishlistProps.h"
-#import "WishlistShadowNodes.h"
 
 using namespace facebook::react;
 
@@ -22,12 +22,12 @@ using namespace facebook::react;
 @end
 
 @implementation MGWishListComponent {
-  WishlistShadowNode::ConcreteState::Shared _sharedState;
+  MGWishlistShadowNode::ConcreteState::Shared _sharedState;
   bool alreadyRendered;
   std::string inflatorId;
   std::string _wishlistId;
   MGScrollViewOrchestrator *_orchestrator;
-  std::shared_ptr<const WishlistEventEmitter> _emitter;
+  std::shared_ptr<const MGWishlistEventEmitter> _emitter;
   int _initialIndex;
 }
 
@@ -105,15 +105,17 @@ using namespace facebook::react;
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
 {
-  return concreteComponentDescriptorProvider<WishlistComponentDescriptor>();
+  return concreteComponentDescriptorProvider<MGWishlistComponentDescriptor>();
 }
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wobjc-missing-super-calls"
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
-  std::shared_ptr<const WishlistProps> wProps = std::static_pointer_cast<const WishlistProps>(props);
+  std::shared_ptr<const MGWishlistProps> wProps = std::static_pointer_cast<const MGWishlistProps>(props);
   _initialIndex = wProps->initialIndex;
+
+  _props = wProps;
 }
 #pragma clang diagnostic pop
 
@@ -121,7 +123,7 @@ using namespace facebook::react;
 {
   if (state == nullptr)
     return;
-  auto newState = std::static_pointer_cast<WishlistShadowNode::ConcreteState const>(state);
+  auto newState = std::static_pointer_cast<MGWishlistShadowNode::ConcreteState const>(state);
   auto &data = newState->getData();
   _sharedState = newState;
 
@@ -134,7 +136,7 @@ using namespace facebook::react;
 #pragma clang diagnostic ignored "-Wobjc-missing-super-calls"
 - (void)updateEventEmitter:(EventEmitter::Shared const &)eventEmitter
 {
-  _emitter = std::static_pointer_cast<WishlistEventEmitter const>(eventEmitter);
+  _emitter = std::static_pointer_cast<MGWishlistEventEmitter const>(eventEmitter);
 }
 #pragma clang diagnostic pop
 
@@ -160,7 +162,7 @@ using namespace facebook::react;
 
 - (void)handleCommand:(const NSString *)commandName args:(const NSArray *)args
 {
-  MGWishlistHandleCommand(self, commandName, args);
+  RCTMGWishlistHandleCommand(self, commandName, args);
 }
 
 - (void)scrollToItem:(NSInteger)index animated:(BOOL)animated
@@ -189,3 +191,8 @@ using namespace facebook::react;
 }
 
 @end
+
+Class<RCTComponentViewProtocol> MGWishlistCls(void)
+{
+  return MGWishListComponent.class;
+}
