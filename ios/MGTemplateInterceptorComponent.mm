@@ -60,11 +60,6 @@ using namespace facebook::react;
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
   auto wProps = std::static_pointer_cast<const MGTemplateInterceptorProps>(props);
-
-  if (_wishlist) {
-    [_wishlist setInflatorId:wProps->inflatorId];
-  }
-
   _props = wProps;
 }
 #pragma clang diagnostic pop
