@@ -60,7 +60,7 @@
     _doWeHaveOngoingEvent = NO;
     _inflatorId = inflatorId;
     _touchEvents = [NSMutableArray new];
-      rerenderAllItems = NO;
+    rerenderAllItems = NO;
 
     [self adjustOffsetIfInitialValueIsCloseToEnd];
   }
@@ -147,22 +147,27 @@
     CGPoint oldOffset = _scrollView.contentOffset;
     _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y - yDiff);
   }
-    
-    [self syncData];
+
+  [self syncData];
 
   // rerender dirty items
   if (!dirtyItems.empty()) {
     std::set<std::string> localDirtyItems;
     localDirtyItems.swap(dirtyItems);
-      if (!rerenderAllItems) {
-          _viewportObserver->rerenderDirtyItems(std::move(localDirtyItems));
-      }
+    if (!rerenderAllItems) {
+      _viewportObserver->rerenderDirtyItems(std::move(localDirtyItems));
+    }
   }
 
   // update teamplates if needed
   if (_doWeHavePendingTemplates or rerenderAllItems) {
     _viewportObserver->update(
-        _scrollView.frame.size.height, _scrollView.frame.size.width, _pendingTemplates, _pendingNames, _inflatorId, rerenderAllItems && !_doWeHaveOngoingEvent);
+        _scrollView.frame.size.height,
+        _scrollView.frame.size.width,
+        _pendingTemplates,
+        _pendingNames,
+        _inflatorId,
+        rerenderAllItems && !_doWeHaveOngoingEvent);
     _doWeHavePendingTemplates = NO;
     rerenderAllItems = NO;
   }
@@ -212,7 +217,8 @@
   }
 
   // pause Vsync listener if there is nothing to do
-  if ([_touchEvents count] == 0 && _currentAnimation == nil && !_doWeHavePendingTemplates && dirtyItems.empty() && !rerenderAllItems) {
+  if ([_touchEvents count] == 0 && _currentAnimation == nil && !_doWeHavePendingTemplates && dirtyItems.empty() &&
+      !rerenderAllItems) {
     [_displayLink setPaused:YES];
   }
 }
@@ -262,19 +268,19 @@
 
 - (void)syncData
 {
-    jsi::Runtime &rt = *ReanimatedRuntimeHandler::rtPtr;
-    jsi::Object global = rt.global().getPropertyAsObject(rt, "global");
-    if (!global.hasProperty(rt, "wishlists")) {
-      global.setProperty(rt, "wishlists", jsi::Object(rt));
-    }
+  jsi::Runtime &rt = *ReanimatedRuntimeHandler::rtPtr;
+  jsi::Object global = rt.global().getPropertyAsObject(rt, "global");
+  if (!global.hasProperty(rt, "wishlists")) {
+    global.setProperty(rt, "wishlists", jsi::Object(rt));
+  }
 
-    jsi::Object wishlists = global.getPropertyAsObject(rt, "wishlists");
-    jsi::Object obj = wishlists.getPropertyAsObject(rt, _wishlistId.c_str());
-    jsi::Value val = obj.getProperty(rt, "listener");
-    if (val.isObject()) {
-        jsi::Function f = val.getObject(rt).getFunction(rt);
-        f.call(rt);
-    }
+  jsi::Object wishlists = global.getPropertyAsObject(rt, "wishlists");
+  jsi::Object obj = wishlists.getPropertyAsObject(rt, _wishlistId.c_str());
+  jsi::Value val = obj.getProperty(rt, "listener");
+  if (val.isObject()) {
+    jsi::Function f = val.getObject(rt).getFunction(rt);
+    f.call(rt);
+  }
 }
 
 - (void)registerWishlistBinding
@@ -308,18 +314,17 @@
             [weakSelf markItemsDirty:keys];
             return jsi::Value::undefined();
           }));
-    binding.setProperty(
-        rt,
-        "markAllItemsDirty",
-        jsi::Function::createFromHostFunction(
-            rt,
-            jsi::PropNameID::forAscii(rt, "markAllItemsDirty"),
-            1,
-            [=](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) -> jsi::Value {
-              
-              [weakSelf markAllItemsDirty];
-              return jsi::Value::undefined();
-            }));
+  binding.setProperty(
+      rt,
+      "markAllItemsDirty",
+      jsi::Function::createFromHostFunction(
+          rt,
+          jsi::PropNameID::forAscii(rt, "markAllItemsDirty"),
+          1,
+          [=](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) -> jsi::Value {
+            [weakSelf markAllItemsDirty];
+            return jsi::Value::undefined();
+          }));
 
   wishlists.setProperty(rt, _wishlistId.c_str(), binding);
   NSLog(@"registered binding for wishlistId: %@", [NSString stringWithUTF8String:_wishlistId.c_str()]);
