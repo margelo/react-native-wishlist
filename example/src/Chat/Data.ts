@@ -62,9 +62,9 @@ const createChatItem = (index: number): ChatItem => {
       authors[Math.round(index % authors.length)]
     }`,
     likes: Math.random() > 0.7 ? Math.floor(Math.random() * 8) : 0,
-    reactions: getRandomReactions().map((ele, index) => ({
+    reactions: getRandomReactions().map((ele, i) => ({
       emoji: ele,
-      id: String(index),
+      id: String(i),
     })),
   };
 };

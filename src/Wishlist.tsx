@@ -23,14 +23,13 @@ import InflatorRepository, {
 import NativeTemplateContainer from './NativeViews/NativeTemplateContainer';
 import NativeTemplateInterceptor from './NativeViews/NativeTemplateInterceptor';
 import NativeWishList, {
-  WishlistCommands,
+  Commands as WishlistCommands,
 } from './NativeViews/WishlistNativeComponent';
 import { TemplateContext } from './TemplateContext';
 import { useWishlistContext, WishlistContext } from './WishlistContext';
+import { generateId } from './Utils';
 
 const OffsetComponent = '__offsetComponent';
-let InflatorId = 1000;
-let wishCtr = 0;
 
 type NestedTemplatesContextValue = {
   templates: { [key: string]: any };
@@ -58,7 +57,7 @@ type WishListInstance = {
   scrollToTop: () => void;
 };
 
-export type BaseItem = { type: string };
+export type BaseItem = { type: string; key: string };
 
 type Props<ItemT extends BaseItem> = ViewProps & {
   data: ItemT[];
@@ -157,7 +156,7 @@ const Component = forwardRef(
           return undefined;
         }
 
-        if (value.key == undefined) {
+        if (value.key == null) {
           throw new Error('Every data cell has to contain unique key prop!');
         }
         // We set the key of the item here so that
@@ -179,7 +178,7 @@ const Component = forwardRef(
           InflatorRepository.unregister(inflatorIdRef.current);
         }
         // Register
-        inflatorIdRef.current = (InflatorId++).toString();
+        inflatorIdRef.current = generateId();
         InflatorRepository.register(inflatorIdRef.current, resolvedInflater);
       }
       return inflatorIdRef.current!;
@@ -187,7 +186,7 @@ const Component = forwardRef(
 
     const wishlistId = useRef<string | null>(null);
     if (!wishlistId.current) {
-      wishlistId.current = `ID#${wishCtr++}`;
+      wishlistId.current = generateId();
     }
     const wishlistContext = useMemo(
       () => ({

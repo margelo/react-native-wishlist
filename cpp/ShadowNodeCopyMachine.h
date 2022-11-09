@@ -2,10 +2,10 @@
 #define ShadowNodeCopyMachine_hpp
 
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
+#include <react/renderer/components/wishlist/Props.h>
 #include <iostream>
 #include "LayoutConstraints.h"
 #include "LayoutContext.h"
-#include "WishlistProps.h"
 
 #include <stdio.h>
 

@@ -48,7 +48,6 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
 
           auto nextProps =
               cd.cloneProps(propsParserContext, sn->getProps(), rawProps);
-          std::cout << nextProps->getDebugValue() << std::endl;
 
           auto clonedShadowNode = cd.cloneShadowNode(
               *sn,
@@ -113,8 +112,6 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
             child->parent = shared_from_this();
           }
 
-          std::cout << "new Children len " << newChildren->size() << std::endl;
-
           auto clonedShadowNode = cd.cloneShadowNode(
               *sn,
               {
@@ -149,8 +146,6 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
                  std::make_shared<ShadowNode::ListOfShared>(children)});
             currentParent->sn = currentSN;
             currentParent = currentParent->parent;
-            std::cout << "is currentParent null " << (currentParent == nullptr)
-                      << std::endl;
           }
 
           return jsi::Value::undefined();

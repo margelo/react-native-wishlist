@@ -6,15 +6,17 @@ import { AssetItem } from './AssetItem';
 import { AssetListHeader } from './AssetListHeader';
 import { AssetListSeparator } from './AssetListSeparator';
 
-import data, { AssetItemType } from './assets';
+import assetsData, { AssetItemType } from './assets';
 import { Header } from './Header';
-type WithType<TType extends String, T> = T & { type: TType };
 
-type AssetListItemType = WithType<'asset', AssetItemType>;
+type WithTypeAndKey<TType extends String, T> = T & { type: TType; key: string };
 
-const tokens: AssetListItemType[] = data.map((item) => ({
+type AssetListItemType = WithTypeAndKey<'asset', AssetItemType>;
+
+const tokens: AssetListItemType[] = assetsData.map((item) => ({
   ...item,
   type: 'asset',
+  key: String(item.id),
 }));
 
 type AssetListState = {
@@ -27,12 +29,13 @@ export type AssetListItemWithState = AssetListItemType & AssetListState;
 
 export type AssetListSeparatorWithState = {
   type: 'asset-list-separator';
+  key: string;
 } & AssetListState;
 
 type ListItemsType =
   | AssetListItemWithState
   | AssetListSeparatorWithState
-  | ({ type: 'asset-list-header' } & AssetListState);
+  | ({ type: 'asset-list-header'; key: string } & AssetListState);
 
 export const AssetListExample: React.FC<{}> = () => {
   const [isEditing, setIsEditing] = useState(false);
