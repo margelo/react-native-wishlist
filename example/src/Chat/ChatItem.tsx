@@ -87,9 +87,9 @@ export const ChatItemView: React.FC<Props> = ({ type, onAddReaction }) => {
   const reactions = useTemplateValue((item: ChatItem) => {
     const obj = item.reactions.reduce((acc, i) => {
       if (acc[i.emoji]) {
-        acc[i.emoji].ids.push(i.id);
+        acc[i.emoji].ids.push(i.key);
       } else {
-        acc[i.emoji] = { ...i, ids: [i.id] };
+        acc[i.emoji] = { ...i, ids: [i.key] };
       }
 
       return acc;
