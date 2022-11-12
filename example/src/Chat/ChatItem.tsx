@@ -1,8 +1,10 @@
-import React from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import React, { isValidElement } from 'react';
+import { Image, ImageEditor, StyleSheet, View } from 'react-native';
 import { useWorkletCallback } from 'react-native-reanimated';
+import { useOnFlushCallback } from 'src/OrchestratorBinding';
 import { useTemplateValue, Wishlist } from 'wishlist';
 import { useMarkItemsDirty } from 'wishlist';
+import { ItemCheckbox } from '../AssetList/ItemCheckbox';
 import type { ChatItem, ReactionItem } from './Data';
 
 const addReaction = require('./assets/add_reaction.png');
@@ -64,20 +66,14 @@ export const ChatItemView: React.FC<Props> = ({ type, onAddReaction }) => {
   const avatarUrl = useTemplateValue((item: ChatItem) => item.avatarUrl);
   const message = useTemplateValue((item: ChatItem) => item.message);
   const likeText = useTemplateValue((item: ChatItem) => {
-    if (global.liked == null) {
-      global.liked = {};
-    }
-    if (global.liked[item.key]) {
+    if (item.liked) {
       return '♥️';
     } else {
       return '🖤';
     }
   });
   const likeOpacity = useTemplateValue((item: ChatItem) => {
-    if (global.liked == null) {
-      global.liked = {};
-    }
-    if (global.liked[item.key]) {
+    if (item.liked) {
       return 1;
     } else {
       return 0.4;
@@ -98,12 +94,12 @@ export const ChatItemView: React.FC<Props> = ({ type, onAddReaction }) => {
     return Object.values(obj);
   });
 
-  const mark = useMarkItemsDirty();
+  const data = useData<ChatItem>();
 
   const likeItemListener = useWorkletCallback((value) => {
-    // eslint-disable-next-line eqeqeq
-    global.liked[value.key] = !(global.liked[value.key] == true);
-    mark([value.key]);
+    const oldValue = data.get(value.key);
+    oldValue.liked = !oldValue.liked;
+    data.set(value.key, oldValue);
   }, []);
 
   return (

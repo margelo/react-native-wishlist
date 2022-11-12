@@ -3,6 +3,7 @@ import { createContext, useContext } from 'react';
 export const WishlistContext = createContext<{
   id: string;
   inflatorId: string;
+  data: Object;
 } | null>(null);
 
 export function useWishlistContext() {
