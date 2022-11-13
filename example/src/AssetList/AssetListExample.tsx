@@ -41,6 +41,7 @@ type ListItemsType =
 export type AssetListGlobalState = {
   isEditing: boolean;
   isExpanded: boolean;
+  selectedItems: { [key: string]: boolean };
 };
 
 export const AssetListExample: React.FC<{}> = () => {
@@ -58,6 +59,9 @@ export const AssetListExample: React.FC<{}> = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [data, setData] = useState<ListItemsType[]>(tokens as ListItemsType[]);
+  const [selectedItems, setSelectedItems] = useState<
+    AssetListGlobalState['selectedItems']
+  >({});
 
   const list = useMemo<ListItemsType[]>(() => {
     const arr = [{ type: 'asset-list-header', key: 'asset-header-0' }].concat(
@@ -88,33 +92,32 @@ export const AssetListExample: React.FC<{}> = () => {
     Alert.alert(address);
   };
 
-  const toggleSelectedItem = () => {
-    // setData((items) =>
-    //   items.map((i) =>
-    //     i.key === item.key
-    //       ? {
-    //           ...i,
-    //           isSelected: !item.isSelected,
-    //         }
-    //       : i,
-    //   ),
-    // );
+  const toggleSelectedItem = (item: AssetListItemWithState) => {
+    console.log('Change', item.id);
+    setSelectedItems((v) => ({
+      ...v,
+      [item.id]: !v[item.id],
+    }));
   };
 
-  const handleItemPress = useWorkletCallback((item: AssetListItemWithState) => {
-    if (item.isEditing) {
-      runOnJS(toggleSelectedItem)();
-    } else {
-      runOnJS(showItemAlert)(item.address!);
-    }
-  }, []);
+  const handleItemPress = useWorkletCallback(
+    (item: AssetListItemWithState, edit: boolean) => {
+      if (edit) {
+        runOnJS(toggleSelectedItem)(item);
+      } else {
+        runOnJS(showItemAlert)(item.address!);
+      }
+    },
+    [isEditing],
+  );
 
   const globalState = useMemo<AssetListGlobalState>(
     () => ({
       isEditing,
       isExpanded,
+      selectedItems,
     }),
-    [isEditing, isExpanded],
+    [isEditing, isExpanded, selectedItems],
   );
 
   return (

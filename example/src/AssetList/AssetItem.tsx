@@ -1,5 +1,6 @@
 import React from 'react';
 import { processColor, StyleSheet, View } from 'react-native';
+import { useWorkletCallback } from 'react-native-reanimated';
 import { useWishListGlobalState, useTemplateValue, Wishlist } from 'wishlist';
 import { AssetIcon } from './AssetIcon';
 import type {
@@ -52,7 +53,7 @@ function AssetInfo() {
 }
 
 type AssetItemProps = {
-  onItemPress: (item: AssetListItemWithState) => void;
+  onItemPress: (item: AssetListItemWithState, edit: boolean) => void;
 };
 
 export function AssetItem({ onItemPress }: AssetItemProps) {
@@ -62,8 +63,12 @@ export function AssetItem({ onItemPress }: AssetItemProps) {
 
   const paddingLeft = useTemplateValue(() => (isEditing.value() ? 0 : 10));
 
+  const handleEdit = useWorkletCallback((item: AssetListItemWithState) => {
+    onItemPress(item, isEditing.value());
+  });
+
   return (
-    <Wishlist.Pressable onPress={onItemPress} nativeId="asset-pressable">
+    <Wishlist.Pressable onPress={handleEdit} nativeId="asset-pressable">
       <Wishlist.View style={[styles.rootContainer, { paddingLeft }]}>
         <Wishlist.IF condition={isEditing}>
           <ItemCheckbox />
