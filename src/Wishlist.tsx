@@ -28,6 +28,7 @@ import NativeWishList, {
 import { TemplateContext } from './TemplateContext';
 import { useWishlistContext, WishlistContext } from './WishlistContext';
 import { generateId } from './Utils';
+import { useSetupGlobalState } from './globalState';
 
 const OffsetComponent = '__offsetComponent';
 
@@ -66,11 +67,20 @@ type Props<ItemT extends BaseItem> = ViewProps & {
   onStartReached?: () => void;
   onEndReached?: () => void;
   initialIndex?: number;
+  globalState?: Record<string, unknown>;
 };
 
 const Component = forwardRef(
   <T extends BaseItem>(
-    { inflateItem, onItemNeeded, children, style, data, ...rest }: Props<T>,
+    {
+      inflateItem,
+      onItemNeeded,
+      children,
+      style,
+      data,
+      globalState,
+      ...rest
+    }: Props<T>,
     ref: React.Ref<WishListInstance>,
   ) => {
     const nativeWishlist = useRef(null); // TODO type it properly
@@ -192,9 +202,15 @@ const Component = forwardRef(
       () => ({
         id: wishlistId.current!,
         inflatorId,
+        globalState,
       }),
+      // we don't need to recreate context on globalState change
+      // this was used only for the initial render
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [inflatorId],
     );
+
+    useSetupGlobalState(wishlistId.current!, inflatorId, globalState);
 
     return (
       <WishlistContext.Provider value={wishlistContext}>
@@ -236,7 +252,7 @@ type InnerComponentProps = ViewProps & {
   nestedTemplates: { [key: string]: any };
 };
 
-function InnerComponent({
+const InnerComponent = React.memo(function InnerComponent({
   inflatorId,
   style,
   nativeWishlist,
@@ -285,7 +301,7 @@ function InnerComponent({
       </NativeTemplateContainer>
     </NativeTemplateInterceptor>
   );
-}
+});
 
 type TemplateProps = {
   type: string;

@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button } from './Button';
-import { useTemplateValue, Wishlist } from 'wishlist';
+import { useTemplateValue, useWishListGlobalState, Wishlist } from 'wishlist';
 import { useWorkletCallback } from 'react-native-reanimated';
-import type { AssetListSeparatorWithState } from './AssetListExample';
+import type { AssetListGlobalState } from './AssetListExample';
 
 type AssetListSeparatorProps = {
   onExpand: () => void;
@@ -14,18 +14,20 @@ export function AssetListSeparator({
   onExpand,
   onEdit,
 }: AssetListSeparatorProps) {
-  const isEditing = useTemplateValue(
-    (item: AssetListSeparatorWithState) => item.isEditing,
+  const isEditing = useWishListGlobalState<AssetListGlobalState>(
+    (state) => state.isEditing,
   );
-  const expandButtonText = useTemplateValue(
-    (item: AssetListSeparatorWithState) =>
-      item.isExpanded ? 'Less ↑' : 'More ↓',
+
+  const isExpanded = useWishListGlobalState<AssetListGlobalState>(
+    (state) => state.isExpanded,
   );
-  const isExpanded = useTemplateValue(
-    (item: AssetListSeparatorWithState) => item.isExpanded,
+
+  const expandButtonText = useTemplateValue(() =>
+    isExpanded.value() ? 'Less ↑' : 'More ↓',
   );
-  const editButtonText = useTemplateValue((item: AssetListSeparatorWithState) =>
-    item.isEditing ? 'Done' : 'Edit',
+
+  const editButtonText = useTemplateValue(() =>
+    isEditing.value() ? 'Done' : 'Edit',
   );
 
   const onPin = useWorkletCallback(() => {});

@@ -2,7 +2,7 @@
 import tokenList from './tokenList.json';
 
 export type AssetItemType = {
-  id: number;
+  id: string;
   name: string;
   balance: string;
   nativeBalance: string;
@@ -34,7 +34,7 @@ const nativeBalanceFormatter = new Intl.NumberFormat('en-US');
 const ethNativeBalance = getRandomFloat(0, 10000, 8);
 
 const ethToken: AssetItemType = {
-  id: 0,
+  id: 'asset-0',
   name: 'Etherium',
   nativeBalance: nativeBalanceFormatter.format(ethNativeBalance),
   balance: balanceFormatter.format(
@@ -52,7 +52,7 @@ const tokens: AssetItemType[] = tokenList
     const change = getChange();
 
     return {
-      id: index + 1,
+      id: `asset-${index + 1}`,
       name: token.name,
       address: token.address,
       balance: balanceFormatter.format(nativeBalance * price),

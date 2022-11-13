@@ -1,8 +1,11 @@
 import React from 'react';
 import { processColor, StyleSheet, View } from 'react-native';
-import { useTemplateValue, Wishlist } from 'wishlist';
+import { useWishListGlobalState, useTemplateValue, Wishlist } from 'wishlist';
 import { AssetIcon } from './AssetIcon';
-import type { AssetListItemWithState } from './AssetListExample';
+import type {
+  AssetListGlobalState,
+  AssetListItemWithState,
+} from './AssetListExample';
 import type { AssetItemType } from './assets';
 import { ItemCheckbox } from './ItemCheckbox';
 
@@ -53,13 +56,11 @@ type AssetItemProps = {
 };
 
 export function AssetItem({ onItemPress }: AssetItemProps) {
-  const isEditing = useTemplateValue(
-    (item: AssetListItemWithState) => item.isEditing,
+  const isEditing = useWishListGlobalState<AssetListGlobalState>(
+    (state) => state.isEditing,
   );
 
-  const paddingLeft = useTemplateValue((item: AssetListItemWithState) =>
-    item.isEditing ? 0 : 10,
-  );
+  const paddingLeft = useTemplateValue(() => (isEditing.value() ? 0 : 10));
 
   return (
     <Wishlist.Pressable onPress={onItemPress} nativeId="asset-pressable">

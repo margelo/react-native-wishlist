@@ -1,12 +1,13 @@
 diff --git a/node_modules/react-native-reanimated/plugin.js b/node_modules/react-native-reanimated/plugin.js
-index 9873ac0..83eb61b 100644
+index 9873ac0..32cf7c0 100644
 --- a/node_modules/react-native-reanimated/plugin.js
 +++ b/node_modules/react-native-reanimated/plugin.js
-@@ -20,6 +20,7 @@ const functionArgsToWorkletize = new Map([
+@@ -20,6 +20,8 @@ const functionArgsToWorkletize = new Map([
    ['withSpring', [2]],
    ['withDecay', [1]],
    ['withRepeat', [3]],
 +  ['useTemplateValue', [0]],
++  ['useWishListGlobalState', [0]],
  ]);
  
  const objectHooks = new Set([

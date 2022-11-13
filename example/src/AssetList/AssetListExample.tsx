@@ -26,16 +26,22 @@ type AssetListState = {
 };
 
 export type AssetListItemWithState = AssetListItemType & AssetListState;
+export type AssetListHeader = { type: 'asset-list-header'; key: string };
 
 export type AssetListSeparatorWithState = {
   type: 'asset-list-separator';
   key: string;
-} & AssetListState;
+};
 
 type ListItemsType =
   | AssetListItemWithState
   | AssetListSeparatorWithState
-  | ({ type: 'asset-list-header'; key: string } & AssetListState);
+  | AssetListHeader;
+
+export type AssetListGlobalState = {
+  isEditing: boolean;
+  isExpanded: boolean;
+};
 
 export const AssetListExample: React.FC<{}> = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -50,35 +56,25 @@ export const AssetListExample: React.FC<{}> = () => {
     setIsExpanded((v) => !v);
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [data, setData] = useState<ListItemsType[]>(tokens as ListItemsType[]);
 
   const list = useMemo<ListItemsType[]>(() => {
-    const arr = [{ type: 'asset-list-header', isExpanded }].concat(data);
+    const arr = [{ type: 'asset-list-header', key: 'asset-header-0' }].concat(
+      data,
+    ) as ListItemsType[];
 
-    // @ts-expect-error
-    const topItems = arr
-      .slice(0, 6)
-      .concat({
-        type: 'asset-list-separator',
-      })
-      .map((item) => ({
-        ...item,
-        isEditing,
-        isExpanded,
-      })) as ListItemsType[];
+    const topItems = arr.slice(0, 6).concat({
+      key: 'list-separator-0',
+      type: 'asset-list-separator',
+    }) as ListItemsType[];
 
     if (!isExpanded) {
       return topItems;
     }
 
-    return topItems.concat(
-      arr.slice(6, arr.length).map((item) => ({
-        ...item,
-        isEditing,
-        isExpanded,
-      })) as ListItemsType[],
-    );
-  }, [data, isExpanded, isEditing]);
+    return topItems.concat(arr.slice(6, arr.length) as ListItemsType[]);
+  }, [data, isExpanded]);
 
   const handleExpandWorklet = useWorkletCallback(() => {
     runOnJS(handleExpand)();
@@ -92,27 +88,34 @@ export const AssetListExample: React.FC<{}> = () => {
     Alert.alert(address);
   };
 
-  const toggleSelectedItem = (item: ListItemsType) => {
-    setData((items) =>
-      items.map((i) =>
-        // @ts-expect-error
-        i.id === item.id
-          ? {
-              ...i,
-              isSelected: !item.isSelected,
-            }
-          : i,
-      ),
-    );
+  const toggleSelectedItem = () => {
+    // setData((items) =>
+    //   items.map((i) =>
+    //     i.key === item.key
+    //       ? {
+    //           ...i,
+    //           isSelected: !item.isSelected,
+    //         }
+    //       : i,
+    //   ),
+    // );
   };
 
   const handleItemPress = useWorkletCallback((item: AssetListItemWithState) => {
     if (item.isEditing) {
-      runOnJS(toggleSelectedItem)(item);
+      runOnJS(toggleSelectedItem)();
     } else {
       runOnJS(showItemAlert)(item.address!);
     }
   }, []);
+
+  const globalState = useMemo<AssetListGlobalState>(
+    () => ({
+      isEditing,
+      isExpanded,
+    }),
+    [isEditing, isExpanded],
+  );
 
   return (
     <View style={styles.container}>
@@ -122,6 +125,7 @@ export const AssetListExample: React.FC<{}> = () => {
         data={list}
         style={styles.listContainer}
         initialIndex={0}
+        globalState={globalState}
       >
         <Wishlist.Template type="asset-list-header">
           <AssetListHeader />
