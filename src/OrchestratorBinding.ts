@@ -13,8 +13,11 @@ export interface ViewportObserver {
   updateIndices: (newIndex: number) => void;
 }
 
-export function useScheduleSyncUp() {
-  const { id } = useWishlistContext();
+export function useScheduleSyncUp(wishlistId?: string) {
+  let id = wishlistId;
+  if (!wishlistId) {
+    id = useWishlistContext().id;
+  }
   return () => {
     'worklet';
     const scheduleSyncUp = global.wishlists[id]
@@ -25,8 +28,12 @@ export function useScheduleSyncUp() {
 
 export function useOnFlushCallback(
   listener: (viewportObserver: ViewportObserver) => void,
+  wishlistId?: string,
 ) {
-  const { id } = useWishlistContext();
+  let id = wishlistId;
+  if (wishlistId == null) {
+    id = useWishlistContext().id;
+  }
 
   useEffect(() => {
     runOnUI(() => {

@@ -1,10 +1,7 @@
 import React, { isValidElement } from 'react';
 import { Image, ImageEditor, StyleSheet, View } from 'react-native';
 import { useWorkletCallback } from 'react-native-reanimated';
-import { useOnFlushCallback } from 'src/OrchestratorBinding';
 import { useTemplateValue, Wishlist } from 'wishlist';
-import { useMarkItemsDirty } from 'wishlist';
-import { ItemCheckbox } from '../AssetList/ItemCheckbox';
 import type { ChatItem, ReactionItem } from './Data';
 
 const addReaction = require('./assets/add_reaction.png');
@@ -97,9 +94,9 @@ export const ChatItemView: React.FC<Props> = ({ type, onAddReaction }) => {
   const data = useData<ChatItem>();
 
   const likeItemListener = useWorkletCallback((value) => {
-    const oldValue = data.get(value.key);
+    const oldValue = data().get(value.key);
     oldValue.liked = !oldValue.liked;
-    data.set(value.key, oldValue);
+    data().set(value.key, oldValue);
   }, []);
 
   return (
