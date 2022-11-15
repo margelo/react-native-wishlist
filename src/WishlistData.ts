@@ -3,7 +3,6 @@ import { runOnUI } from './Utils';
 import { makeRemote } from 'react-native-reanimated/src/reanimated2/core';
 import { useWishlistContext } from './WishlistContext';
 import { useOnFlushCallback, useScheduleSyncUp } from './OrchestratorBinding';
-import Denque from 'denque';
 
 export function useInternalWishlistData(wishlistId, initialData) {
   const scheduleSyncUp = useScheduleSyncUp(wishlistId);
@@ -17,12 +16,12 @@ export function useInternalWishlistData(wishlistId, initialData) {
         
         class ItemsDataStructure { // TODO it can be implmented so that all ops are O(log n)
           constructor(initialData) {
-            this.deque = new Denque(initialData || []);
+            this.deque = initialData || [];
           }
 
           getIndex(key) { // That's linear but can be log n (only for testing)
             for (let i = 0; i < this.deque.length; ++i) {
-              if (this.deque.peekAt(i).key === key) {
+              if (this.deque.[i].key === key) {
                 return i;
               }
             }
@@ -30,7 +29,7 @@ export function useInternalWishlistData(wishlistId, initialData) {
           }
 
           at(index) {
-            return this.deque.peekAt(index);
+            return this.deque[index];
           }
 
           length() {
@@ -48,7 +47,7 @@ export function useInternalWishlistData(wishlistId, initialData) {
           }
 
           setAt(index, value) {
-            this.deque.peekAt(index) = value;
+            this.deque.[index] = value;
             if (this.isTrackingChanges) {
               this.dirtyKeys.add(value.key);
             }
@@ -90,7 +89,7 @@ export function useInternalWishlistData(wishlistId, initialData) {
           worklet(__nextCopy);
           pendingUpdates.push(worklet);
         }
-
+        
         function at(index) {
           return __currentlyRenderedCopy.at(index);
         }
