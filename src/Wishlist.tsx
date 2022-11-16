@@ -62,8 +62,6 @@ export type BaseItem = { type: string; key: string };
 
 type Props<ItemT extends BaseItem> = ViewProps & {
   initialData: ItemT[];
-  inflateItem?: InflateMethod;
-  onItemNeeded?: (index: number) => ItemT;
   onStartReached?: () => void;
   onEndReached?: () => void;
   initialIndex?: number;
@@ -71,14 +69,7 @@ type Props<ItemT extends BaseItem> = ViewProps & {
 
 const Component = forwardRef(
   <T extends BaseItem>(
-    {
-      inflateItem,
-      onItemNeeded,
-      children,
-      style,
-      initialData,
-      ...rest
-    }: Props<T>,
+    { children, style, initialData, ...rest }: Props<T>,
     ref: React.Ref<WishListInstance>,
   ) => {
     const nativeWishlist = useRef(null); // TODO type it properly
@@ -106,12 +97,12 @@ const Component = forwardRef(
             WishlistCommands.scrollToItem(nativeWishlist.current, 0, true);
           }
         },
-        update: (worklet: any /* TODO type properly */) => {
-          runOnUI()(
+        update: (updateJob: any /* TODO type properly */) => {
+          runOnUI(() => {
             'worklet';
-            data().update(worklet);
-          );
-        }
+            data().update(updateJob);
+          })();
+        },
       }),
     );
 
@@ -142,7 +133,9 @@ const Component = forwardRef(
     const resolvedInflater: InflateMethod = useMemo(() => {
       return (index: number, pool: ComponentPool) => {
         'worklet';
+        _log('ooo resolved inflator');
         const value = data().at(index);
+        _log('ooo after using data');
         if (!value) {
           return undefined;
         }
@@ -179,7 +172,7 @@ const Component = forwardRef(
       }
       return inflatorIdRef.current!;
     }, [resolvedInflater]);
-    
+
     const wishlistContext = useMemo(
       () => ({
         id: wishlistId.current!,

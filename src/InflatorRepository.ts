@@ -75,10 +75,15 @@ const maybeInit = () => {
 
       const InflatorRegistry: UIInflatorRegistry = {
         inflateItem: (id, index, pool) => {
+          _log('inflate item ooo');
           const inflator = registry.get(id);
+          _log('ooo right after registry.get');
           if (inflator) {
+            _log('ooo befire inflator');
             const result = inflator(index, pool);
+            _log('ooo r a inflator');
             if (!result) {
+              _log('ooo no result');
               return result;
             }
             const [item, value] = result;
@@ -92,6 +97,7 @@ const maybeInit = () => {
               value, // rootValue
             );
           } else {
+            _log('ooo inflator not found');
             console.log('Inflator not found for id: ' + id);
             return undefined;
           }
@@ -143,6 +149,7 @@ const maybeInit = () => {
           innerMapping.set(nativeId, inflateMethod);
           mapping.set(templateType, innerMapping);
           mappings.set(inflatorId, mapping);
+          console.log('registered!@');
         },
         getTemplateValueState: (id) => {
           return templateValueStates.get(id);
