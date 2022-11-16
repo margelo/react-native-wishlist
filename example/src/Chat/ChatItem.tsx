@@ -94,8 +94,10 @@ export const ChatItemView: React.FC<Props> = ({ type, onAddReaction }) => {
   const data = useData<ChatItem>();
 
   const likeItemListener = useWorkletCallback((value) => {
-    value.update();
+    _log('ooo clicked!!!');
+
     data().update((dataCopy) => {
+      _log('ooo update update!!');
       const oldValue = dataCopy.get(value.key);
       oldValue.liked = !oldValue.liked;
       dataCopy.set(value.key, oldValue);
