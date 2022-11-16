@@ -9,17 +9,17 @@ export function useInternalWishlistData(wishlistId, initialData) {
   const data = useMemo(() => {
     return () => {
       'worklet';
-      _log('ooo data');
       if (!global.dataCtx) {
         global.dataCtx = {};
       }
       if (!global.dataCtx[wishlistId]) {
-        _log('ooo need to init');
-        function createItemsDataStructure(initialData) {// classes doesn't work :(
+        function createItemsDataStructure(initialData) {
+          // classes doesn't work :(
           // TODO it can be implmented so that all ops are O(log n)
           const thiz = {};
 
-          thiz.deque = initialData;
+          // get rid of frozen array
+          thiz.deque = JSON.parse(JSON.stringify(initialData));
 
           thiz.getIndex = function getIndex(key) {
             // That's linear but can be log n (only for testing)
@@ -32,7 +32,10 @@ export function useInternalWishlistData(wishlistId, initialData) {
           };
 
           thiz.at = function at(index) {
-            _log('ooo at');
+            if (index == undefined || index >= this.length() || index < 0) {
+              return undefined;
+            }
+
             return this.deque[index];
           };
 
@@ -75,7 +78,6 @@ export function useInternalWishlistData(wishlistId, initialData) {
 
           // TODO(Szymon) it would be better to implment that outside of the class
           thiz.applyChanges = function applyChanges(pendingUpdates) {
-            _log('ooo applyChanges');
             this.isTrackingChanges = true;
             for (let updateJob of pendingUpdates) {
               updateJob(this);
@@ -88,23 +90,17 @@ export function useInternalWishlistData(wishlistId, initialData) {
           return thiz;
         }
 
-        _log('ooo created create funciton');
-
         const __nextCopy = createItemsDataStructure(initialData);
         const __currentlyRenderedCopy = createItemsDataStructure(initialData);
 
-        _log('ooo created copies');
-
         const pendingUpdates = [];
         function update(updateJob) {
-          _log('ooo update!!!');
           updateJob(__nextCopy);
           pendingUpdates.push(updateJob);
           scheduleSyncUp();
         }
 
         function at(index) {
-          _log('ooo outer at: ' + index.toString());
           return __currentlyRenderedCopy.at(index);
         }
 
@@ -126,24 +122,22 @@ export function useInternalWishlistData(wishlistId, initialData) {
           pendingUpdates,
         };
         global.dataCtx[wishlistId] = internalData;
-        _log('ooo init is done');
       }
-      _log('ooo return internal data');
       return global.dataCtx[wishlistId];
     };
   }, []);
 
   useOnFlushCallback((viewportObserver) => {
     'worklet';
-    _log('ooo flush callback');
-    const pendingsUpdatesCopy = [...data().pendingUpdates];
-    data().splice(0, data().pendingsUpdates.length);
+    const pendingUpdates = data().pendingUpdates;
+    const pendingUpdatesCopy = pendingUpdates.splice(0, pendingUpdates.length);
+
     const dirty =
-      data().__currentlyRenderedCopy.applyChanges(pendingsUpdatesCopy);
+      data().__currentlyRenderedCopy.applyChanges(pendingUpdatesCopy);
     const window = viewportObserver.getAllVisibleItems();
 
     // Right now we only support adding items but it can be easily extended
-    const newIndex = data().__currentlyRenderedCopy.forKey(window[0].key);
+    const newIndex = data().__currentlyRenderedCopy.getIndex(window[0].key);
     viewportObserver.updateIndices(newIndex);
 
     const dirtyItems = [];
@@ -154,7 +148,6 @@ export function useInternalWishlistData(wishlistId, initialData) {
       }
       i++;
     }
-    _log('ooo dirtyIndices ' + JSON.stringify(dirtyItems.values()));
     viewportObserver.markItemsDirty(dirtyItems);
   }, wishlistId);
 
