@@ -75,6 +75,7 @@ export function useInternalWishlistData(wishlistId, initialData) {
 
           // TODO(Szymon) it would be better to implment that outside of the class
           thiz.applyChanges = function applyChanges(pendingUpdates) {
+            _log('ooo applyChanges');
             this.isTrackingChanges = true;
             for (let updateJob of pendingUpdates) {
               updateJob(this);
@@ -103,7 +104,7 @@ export function useInternalWishlistData(wishlistId, initialData) {
         }
 
         function at(index) {
-          _log('ooo outer at');
+          _log('ooo outer at: ' + index.toString());
           return __currentlyRenderedCopy.at(index);
         }
 
@@ -153,6 +154,7 @@ export function useInternalWishlistData(wishlistId, initialData) {
       }
       i++;
     }
+    _log('ooo dirtyIndices ' + JSON.stringify(dirtyItems.values()));
     viewportObserver.markItemsDirty(dirtyItems);
   }, wishlistId);
 

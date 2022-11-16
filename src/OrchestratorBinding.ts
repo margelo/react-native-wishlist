@@ -52,5 +52,5 @@ export function useOnFlushCallback(
         global.wishlists[id].listener = undefined;
       })();
     };
-  }, [id, listener]);
+  }, [id]);
 }

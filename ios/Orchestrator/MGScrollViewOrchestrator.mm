@@ -150,6 +150,7 @@
     if (_needToSyncUpWithJS) {
         [self syncUpWithJS: _viewportObserver->getBinding()];
         _viewportObserver->updateDirtyItems();
+        _needToSyncUpWithJS = NO;
     }
 
   // update teamplates if needed
