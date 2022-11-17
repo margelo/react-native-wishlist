@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useWishlistContext } from './WishlistContext';
 import { useOnFlushCallback, useScheduleSyncUp } from './OrchestratorBinding';
 
@@ -83,7 +83,7 @@ export function useInternalWishlistData<T extends Item>(
             },
             setItem: function setItem(key: string, value: T) {
               const index = this.getIndex(key);
-              this.setAt(index, value);
+              this.setAt(index!, value);
             },
             set: function set(key: string, value: T) {
               return this.setItem(key, value);
@@ -152,6 +152,7 @@ export function useInternalWishlistData<T extends Item>(
       }
       return global.dataCtx[wishlistId] as Data<T>;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useOnFlushCallback((viewportObserver) => {
