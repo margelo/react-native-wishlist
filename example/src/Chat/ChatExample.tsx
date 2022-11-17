@@ -1,21 +1,33 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { runOnJS, useWorkletCallback } from 'react-native-reanimated';
+import type { WishListInstance } from 'wishlist';
 import { ChatHeader } from './ChatHeader';
 import { ChatListView } from './ChatList';
-import { addSendedMessage, ChatItem, fetchData } from './Data';
+import {
+  addSendedMessage,
+  ChatItem,
+  fetchData,
+  getSendedMessage,
+} from './Data';
 import { MessageInput } from './MessageInput';
 import { ReactionPicker } from './ReactionPicker';
 
 export default function App() {
   const [data, setData] = useState<ChatItem[]>([]);
 
-  const handleSend = useCallback(
-    (text: string) => {
-      setData((val) => addSendedMessage(val, text));
-    },
-    [setData],
-  );
+  const listRef = useRef<WishListInstance<ChatItem>>();
+
+  const handleSend = useCallback((text: string) => {
+    // setData((val) => addSendedMessage(val, text));
+    const newItem = getSendedMessage(text);
+    listRef.current?.update((dataCopy) => {
+      'worklet';
+      // get rid of frozen object that Reanimated creates
+      const val = JSON.parse(JSON.stringify(newItem));
+      dataCopy.push(val);
+    });
+  }, []);
 
   // Load data
   useEffect(() => {
@@ -59,6 +71,7 @@ export default function App() {
           style={styles.list}
           initialData={data}
           onAddReaction={onAddReaction}
+          ref={listRef}
         />
         <MessageInput onSend={handleSend} />
       </View>
