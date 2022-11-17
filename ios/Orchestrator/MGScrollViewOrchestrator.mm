@@ -156,7 +156,11 @@
   // update teamplates if needed
   if (_doWeHavePendingTemplates) {
     _viewportObserver->update(
-        _scrollView.frame.size.height, _scrollView.frame.size.width, _pendingTemplates, _pendingNames, _inflatorId);
+        _scrollView.frame.size.height,
+        _scrollView.frame.size.width,
+        _pendingTemplates,
+        _pendingNames,
+        _inflatorId);
     _doWeHavePendingTemplates = NO;
   }
 
@@ -247,11 +251,11 @@
 
 - (void)syncUpWithJS:(jsi::Value)observerBinding
 {
-    jsi::Runtime &rt = *ReanimatedRuntimeHandler::rtPtr;
-    jsi::Object global = rt.global().getPropertyAsObject(rt, "global");
-    if (!global.hasProperty(rt, "wishlists")) {
-      global.setProperty(rt, "wishlists", jsi::Object(rt));
-    }
+  jsi::Runtime &rt = *ReanimatedRuntimeHandler::rtPtr;
+  jsi::Object global = rt.global().getPropertyAsObject(rt, "global");
+  if (!global.hasProperty(rt, "wishlists")) {
+    global.setProperty(rt, "wishlists", jsi::Object(rt));
+  }
 
     jsi::Object wishlists = global.getPropertyAsObject(rt, "wishlists");
     jsi::Object obj = wishlists.getPropertyAsObject(rt, _wishlistId.c_str());
