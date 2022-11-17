@@ -57,7 +57,7 @@ export default function App() {
         <ChatHeader isLoading={false} />
         <ChatListView
           style={styles.list}
-          data={data}
+          initialData={data}
           onAddReaction={onAddReaction}
         />
         <MessageInput onSend={handleSend} />
