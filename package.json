@@ -35,7 +35,7 @@
     "release": "release-it",
     "example": "yarn --cwd example",
     "bootstrap": "yarn example && yarn install && yarn example pods",
-    "clang-format": "clang-format -i --glob='{ios,android,lib}/**/*.{h,cpp,m,mm}'"
+    "clang-format": "clang-format -i --glob='{ios,android,cpp}/**/*.{h,cpp,m,mm}'"
   },
   "keywords": [
     "react-native",
