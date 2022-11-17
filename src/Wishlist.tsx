@@ -16,7 +16,7 @@ import { WishlistImage } from './Components/WishlistImage';
 import { WishlistText } from './Components/WishlistText';
 import { WishlistView } from './Components/WishlistView';
 import { initEventHandler } from './EventHandler';
-import { useInternalWishlistData } from './WishlistData';
+import { UpdateJob, useInternalWishlistData } from './WishlistData';
 import InflatorRepository, {
   ComponentPool,
   InflateMethod,
@@ -53,9 +53,10 @@ function getTemplatesFromChildren(children: React.ReactNode, width: number) {
   return nextTemplates;
 }
 
-type WishListInstance = {
+type WishListInstance<T extends BaseItem> = {
   scrollToItem: (index: number, animated?: boolean) => void;
   scrollToTop: () => void;
+  update: (updateJob: UpdateJob<T>) => void;
 };
 
 export type BaseItem = { type: string; key: string };
@@ -70,7 +71,7 @@ type Props<ItemT extends BaseItem> = ViewProps & {
 const Component = forwardRef(
   <T extends BaseItem>(
     { children, style, initialData, ...rest }: Props<T>,
-    ref: React.Ref<WishListInstance>,
+    ref: React.Ref<WishListInstance<T>>,
   ) => {
     const nativeWishlist = useRef(null); // TODO type it properly
     const wishlistId = useRef<string | null>(null);
@@ -78,11 +79,11 @@ const Component = forwardRef(
       wishlistId.current = generateId();
     }
 
-    const data = useInternalWishlistData(wishlistId.current, initialData);
+    const data = useInternalWishlistData<T>(wishlistId.current, initialData);
 
     useImperativeHandle(
       ref,
-      (): WishListInstance => ({
+      (): WishListInstance<T> => ({
         scrollToItem: (index: number, animated?: boolean) => {
           if (nativeWishlist.current != null) {
             WishlistCommands.scrollToItem(
@@ -97,7 +98,7 @@ const Component = forwardRef(
             WishlistCommands.scrollToItem(nativeWishlist.current, 0, true);
           }
         },
-        update: (updateJob: any /* TODO type properly */) => {
+        update: (updateJob: UpdateJob<T>) => {
           runOnUI(() => {
             'worklet';
             // we have to do sth here to get rid of frozen objs
@@ -135,9 +136,7 @@ const Component = forwardRef(
     const resolvedInflater: InflateMethod = useMemo(() => {
       return (index: number, pool: ComponentPool) => {
         'worklet';
-        _log('ooo resolved inflator');
         const value = data().at(index);
-        _log(`ooo after using data value:${JSON.stringify(value)}`);
         if (!value) {
           return undefined;
         }
@@ -181,7 +180,7 @@ const Component = forwardRef(
         inflatorId,
         data,
       }),
-      [inflatorId],
+      [inflatorId, data],
     );
 
     return (

@@ -1,4 +1,3 @@
-import { useWishlistContext } from './WishlistContext';
 import { useEffect } from 'react';
 import { runOnUI } from './Utils';
 
@@ -13,14 +12,10 @@ export interface ViewportObserver {
   updateIndices: (newIndex: number) => void;
 }
 
-export function useScheduleSyncUp(wishlistId?: string) {
-  let id = wishlistId;
-  if (!wishlistId) {
-    id = useWishlistContext().id;
-  }
+export function useScheduleSyncUp(wishlistId: string) {
   return () => {
     'worklet';
-    const scheduleSyncUp = global.wishlists[id]
+    const scheduleSyncUp = global.wishlists[wishlistId]
       .scheduleSyncUp as any as () => void;
 
     return scheduleSyncUp();
@@ -29,12 +24,8 @@ export function useScheduleSyncUp(wishlistId?: string) {
 
 export function useOnFlushCallback(
   listener: (viewportObserver: ViewportObserver) => void,
-  wishlistId?: string,
+  wishlistId: string,
 ) {
-  let id = wishlistId;
-  if (wishlistId == null) {
-    id = useWishlistContext().id;
-  }
 
   useEffect(() => {
     runOnUI(() => {
@@ -42,16 +33,16 @@ export function useOnFlushCallback(
       if (!global.wishlists) {
         global.wishlists = {};
       }
-      if (!global.wishlists[id]) {
-        global.wishlists[id] = {};
+      if (!global.wishlists[wishlistId]) {
+        global.wishlists[wishlistId] = {};
       }
-      global.wishlists[id].listener = listener;
+      global.wishlists[wishlistId].listener = listener;
     })();
     return () => {
       runOnUI(() => {
         'worklet';
-        global.wishlists[id].listener = undefined;
+        global.wishlists[wishlistId].listener = undefined;
       })();
     };
-  }, [id]);
+  }, []);
 }
