@@ -18,7 +18,7 @@
   // ViewportObserer
   std::shared_ptr<ViewportObserver> _viewportObserver;
   std::string _inflatorId;
-    BOOL _needToSyncUpWithJS;
+  BOOL _needToSyncUpWithJS;
 
   id<MGScrollAnimation> _currentAnimation;
   std::string _wishlistId;
@@ -59,7 +59,7 @@
     _doWeHaveOngoingEvent = NO;
     _inflatorId = inflatorId;
     _touchEvents = [NSMutableArray new];
-      _needToSyncUpWithJS = NO;
+    _needToSyncUpWithJS = NO;
 
     [self adjustOffsetIfInitialValueIsCloseToEnd];
   }
@@ -146,21 +146,17 @@
     CGPoint oldOffset = _scrollView.contentOffset;
     _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y - yDiff);
   }
-    
-    if (_needToSyncUpWithJS) {
-        [self syncUpWithJS: _viewportObserver->getBinding()];
-        _viewportObserver->updateDirtyItems();
-        _needToSyncUpWithJS = NO;
-    }
+
+  if (_needToSyncUpWithJS) {
+    [self syncUpWithJS:_viewportObserver->getBinding()];
+    _viewportObserver->updateDirtyItems();
+    _needToSyncUpWithJS = NO;
+  }
 
   // update teamplates if needed
   if (_doWeHavePendingTemplates) {
     _viewportObserver->update(
-        _scrollView.frame.size.height,
-        _scrollView.frame.size.width,
-        _pendingTemplates,
-        _pendingNames,
-        _inflatorId);
+        _scrollView.frame.size.height, _scrollView.frame.size.width, _pendingTemplates, _pendingNames, _inflatorId);
     _doWeHavePendingTemplates = NO;
   }
 
@@ -257,13 +253,13 @@
     global.setProperty(rt, "wishlists", jsi::Object(rt));
   }
 
-    jsi::Object wishlists = global.getPropertyAsObject(rt, "wishlists");
-    jsi::Object obj = wishlists.getPropertyAsObject(rt, _wishlistId.c_str());
-    jsi::Value val = obj.getProperty(rt, "listener");
-    if (val.isObject()) {
-        jsi::Function f = val.getObject(rt).getFunction(rt);
-        f.call(rt, std::move(observerBinding));
-    }
+  jsi::Object wishlists = global.getPropertyAsObject(rt, "wishlists");
+  jsi::Object obj = wishlists.getPropertyAsObject(rt, _wishlistId.c_str());
+  jsi::Value val = obj.getProperty(rt, "listener");
+  if (val.isObject()) {
+    jsi::Function f = val.getObject(rt).getFunction(rt);
+    f.call(rt, std::move(observerBinding));
+  }
 }
 
 - (void)registerWishlistBinding
@@ -275,26 +271,23 @@
   }
 
   jsi::Object wishlists = global.getPropertyAsObject(rt, "wishlists");
-    
-    
 
   jsi::Object binding(rt);
-    if (wishlists.getProperty(rt, _wishlistId.c_str()).isObject()) {
-        binding = wishlists.getProperty(rt, _wishlistId.c_str()).asObject(rt);
-    }
+  if (wishlists.getProperty(rt, _wishlistId.c_str()).isObject()) {
+    binding = wishlists.getProperty(rt, _wishlistId.c_str()).asObject(rt);
+  }
   __weak MGScrollViewOrchestrator *weakSelf = self;
-    binding.setProperty(
-        rt,
-        "scheduleSyncUp",
-        jsi::Function::createFromHostFunction(
-            rt,
-            jsi::PropNameID::forAscii(rt, "scheduleSyncUp"),
-            1,
-            [=](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) -> jsi::Value {
-              
-              [weakSelf scheduleSyncUp];
-              return jsi::Value::undefined();
-            }));
+  binding.setProperty(
+      rt,
+      "scheduleSyncUp",
+      jsi::Function::createFromHostFunction(
+          rt,
+          jsi::PropNameID::forAscii(rt, "scheduleSyncUp"),
+          1,
+          [=](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) -> jsi::Value {
+            [weakSelf scheduleSyncUp];
+            return jsi::Value::undefined();
+          }));
 
   wishlists.setProperty(rt, _wishlistId.c_str(), binding);
   NSLog(@"registered binding for wishlistId: %@", [NSString stringWithUTF8String:_wishlistId.c_str()]);
