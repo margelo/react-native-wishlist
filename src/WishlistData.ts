@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useWishlistContext } from './WishlistContext';
 import { useOnFlushCallback, useScheduleSyncUp } from './OrchestratorBinding';
+import { runOnJS } from 'react-native-reanimated';
 
 export type Item = {
   key: string;
@@ -25,7 +26,7 @@ export interface DataCopy<T extends Item> {
 }
 
 export interface Data<T extends Item> {
-  update: (job: UpdateJob<T>) => void;
+  update: (job: UpdateJob<T>, callback?: () => void) => void;
   at: (index: number) => T | undefined;
   length: () => number;
   forKey: (key: string) => T | undefined;
@@ -121,9 +122,14 @@ export function useInternalWishlistData<T extends Item>(
         const __currentlyRenderedCopy = createItemsDataStructure(initialData);
 
         const pendingUpdates: Array<UpdateJob<T>> = [];
-        function update(updateJob: UpdateJob<T>) {
+        function update(updateJob: UpdateJob<T>, callback?: () => void) {
           updateJob(__nextCopy);
-          pendingUpdates.push(updateJob);
+          pendingUpdates.push((dataCopy: DataCopy<T>) => {
+            updateJob(dataCopy);
+            if (callback) {
+              runOnJS(callback)();
+            }
+          });
           scheduleSyncUp();
         }
 

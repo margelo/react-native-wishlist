@@ -85,6 +85,7 @@ function ComponentBase<T extends BaseItem>(
     (): WishListInstance<T> => ({
       scrollToItem: (index: number, animated?: boolean) => {
         if (nativeWishlist.current != null) {
+          console.log('scrollTo', index);
           WishlistCommands.scrollToItem(
             nativeWishlist.current,
             index,
@@ -97,13 +98,15 @@ function ComponentBase<T extends BaseItem>(
           WishlistCommands.scrollToItem(nativeWishlist.current, 0, true);
         }
       },
-      update: (updateJob: UpdateJob<T>) => {
-        runOnUI(() => {
-          'worklet';
-          // we have to do sth here to get rid of frozen objs
-          // otherwise data can't be modified
-          data().update(updateJob);
-        })();
+      update: async (updateJob: UpdateJob<T>) => {
+        return new Promise((resolve, _reject) => {
+          runOnUI(() => {
+            'worklet';
+            // we have to do sth here to get rid of frozen objs
+            // otherwise data can't be modified
+            data().update(updateJob, resolve);
+          })();
+        });
       },
     }),
   );
