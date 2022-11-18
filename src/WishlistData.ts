@@ -79,7 +79,7 @@ export function useInternalWishlistData<T extends Item>(
               return this.at(index);
             },
             get: function get(key: string) {
-              return this.get(key);
+              return this.forKey(key);
             },
             setItem: function setItem(key: string, value: T) {
               const index = this.getIndex(key);
@@ -157,6 +157,7 @@ export function useInternalWishlistData<T extends Item>(
 
   useOnFlushCallback((viewportObserver) => {
     'worklet';
+    _log('ooo flush');
     const pendingUpdates = data().pendingUpdates;
     const pendingUpdatesCopy = pendingUpdates.splice(0, pendingUpdates.length);
 
@@ -179,7 +180,6 @@ export function useInternalWishlistData<T extends Item>(
     viewportObserver.markItemsDirty(dirtyItems);
   }, wishlistId);
 
-  console.log('returning data');
   return data as () => Data<T>;
 }
 
