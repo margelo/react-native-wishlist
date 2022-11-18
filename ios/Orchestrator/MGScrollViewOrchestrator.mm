@@ -71,13 +71,13 @@
 - (void)adjustOffsetIfInitialValueIsCloseToEnd
 {
   CGFloat topElementY = _viewportObserver->window[0].offset;
-  CGFloat bottomElementY = _viewportObserver->window.back().offset;
+  CGFloat bottomElementBottomEdgeY = _viewportObserver->window.back().offset + _viewportObserver->window.back().height;
 
   CGFloat topViewportEdge = _scrollView.contentOffset.y;
   CGFloat bottomViewPortEdge = topViewportEdge + _scrollView.frame.size.height;
 
-  if (bottomElementY < bottomViewPortEdge) {
-    CGFloat diff = bottomElementY - bottomViewPortEdge;
+  if (bottomElementBottomEdgeY < bottomViewPortEdge) {
+    CGFloat diff = bottomElementBottomEdgeY - bottomViewPortEdge;
     CGPoint oldOffset = _scrollView.contentOffset;
 
     _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + diff);
@@ -165,7 +165,7 @@
 
   // update offset if new elements require it
   CGFloat topElementY = _viewportObserver->window[0].offset;
-  CGFloat bottomElementY = _viewportObserver->window.back().offset;
+  CGFloat bottomElementBottomEdgeY = _viewportObserver->window.back().offset + _viewportObserver->window.back().height;
 
   CGFloat topViewportEdge = _scrollView.contentOffset.y;
   CGFloat bottomViewPortEdge = topViewportEdge + _scrollView.frame.size.height;
@@ -175,8 +175,8 @@
   /* stop overscrollAnimation */
 
   // bottomElementY < bottomViewportEdge (bottom overscroll)
-  if (bottomElementY < bottomViewPortEdge) {
-    CGFloat diff = bottomElementY - bottomViewPortEdge;
+  if (bottomElementBottomEdgeY < bottomViewPortEdge) {
+    CGFloat diff = bottomElementBottomEdgeY - bottomViewPortEdge;
     CGPoint oldOffset = _scrollView.contentOffset;
 
     _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + diff);

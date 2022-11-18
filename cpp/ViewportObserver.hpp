@@ -128,7 +128,7 @@ struct ViewportObserver {
             float bottom = item.offset + item.height;
             
             if (item.offset > topEdge) {
-                WishItem wishItem = itemProvider->provide(item.index-1);
+                WishItem wishItem = itemProvider->provide(item.index - 1);
                 if (wishItem.sn.get() == nullptr) {
                     break;
                 }
