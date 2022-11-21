@@ -20,6 +20,7 @@ export interface DataCopy<T extends Item> {
   setAt: (index: number, value: T) => void;
   push: (value: T) => void;
   unshift: (value: T) => void;
+  replaceSlow: (newData: T[]) => void;
   applyChanges: (pendingUpdates: Array<UpdateJob<T>>) => Set<string>;
   isTrackingChanges: boolean;
   dirtyKeys: Set<string>;
@@ -100,6 +101,9 @@ export function useInternalWishlistData<T extends Item>(
             },
             unshift: function unshift(value: T) {
               this.deque.unshift(value);
+            },
+            replaceSlow: function replaceSlow(newData: T[]) {
+              this.deque = JSON.parse(JSON.stringify(newData));
             },
             applyChanges: function applyChanges(pendingUpdates) {
               this.isTrackingChanges = true;

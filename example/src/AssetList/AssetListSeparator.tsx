@@ -14,13 +14,17 @@ export function AssetListSeparator({
   onExpand,
   onEdit,
 }: AssetListSeparatorProps) {
-  const isEditing = useWishListGlobalState<AssetListGlobalState>(
-    (state) => state.isEditing,
-  );
+  const isEditing = useWishListGlobalState<AssetListGlobalState>((state) => {
+    'worklet';
 
-  const isExpanded = useWishListGlobalState<AssetListGlobalState>(
-    (state) => state.isExpanded,
-  );
+    return state.isEditing;
+  });
+
+  const isExpanded = useWishListGlobalState<AssetListGlobalState>((state) => {
+    'worklet';
+
+    return state.isExpanded;
+  });
 
   const expandButtonText = useTemplateValue(() =>
     isExpanded.value() ? 'Less ↑' : 'More ↓',

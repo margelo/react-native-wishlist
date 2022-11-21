@@ -1,7 +1,13 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 import { runOnJS, useWorkletCallback } from 'react-native-reanimated';
-import { Wishlist } from 'wishlist';
+import { Wishlist, WishListInstance } from 'wishlist';
 import { AssetItem } from './AssetItem';
 import { AssetListHeader } from './AssetListHeader';
 import { AssetListSeparator } from './AssetListSeparator';
@@ -57,15 +63,15 @@ export const AssetListExample: React.FC<{}> = () => {
     setIsExpanded((v) => !v);
   }, []);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [data, setData] = useState<ListItemsType[]>(tokens as ListItemsType[]);
   const [selectedItems, setSelectedItems] = useState<
     AssetListGlobalState['selectedItems']
   >({});
 
+  const listRef = useRef<WishListInstance<ListItemsType>>(null);
+
   const list = useMemo<ListItemsType[]>(() => {
     const arr = [{ type: 'asset-list-header', key: 'asset-header-0' }].concat(
-      data,
+      tokens,
     ) as ListItemsType[];
 
     const topItems = arr.slice(0, 6).concat({
@@ -78,7 +84,15 @@ export const AssetListExample: React.FC<{}> = () => {
     }
 
     return topItems.concat(arr.slice(6, arr.length) as ListItemsType[]);
-  }, [data, isExpanded]);
+  }, [isExpanded]);
+
+  useEffect(() => {
+    listRef.current?.update((data) => {
+      'worklet';
+
+      data.replaceSlow(list);
+    });
+  }, [list]);
 
   const handleExpandWorklet = useWorkletCallback(() => {
     runOnJS(handleExpand)();
@@ -129,6 +143,7 @@ export const AssetListExample: React.FC<{}> = () => {
         style={styles.listContainer}
         initialIndex={0}
         globalState={globalState}
+        ref={listRef}
       >
         <Wishlist.Template type="asset-list-header">
           <AssetListHeader />

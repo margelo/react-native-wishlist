@@ -33,7 +33,11 @@ export function useSetupGlobalState(
       global.wishlistsState[wishListId] = globalState;
 
       if (!isInit && sameInflatorId) {
-        global.wishlists[wishListId].markAllItemsDirty();
+        try {
+          global.wishlists[wishListId].scheduleSyncUp();
+        } catch (err) {
+          console.log('Errrr', err.message);
+        }
       }
     })();
   }, [wishListId, globalState, inflatorId]);

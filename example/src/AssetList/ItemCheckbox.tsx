@@ -15,6 +15,8 @@ export function ItemCheckbox() {
     return item.id;
   });
   const checked = useWishListGlobalState<AssetListGlobalState>((state) => {
+    'worklet';
+
     return state.selectedItems[id.value()];
   });
 
