@@ -1,4 +1,4 @@
-import React, { isValidElement } from 'react';
+import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { useWorkletCallback } from 'react-native-reanimated';
 import { useTemplateValue, Wishlist, useData } from 'wishlist';
