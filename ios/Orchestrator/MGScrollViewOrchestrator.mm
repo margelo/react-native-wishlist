@@ -18,8 +18,7 @@
   // ViewportObserer
   std::shared_ptr<ViewportObserver> _viewportObserver;
   std::string _inflatorId;
-  std::set<std::string> dirtyItems;
-  BOOL rerenderAllItems;
+  BOOL _needToSyncUpWithJS;
 
   id<MGScrollAnimation> _currentAnimation;
   std::string _wishlistId;
@@ -60,7 +59,7 @@
     _doWeHaveOngoingEvent = NO;
     _inflatorId = inflatorId;
     _touchEvents = [NSMutableArray new];
-    rerenderAllItems = NO;
+    _needToSyncUpWithJS = NO;
 
     [self adjustOffsetIfInitialValueIsCloseToEnd];
   }
@@ -72,13 +71,13 @@
 - (void)adjustOffsetIfInitialValueIsCloseToEnd
 {
   CGFloat topElementY = _viewportObserver->window[0].offset;
-  CGFloat bottomElementY = _viewportObserver->window.back().offset;
+  CGFloat bottomElementBottomEdgeY = _viewportObserver->window.back().offset + _viewportObserver->window.back().height;
 
   CGFloat topViewportEdge = _scrollView.contentOffset.y;
   CGFloat bottomViewPortEdge = topViewportEdge + _scrollView.frame.size.height;
 
-  if (bottomElementY < bottomViewPortEdge) {
-    CGFloat diff = bottomElementY - bottomViewPortEdge;
+  if (bottomElementBottomEdgeY < bottomViewPortEdge) {
+    CGFloat diff = bottomElementBottomEdgeY - bottomViewPortEdge;
     CGPoint oldOffset = _scrollView.contentOffset;
 
     _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + diff);
@@ -148,28 +147,17 @@
     _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y - yDiff);
   }
 
-  [self syncData];
-
-  // rerender dirty items
-  if (!dirtyItems.empty()) {
-    std::set<std::string> localDirtyItems;
-    localDirtyItems.swap(dirtyItems);
-    if (!rerenderAllItems) {
-      _viewportObserver->rerenderDirtyItems(std::move(localDirtyItems));
-    }
+  if (_needToSyncUpWithJS) {
+    [self syncUpWithJS:_viewportObserver->getBinding()];
+    _viewportObserver->updateDirtyItems();
+    _needToSyncUpWithJS = NO;
   }
 
   // update teamplates if needed
-  if (_doWeHavePendingTemplates or rerenderAllItems) {
+  if (_doWeHavePendingTemplates) {
     _viewportObserver->update(
-        _scrollView.frame.size.height,
-        _scrollView.frame.size.width,
-        _pendingTemplates,
-        _pendingNames,
-        _inflatorId,
-        rerenderAllItems && !_doWeHaveOngoingEvent);
+        _scrollView.frame.size.height, _scrollView.frame.size.width, _pendingTemplates, _pendingNames, _inflatorId);
     _doWeHavePendingTemplates = NO;
-    rerenderAllItems = NO;
   }
 
   // cover Viewport if possible
@@ -177,7 +165,7 @@
 
   // update offset if new elements require it
   CGFloat topElementY = _viewportObserver->window[0].offset;
-  CGFloat bottomElementY = _viewportObserver->window.back().offset;
+  CGFloat bottomElementBottomEdgeY = _viewportObserver->window.back().offset + _viewportObserver->window.back().height;
 
   CGFloat topViewportEdge = _scrollView.contentOffset.y;
   CGFloat bottomViewPortEdge = topViewportEdge + _scrollView.frame.size.height;
@@ -187,8 +175,8 @@
   /* stop overscrollAnimation */
 
   // bottomElementY < bottomViewportEdge (bottom overscroll)
-  if (bottomElementY < bottomViewPortEdge) {
-    CGFloat diff = bottomElementY - bottomViewPortEdge;
+  if (bottomElementBottomEdgeY < bottomViewPortEdge) {
+    CGFloat diff = bottomElementBottomEdgeY - bottomViewPortEdge;
     CGPoint oldOffset = _scrollView.contentOffset;
 
     _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + diff);
@@ -217,8 +205,7 @@
   }
 
   // pause Vsync listener if there is nothing to do
-  if ([_touchEvents count] == 0 && _currentAnimation == nil && !_doWeHavePendingTemplates && dirtyItems.empty() &&
-      !rerenderAllItems) {
+  if ([_touchEvents count] == 0 && _currentAnimation == nil && !_doWeHavePendingTemplates && !_needToSyncUpWithJS) {
     [_displayLink setPaused:YES];
   }
 }
@@ -252,21 +239,13 @@
   [self maybeRegisterForNextVSync];
 }
 
-- (void)markItemsDirty:(std::vector<std::string>)items
+- (void)scheduleSyncUp
 {
-  for (auto &key : items) {
-    dirtyItems.insert(key);
-  }
+  _needToSyncUpWithJS = YES;
   [self maybeRegisterForNextVSync];
 }
 
-- (void)markAllItemsDirty
-{
-  rerenderAllItems = YES;
-  [self maybeRegisterForNextVSync];
-}
-
-- (void)syncData
+- (void)syncUpWithJS:(jsi::Value)observerBinding
 {
   jsi::Runtime &rt = *ReanimatedRuntimeHandler::rtPtr;
   jsi::Object global = rt.global().getPropertyAsObject(rt, "global");
@@ -279,7 +258,7 @@
   jsi::Value val = obj.getProperty(rt, "listener");
   if (val.isObject()) {
     jsi::Function f = val.getObject(rt).getFunction(rt);
-    f.call(rt);
+    f.call(rt, std::move(observerBinding));
   }
 }
 
@@ -294,35 +273,19 @@
   jsi::Object wishlists = global.getPropertyAsObject(rt, "wishlists");
 
   jsi::Object binding(rt);
+  if (wishlists.getProperty(rt, _wishlistId.c_str()).isObject()) {
+    binding = wishlists.getProperty(rt, _wishlistId.c_str()).asObject(rt);
+  }
   __weak MGScrollViewOrchestrator *weakSelf = self;
   binding.setProperty(
       rt,
-      "markItemsDirty",
+      "scheduleSyncUp",
       jsi::Function::createFromHostFunction(
           rt,
-          jsi::PropNameID::forAscii(rt, "markItemsDirty"),
+          jsi::PropNameID::forAscii(rt, "scheduleSyncUp"),
           1,
           [=](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) -> jsi::Value {
-            jsi::Array arr = args[0].getObject(rt).getArray(rt);
-
-            std::vector<std::string> keys;
-
-            for (int i = 0; i < arr.size(rt); ++i) {
-              keys.push_back(arr.getValueAtIndex(rt, i).asString(rt).utf8(rt));
-            }
-
-            [weakSelf markItemsDirty:keys];
-            return jsi::Value::undefined();
-          }));
-  binding.setProperty(
-      rt,
-      "markAllItemsDirty",
-      jsi::Function::createFromHostFunction(
-          rt,
-          jsi::PropNameID::forAscii(rt, "markAllItemsDirty"),
-          1,
-          [=](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) -> jsi::Value {
-            [weakSelf markAllItemsDirty];
+            [weakSelf scheduleSyncUp];
             return jsi::Value::undefined();
           }));
 

@@ -125,7 +125,7 @@ export const AssetListExample: React.FC<{}> = () => {
       <Header />
 
       <Wishlist.Component
-        data={list}
+        initialData={list}
         style={styles.listContainer}
         initialIndex={0}
         globalState={globalState}

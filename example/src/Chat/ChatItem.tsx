@@ -1,8 +1,7 @@
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { useWorkletCallback } from 'react-native-reanimated';
-import { useTemplateValue, Wishlist } from 'wishlist';
-import { useMarkItemsDirty } from 'wishlist';
+import { useTemplateValue, Wishlist, useData } from 'wishlist';
 import type { ChatItem, ReactionItem } from './Data';
 
 const addReaction = require('./assets/add_reaction.png');
@@ -61,23 +60,19 @@ export const AddReaction = ({
 
 export const ChatItemView: React.FC<Props> = ({ type, onAddReaction }) => {
   const author = useTemplateValue((item: ChatItem) => item.author);
-  const avatarUrl = useTemplateValue((item: ChatItem) => item.avatarUrl);
+  const avatarUrl = useTemplateValue((item: ChatItem) => {
+    return item.avatarUrl;
+  });
   const message = useTemplateValue((item: ChatItem) => item.message);
   const likeText = useTemplateValue((item: ChatItem) => {
-    if (global.liked == null) {
-      global.liked = {};
-    }
-    if (global.liked[item.key]) {
+    if (item.liked) {
       return '♥️';
     } else {
       return '🖤';
     }
   });
   const likeOpacity = useTemplateValue((item: ChatItem) => {
-    if (global.liked == null) {
-      global.liked = {};
-    }
-    if (global.liked[item.key]) {
+    if (item.liked) {
       return 1;
     } else {
       return 0.4;
@@ -98,21 +93,40 @@ export const ChatItemView: React.FC<Props> = ({ type, onAddReaction }) => {
     return Object.values(obj);
   });
 
-  const mark = useMarkItemsDirty();
+  const data = useData<ChatItem>();
 
   const likeItemListener = useWorkletCallback((value) => {
-    // eslint-disable-next-line eqeqeq
-    global.liked[value.key] = !(global.liked[value.key] == true);
-    mark([value.key]);
+    data().update((dataCopy) => {
+      const oldValue = dataCopy.get(value.key);
+      oldValue!.liked = !oldValue!.liked;
+      dataCopy.set(value.key, oldValue!);
+    });
   }, []);
+
+  const toggleImage = useWorkletCallback((value) => {
+    data().update((dataCopy) => {
+      const oldValue = dataCopy.get(value.key);
+      oldValue!.showBiggerAvatar = !oldValue!.showBiggerAvatar;
+      dataCopy.set(value.key, oldValue!);
+    });
+  }, []);
+
+  const avatarSide = useTemplateValue((item: ChatItem) => {
+    return item.showBiggerAvatar ? 60 : 30;
+  });
 
   return (
     <View style={[styles.container, type === 'me' ? styles.me : styles.other]}>
       <View style={styles.imageAndAuthor}>
-        <Wishlist.Image
-          style={styles.avatarImage}
-          source={{ uri: avatarUrl }}
-        />
+        <Wishlist.Pressable onPress={toggleImage}>
+          <Wishlist.Image
+            style={[
+              styles.avatarImage,
+              { width: avatarSide, height: avatarSide },
+            ]}
+            source={{ uri: avatarUrl }}
+          />
+        </Wishlist.Pressable>
         <View style={styles.authorContainer}>
           <Wishlist.Text style={styles.authorText}>{author}</Wishlist.Text>
           {type === 'other' ? (
@@ -167,8 +181,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatarImage: {
-    width: 30,
-    height: 30,
     borderRadius: 15,
   },
   authorContainer: {

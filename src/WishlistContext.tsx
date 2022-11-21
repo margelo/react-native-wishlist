@@ -4,6 +4,7 @@ export const WishlistContext = createContext<{
   id: string;
   inflatorId: string;
   globalState?: Record<string, any>;
+  data: Object;
 } | null>(null);
 
 export function useWishlistContext() {

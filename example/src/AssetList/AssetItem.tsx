@@ -57,9 +57,11 @@ type AssetItemProps = {
 };
 
 export function AssetItem({ onItemPress }: AssetItemProps) {
-  const isEditing = useWishListGlobalState<AssetListGlobalState>(
-    (state) => state.isEditing,
-  );
+  const isEditing = useWishListGlobalState<AssetListGlobalState>((state) => {
+    'worklet';
+
+    return state.isEditing;
+  });
 
   const paddingLeft = useTemplateValue(() => (isEditing.value() ? 0 : 10));
 
