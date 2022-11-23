@@ -117,7 +117,7 @@ struct ViewportObserver {
     }
     
     void updateWindow(bool newTemplates) {
-        float topEdge = offset - windowHeight;
+        float topEdge = offset - windowHeight / 10.0;
         float bottomEdge = offset + 2 * windowHeight;
         
         assert(window.size() != 0);
@@ -190,7 +190,7 @@ struct ViewportObserver {
         }
     }
     
-    std::shared_ptr<ShadowNode> getOffseter(float offset);
+    std::shared_ptr<ShadowNode> getOffseter(float offset, const ShadowNode & sn);
     
     void pushChildren();
 };

@@ -1,5 +1,6 @@
 #import "MGScrollViewOrchestrator.h"
 #include <set>
+#import <iostream>
 
 @implementation MGScrollViewOrchestrator {
   UIScrollView *_scrollView;
@@ -22,6 +23,8 @@
 
   id<MGScrollAnimation> _currentAnimation;
   std::string _wishlistId;
+    
+    std::chrono::time_point<std::chrono::high_resolution_clock> __lastTimeStamp;
 }
 
 - (instancetype)initWith:(UIScrollView *)scrollView
@@ -60,6 +63,8 @@
     _inflatorId = inflatorId;
     _touchEvents = [NSMutableArray new];
     _needToSyncUpWithJS = NO;
+      
+      __lastTimeStamp = std::chrono::high_resolution_clock::now();
 
     [self adjustOffsetIfInitialValueIsCloseToEnd];
   }
@@ -108,6 +113,13 @@
 
 - (void)handleVSync:(CADisplayLink *)displayLink
 {
+    auto currentTimestamp = std::chrono::high_resolution_clock::now();
+    auto dd = std::chrono::duration_cast<std::chrono::microseconds>(currentTimestamp - __lastTimeStamp);
+    __lastTimeStamp = currentTimestamp;
+    if (dd.count() > 17000) {
+        std::cout << "ooo ups frame drop!!!!!!!!" << std::endl;
+    }
+    std::cout << "ooo frame diff " << dd.count() << std::endl;
   CGFloat yDiff = 0;
   // Check Touch Events
   if (_touchEvents.count > 0) {
@@ -120,6 +132,9 @@
       if (event.state == UIGestureRecognizerStateChanged) {
         yDiff = event.translation - _lastTranslation;
         _lastTranslation = event.translation;
+          auto handledAt = std::chrono::high_resolution_clock::now();
+          auto d = std::chrono::duration_cast<std::chrono::microseconds>(handledAt - event.firedAt);
+          std::cout << "ooo elapsed time " << d.count() << std::endl;
       }
       if (event.state == UIGestureRecognizerStateEnded) {
         _doWeHaveOngoingEvent = NO;
@@ -205,9 +220,13 @@
   }
 
   // pause Vsync listener if there is nothing to do
-  if ([_touchEvents count] == 0 && _currentAnimation == nil && !_doWeHavePendingTemplates && !_needToSyncUpWithJS) {
+  if (!_doWeHaveOngoingEvent && _currentAnimation == nil && !_doWeHavePendingTemplates && !_needToSyncUpWithJS) {
     [_displayLink setPaused:YES];
   }
+  
+    auto afterVsync = std::chrono::high_resolution_clock::now();
+    auto ddd = std::chrono::duration_cast<std::chrono::milliseconds>(afterVsync - currentTimestamp);
+    std::cout << "oooo vsync took " << ddd.count() << std::endl;
 }
 
 - (void)notifyAboutEvent:(PanEvent *)event

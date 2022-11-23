@@ -6,10 +6,14 @@ using namespace facebook::react;
 
 thread_local bool ViewportObserver::isPushingChildren = false;
 
-std::shared_ptr<ShadowNode> ViewportObserver::getOffseter(float offset)
+std::shared_ptr<ShadowNode> ViewportObserver::getOffseter(float offset, const ShadowNode & sn)
 {
-  std::shared_ptr<const YogaLayoutableShadowNode> offseterTemplate =
-      std::static_pointer_cast<const YogaLayoutableShadowNode>(componentsPool->getNodeForType("__offsetComponent"));
+    std::shared_ptr<const YogaLayoutableShadowNode> offseterTemplate = nullptr;
+    if (sn.getChildren().size() > 0) {
+        offseterTemplate = std::static_pointer_cast<const YogaLayoutableShadowNode>(sn.getChildren().at(0));
+    } else {
+        offseterTemplate = std::static_pointer_cast<const YogaLayoutableShadowNode>(componentsPool->getNodeForType("__offsetComponent"));
+    }
 
   auto &cd = offseterTemplate->getComponentDescriptor();
   PropsParserContext propsParserContext{surfaceId, *cd.getContextContainer().get()};
@@ -18,7 +22,6 @@ std::shared_ptr<ShadowNode> ViewportObserver::getOffseter(float offset)
   folly::dynamic props = convertIdToFollyDynamic(@{
     @"height" : @(offset),
     @"width" : @(this->windowWidth),
-    @"backgroundColor" : @((*(colorFromComponents(ColorComponents{0, 0, 1, 1}))))
   });
 
   Props::Shared newProps = cd.cloneProps(propsParserContext, offseterTemplate->getProps(), RawProps(props));
@@ -41,8 +44,8 @@ void ViewportObserver::pushChildren()
       return std::static_pointer_cast<RootShadowNode>(
           oldRootShadowNode.cloneTree(sWishList->getFamily(), [&](const ShadowNode &sn) -> std::shared_ptr<ShadowNode> {
             auto children = std::make_shared<ShadowNode::ListOfShared>();
-
-            children->push_back(getOffseter(window[0].offset));
+            
+            children->push_back(getOffseter(window[0].offset, sn));
 
             for (WishItem &wishItem : window) {
               if (wishItem.sn != nullptr) {

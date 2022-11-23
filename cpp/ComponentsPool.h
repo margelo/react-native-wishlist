@@ -41,7 +41,7 @@ struct ShadowNodeBinding : public jsi::HostObject,
     if (n->getProps()->nativeId.length() > 0) {
       ss << " (" << n->getProps()->nativeId << ")";
     }
-    ss << " " << n->getProps()->getDebugDescription();
+    // ss << " " << n->getProps()->getDebugDescription();
     ss << "\n";
     for (auto child : n->getChildren()) {
       describe(ss, child, level + 2);

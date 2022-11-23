@@ -12,6 +12,7 @@
 #import "MGScrollViewOrchestrator.h"
 #import "MGWishlistComponentDescriptor.h"
 #import "RCTFabricComponentsPlugins.h"
+#import <chrono>
 
 using namespace facebook::react;
 
@@ -65,6 +66,7 @@ using namespace facebook::react;
     panEvent.state = gesture.state;
     panEvent.velocity = [gesture velocityInView:self].y;
     panEvent.translation = [gesture translationInView:self.scrollView].y;
+    panEvent.firedAt = std::chrono::high_resolution_clock::now();
     [_orchestrator notifyAboutEvent:panEvent];
   }
 }
@@ -190,6 +192,19 @@ using namespace facebook::react;
   }
 }
 
+-(void) updateClippedSubviewsWithClipRect:(CGRect)clipRect relativeToView:(UIView *)clipView {
+    // do nothing
+   // NSLog(@"do nothing");
+}
+
+- (void)_remountChildrenIfNeeded {
+    //NSLog(@"do nothing");
+}
+
+- (void)_remountChildren {
+    // do not remount anything
+    //NSLog(@"do nothing");
+}
 @end
 
 Class<RCTComponentViewProtocol> MGWishlistCls(void)

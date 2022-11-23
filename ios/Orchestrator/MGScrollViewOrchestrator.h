@@ -5,6 +5,7 @@
 #import <string>
 #import <vector>
 #import "MGAnimations.h"
+#import <chrono>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -14,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) UIGestureRecognizerState state;
 @property (nonatomic, assign) CGFloat translation;
 @property (nonatomic, assign) CGFloat velocity;
+@property (nonatomic, assign) std::chrono::time_point<std::chrono::high_resolution_clock> firedAt;
 
 @end
 

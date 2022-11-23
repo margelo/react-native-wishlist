@@ -36,6 +36,7 @@ export const Reaction = () => {
     <Wishlist.Pressable onPress={handler}>
       <View style={styles.reactionItem}>
         <Wishlist.Text style={styles.reactionText}>{emoji}</Wishlist.Text>
+
         <Wishlist.IF condition={showCounter}>
           <Wishlist.Text style={styles.reactionCount}>{count}</Wishlist.Text>
         </Wishlist.IF>
