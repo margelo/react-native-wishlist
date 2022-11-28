@@ -35,7 +35,7 @@ const authors = ['John', 'Bob', 'Szymon', 'Marc', 'Elon Musk', 'Me'];
 export const emoticons = ['🙂', '⚡️', '😵‍💫', '💩'];
 
 function getRandomReactions() {
-  const number = Math.floor(Math.random() * 5);
+  const number = 3; //Math.floor(Math.random() * 5);
   let arr = emoticons.slice();
   if (Math.random() > 0.5) {
     arr.push(...emoticons);
@@ -46,19 +46,22 @@ function getRandomReactions() {
 }
 
 const createChatItem = (index: number): ChatItem => {
-  const len = SampleText.length;
-  const start = Math.floor(Math.random() * len);
-  const messageLen = Math.floor(Math.random() * (len - start - 1)) + 1;
-  const message = SampleText.slice(start, start + messageLen)
+  let len = SampleText.length;
+  let start = Math.floor(Math.random() * len);
+  let messageLen = Math.floor(Math.random() * (len - start - 1)) + 1;
+  let message = SampleText.slice(start, start + messageLen)
     .replace('\n', ' ')
     .trim();
-  const author = authors[index % authors.length];
+  let author = authors[index % authors.length];
+
+  author = 'Marc';
+  message = 'is simply dummy test of the printing a';
 
   return {
     key: `id#${index}`,
     type: author === 'Me' ? 'me' : 'other',
     author,
-    message,
+    message: `${message} key:id#${index}`,
     avatarUrl: `https://i.pravatar.cc/100?u=${
       authors[Math.round(index % authors.length)]
     }`,

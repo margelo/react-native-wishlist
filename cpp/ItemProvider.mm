@@ -1,12 +1,15 @@
 #include "ItemProvider.hpp"
 #include <react/renderer/uimanager/UIManager.h>
 #include <react/renderer/uimanager/primitives.h>
+#include <chrono>
+#include <iostream>
 
 struct
 
     WishItem
     WorkletItemProvider::provide(int index)
 {
+        auto start = std::chrono::high_resolution_clock::now();
   WishItem wishItem;
 
   jsi::Runtime &rt = *ReanimatedRuntimeHandler::rtPtr;
@@ -27,6 +30,10 @@ struct
       returnedValue.asObject(rt).getHostObject<ShadowNodeBinding>(rt);
 
   std::shared_ptr<const ShadowNode> sn = shadowNodeWrapper->sn;
+        
+        auto end = std::chrono::high_resolution_clock::now();
+        auto d = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        std::cout << "ooooo provide item took: " << d.count() << std::endl;
 
   auto affected = std::vector<const LayoutableShadowNode *>();
   this->lc.affectedNodes = &affected;
@@ -38,5 +45,9 @@ struct
   wishItem.height = sz.height;
   wishItem.index = index;
   wishItem.key = shadowNodeWrapper->key;
-  return wishItem;
+        std::cout << "ooo inflateItem " << wishItem.key << std::endl;
+        auto end2 =  std::chrono::high_resolution_clock::now();
+        auto dd2 = std::chrono::duration_cast<std::chrono::microseconds>(end2 - start);
+        std::cout << "ooooo with measure took: " << dd2.count() << " withKey " << wishItem.key << std::endl;
+        return wishItem;
 }

@@ -11,8 +11,6 @@ PODS:
     - ReactCommon/turbomodule/core (= 0.70.3)
   - fmt (6.2.1)
   - glog (0.3.5)
-  - hermes-engine (0.70.3)
-  - libevent (2.1.12)
   - MGWishList (0.1.0):
     - RCT-Folly
     - RCTRequired
@@ -37,12 +35,6 @@ PODS:
     - DoubleConversion
     - fmt (~> 6.2.1)
     - glog
-  - RCT-Folly/Futures (2021.07.22.00):
-    - boost
-    - DoubleConversion
-    - fmt (~> 6.2.1)
-    - glog
-    - libevent
   - RCTRequired (0.70.3)
   - RCTTypeSafety (0.70.3):
     - FBLazyVector (= 0.70.3)
@@ -533,17 +525,6 @@ PODS:
   - React-graphics (0.70.3):
     - RCT-Folly/Fabric (= 2021.07.22.00)
     - React-Core/Default (= 0.70.3)
-  - React-hermes (0.70.3):
-    - DoubleConversion
-    - glog
-    - hermes-engine
-    - RCT-Folly (= 2021.07.22.00)
-    - RCT-Folly/Futures (= 2021.07.22.00)
-    - React-cxxreact (= 0.70.3)
-    - React-jsi (= 0.70.3)
-    - React-jsiexecutor (= 0.70.3)
-    - React-jsinspector (= 0.70.3)
-    - React-perflogger (= 0.70.3)
   - React-jsi (0.70.3):
     - boost (= 1.76.0)
     - DoubleConversion
@@ -679,8 +660,6 @@ DEPENDENCIES:
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../node_modules/react-native/React/FBReactNativeSpec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
-  - hermes-engine (from `../node_modules/react-native/sdks/hermes/hermes-engine.podspec`)
-  - libevent (~> 2.1.12)
   - MGWishList (from `../..`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCT-Folly/Fabric (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
@@ -696,7 +675,6 @@ DEPENDENCIES:
   - React-cxxreact (from `../node_modules/react-native/ReactCommon/cxxreact`)
   - React-Fabric (from `../node_modules/react-native/ReactCommon`)
   - React-graphics (from `../node_modules/react-native/ReactCommon/react/renderer/graphics`)
-  - React-hermes (from `../node_modules/react-native/ReactCommon/hermes`)
   - React-jsi (from `../node_modules/react-native/ReactCommon/jsi`)
   - React-jsi/Fabric (from `../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
@@ -722,7 +700,6 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - fmt
-    - libevent
 
 EXTERNAL SOURCES:
   boost:
@@ -735,8 +712,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/React/FBReactNativeSpec"
   glog:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
-  hermes-engine:
-    :podspec: "../node_modules/react-native/sdks/hermes/hermes-engine.podspec"
   MGWishList:
     :path: "../.."
   RCT-Folly:
@@ -763,8 +738,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   React-graphics:
     :path: "../node_modules/react-native/ReactCommon/react/renderer/graphics"
-  React-hermes:
-    :path: "../node_modules/react-native/ReactCommon/hermes"
   React-jsi:
     :path: "../node_modules/react-native/ReactCommon/jsi"
   React-jsiexecutor:
@@ -813,8 +786,6 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: c0b39268611f0be970be1fb056527ffe1322c3fa
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 3d02b25ca00c2d456734d0bcff864cbc62f6ae1a
-  hermes-engine: bb344d89a0d14c2c91ad357480a79698bb80e186
-  libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   MGWishList: 26a60064bd8a08281d2050341c3d399eb4f51c76
   RCT-Folly: 0080d0a6ebf2577475bda044aa59e2ca1f909cda
   RCTRequired: 5cf7e7d2f12699724b59f90350257a422eaa9492
@@ -828,7 +799,6 @@ SPEC CHECKSUMS:
   React-cxxreact: 81d5bf256313bf96cb925eb0e654103291161a17
   React-Fabric: eae2bf0596c0f4938074df28fbd0338ca59a6f64
   React-graphics: fe9cb66bca543a35c603a041295b54a42436374c
-  React-hermes: 1c35cbfbdc7a888c3a1aa05e6d0ca004d92c923c
   React-jsi: 7f99dc3055bec9a0eeb4230f8b6ac873514c8421
   React-jsiexecutor: 7e2e1772ef7b97168c880eeaf3749d8c145ffd6e
   React-jsinspector: 0553c9fe7218e1f127be070bd5a4d2fc19fb8190
@@ -850,6 +820,6 @@ SPEC CHECKSUMS:
   RNReanimated: 10249ac81b456595273588ce2195198d85fcbd28
   Yoga: 2ed968a4f060a92834227c036279f2736de0fce3
 
-PODFILE CHECKSUM: d8f73a29796df8f5f7f3dd14fa901041c437296a
+PODFILE CHECKSUM: 8f6ffd65d7bc8849d37d15f34b9520da2d5eb372
 
 COCOAPODS: 1.11.3

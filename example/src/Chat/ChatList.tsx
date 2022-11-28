@@ -15,7 +15,7 @@ export const ChatListView: React.FC<Props> = React.memo(
       return (
         <Wishlist.Component
           style={style}
-          initialIndex={initialData.length - 1}
+          initialIndex={0 /*initialData.length - 1*/}
           initialData={initialData}
           ref={ref}
         >

@@ -85,7 +85,6 @@ function ComponentBase<T extends BaseItem>(
     (): WishListInstance<T> => ({
       scrollToItem: (index: number, animated?: boolean) => {
         if (nativeWishlist.current != null) {
-          console.log('scrollTo', index);
           WishlistCommands.scrollToItem(
             nativeWishlist.current,
             index,
@@ -142,8 +141,6 @@ function ComponentBase<T extends BaseItem>(
       if (!value) {
         return undefined;
       }
-
-      console.log('returned', value, "for index", index, 'data len', data().length());
 
       const item = pool.getComponent(value.type);
       if (!item) {
@@ -254,7 +251,6 @@ function InnerComponent({
   const { id } = useWishlistContext();
 
   const keys = Object.keys(combinedTemplates);
-  // console.log('@@@ Render WishList', inflatorId, keys.join(', '));
 
   return (
     <NativeTemplateInterceptor

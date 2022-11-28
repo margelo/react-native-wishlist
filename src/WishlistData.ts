@@ -166,7 +166,6 @@ export function useInternalWishlistData<T extends Item>(
 
   useOnFlushCallback((viewportObserver) => {
     'worklet';
-    _log('ooo flush');
     const pendingUpdates = data().pendingUpdates;
     const pendingUpdatesCopy = pendingUpdates.splice(0, pendingUpdates.length);
 

@@ -117,8 +117,8 @@ struct ViewportObserver {
     }
     
     void updateWindow(bool newTemplates) {
-        float topEdge = offset - windowHeight / 10.0;
-        float bottomEdge = offset + 2 * windowHeight;
+        float topEdge = offset - (windowHeight * 0.1);
+        float bottomEdge = offset + (1.1 * windowHeight);
         
         assert(window.size() != 0);
         

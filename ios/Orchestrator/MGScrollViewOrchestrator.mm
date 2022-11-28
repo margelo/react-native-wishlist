@@ -36,6 +36,7 @@
               wishlistId:(std::string)wishlistId
 {
   if (self = [super init]) {
+      auto start = std::chrono::high_resolution_clock::now();
     _scrollView = scrollView;
     _wishlistId = wishlistId;
 
@@ -67,6 +68,9 @@
       __lastTimeStamp = std::chrono::high_resolution_clock::now();
 
     [self adjustOffsetIfInitialValueIsCloseToEnd];
+      auto end = std::chrono::high_resolution_clock::now();
+      auto d = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+      std::cout << "ooo init took " << d.count() << std::endl;
   }
   return self;
 }
@@ -119,7 +123,9 @@
     if (dd.count() > 17000) {
         std::cout << "ooo ups frame drop!!!!!!!!" << std::endl;
     }
-    std::cout << "ooo frame diff " << dd.count() << std::endl;
+    //std::cout << "ooo frame diff " << dd.count() << std::endl;
+    std::cout << "ooo timeSinceLastFrame " << displayLink.targetTimestamp - displayLink.timestamp << std::endl;
+
   CGFloat yDiff = 0;
   // Check Touch Events
   if (_touchEvents.count > 0) {

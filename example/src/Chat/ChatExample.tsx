@@ -49,7 +49,6 @@ export default function App() {
   });
 
   const onPickReaction = (emoji: string) => {
-    console.log(emoji);
     setActiveReactionPicker(null);
   };
 
