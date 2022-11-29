@@ -16,6 +16,7 @@ struct ViewportObserver {
     float windowWidth;
     int surfaceId;
     int initialIndex;
+    int optimisticallyInflateTop = 0;
     static thread_local bool isPushingChildren;
     
     std::shared_ptr<ComponentsPool> componentsPool = std::make_shared<ComponentsPool>();
@@ -62,12 +63,14 @@ struct ViewportObserver {
     
     jsi::Value getBinding();
     
-    void updateDirtyItems() {
+    bool updateDirtyItems() {
         float offset = window.front().offset;
+        bool changedAnything = false;
         
         for (auto & item : window) {
             item.offset = offset;
             if (item.dirty) {
+                changedAnything = true;
                 item.dirty = false;
                 WishItem wishItem = itemProvider->provide(item.index);
                 wishItem.offset = offset;
@@ -76,6 +79,7 @@ struct ViewportObserver {
             }
             offset = item.offset + item.height;
         }
+        return changedAnything;
     }
     
     void update(float windowHeight, float windowWidth,
@@ -111,14 +115,16 @@ struct ViewportObserver {
         updateWindow(true);
     }
     
-    void reactToOffsetChange(float offset) {
+    bool reactToOffsetChange(float offset) {
         this->offset = offset;
-        updateWindow(false);
+        return updateWindow(false);
     }
     
-    void updateWindow(bool newTemplates) {
+    bool updateWindow(bool newTemplates) {
         float topEdge = offset - (windowHeight * 0.1);
         float bottomEdge = offset + (1.1 * windowHeight);
+        bool changedAnything = false;
+        optimisticallyInflateTop = 1 - optimisticallyInflateTop;
         
         assert(window.size() != 0);
         
@@ -134,6 +140,7 @@ struct ViewportObserver {
                 }
                 wishItem.offset = item.offset - wishItem.height;
                 window.push_front(wishItem);
+                changedAnything = true;
             } else {
                 break;
             }
@@ -151,6 +158,7 @@ struct ViewportObserver {
                 }
                 wishItem.offset = bottom;
                 window.push_back(wishItem);
+                changedAnything = true;
             } else {
                 break;
             }
@@ -165,6 +173,7 @@ struct ViewportObserver {
             if (bottom <= topEdge) {
                 window.pop_front();
                 itemsToRemove.push_back(item);
+                changedAnything = true;
                 continue;
             } else {
                 break;
@@ -177,10 +186,50 @@ struct ViewportObserver {
             if (item.offset >= bottomEdge) {
                 window.pop_back();
                 itemsToRemove.push_back(item);
+                changedAnything = true;
                 continue;
             } else {
                 break;
             }
+        }
+        
+        for (auto & item : window) {
+            float bottom = item.offset + item.height;
+            if (item.offset <= bottomEdge and bottom >= topEdge and item.next) {
+                item.next = false;
+                changedAnything = true;
+            }
+        }
+        
+        if (!changedAnything) { // optimisically inflate items
+            topEdge -= windowHeight;
+            bottomEdge += windowHeight;
+            if (optimisticallyInflateTop) { // inflate above
+                WishItem item = window.front();
+                float bottom = item.offset + item.height;
+                
+                if (item.offset > topEdge) {
+                    WishItem wishItem = itemProvider->provide(item.index - 1);
+                    if (wishItem.sn.get() != nullptr) {
+                        wishItem.offset = item.offset - wishItem.height;
+                        window.push_front(wishItem);
+                    }
+                }
+            } else { // inflate below
+                WishItem item = window.back();
+                float bottom = item.offset + item.height;
+
+                if (bottom < bottomEdge) {
+                    WishItem wishItem = itemProvider->provide(item.index + 1);
+                    if (wishItem.sn.get() != nullptr) {
+                        wishItem.offset = bottom;
+                        window.push_back(wishItem);
+                    }
+                }
+            }
+            
+           // TODO inflate optimistically
+            return false;
         }
         
         pushChildren();
@@ -188,6 +237,7 @@ struct ViewportObserver {
         for (auto & item : itemsToRemove) {
             componentsPool->returnToPool(item.sn);
         }
+        return true;
     }
     
     std::shared_ptr<ShadowNode> getOffseter(float offset, const ShadowNode & sn);

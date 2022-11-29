@@ -16,6 +16,7 @@ struct WishItem
     std::string key;
     float height;
     bool dirty = false;
+    bool next = true;
     std::shared_ptr<ShadowNode> sn;
 };
 

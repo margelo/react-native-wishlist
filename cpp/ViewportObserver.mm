@@ -48,7 +48,7 @@ void ViewportObserver::pushChildren()
             children->push_back(getOffseter(window[0].offset, sn));
 
             for (WishItem &wishItem : window) {
-              if (wishItem.sn != nullptr) {
+              if (wishItem.sn != nullptr && wishItem.next == false) {
                 children->push_back(wishItem.sn);
               }
             }
