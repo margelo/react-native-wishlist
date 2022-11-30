@@ -121,8 +121,11 @@ struct ViewportObserver {
     }
     
     bool updateWindow(bool newTemplates) {
-        float topEdge = offset - (windowHeight * 0.1);
-        float bottomEdge = offset + (1.1 * windowHeight);
+        float topEdge = offset - windowHeight;
+        float bottomEdge = offset + 2.0 * windowHeight;
+        float topEdgeOpt = topEdge - windowHeight;
+        float bottomEdgeOpt = bottomEdge + windowHeight;
+        
         bool changedAnything = false;
         optimisticallyInflateTop = 1 - optimisticallyInflateTop;
         
@@ -170,11 +173,13 @@ struct ViewportObserver {
         while (1) {
             WishItem item = window.front();
             float bottom = item.offset + item.height;
-            if (bottom <= topEdge) {
+            if (bottom <= topEdgeOpt) {
+                window.front().next = true;
+                changedAnything = true;
+            } else if (bottom <= topEdge) {
                 window.pop_front();
                 itemsToRemove.push_back(item);
                 changedAnything = true;
-                continue;
             } else {
                 break;
             }
@@ -183,11 +188,13 @@ struct ViewportObserver {
         // remove below
         while (1) {
             WishItem item = window.back();
-            if (item.offset >= bottomEdge) {
+            if (item.offset >= bottomEdgeOpt) {
+                window.back().next = true;
+                changedAnything = true;
+            } else if (item.offset >= bottomEdge) {
                 window.pop_back();
                 itemsToRemove.push_back(item);
                 changedAnything = true;
-                continue;
             } else {
                 break;
             }
@@ -202,13 +209,12 @@ struct ViewportObserver {
         }
         
         if (!changedAnything) { // optimisically inflate items
-            topEdge -= windowHeight;
-            bottomEdge += windowHeight;
+            std::cout << "oooo vsync opt inf " << std::endl;
             if (optimisticallyInflateTop) { // inflate above
                 WishItem item = window.front();
                 float bottom = item.offset + item.height;
                 
-                if (item.offset > topEdge) {
+                if (item.offset > topEdgeOpt) {
                     WishItem wishItem = itemProvider->provide(item.index - 1);
                     if (wishItem.sn.get() != nullptr) {
                         wishItem.offset = item.offset - wishItem.height;
@@ -219,7 +225,7 @@ struct ViewportObserver {
                 WishItem item = window.back();
                 float bottom = item.offset + item.height;
 
-                if (bottom < bottomEdge) {
+                if (bottom < bottomEdgeOpt) {
                     WishItem wishItem = itemProvider->provide(item.index + 1);
                     if (wishItem.sn.get() != nullptr) {
                         wishItem.offset = bottom;
@@ -232,6 +238,7 @@ struct ViewportObserver {
             return false;
         }
         
+        std::cout << "oooo vsync push children " << std::endl;
         pushChildren();
         
         for (auto & item : itemsToRemove) {

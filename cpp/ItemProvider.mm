@@ -49,5 +49,6 @@ struct
         auto end2 =  std::chrono::high_resolution_clock::now();
         auto dd2 = std::chrono::duration_cast<std::chrono::microseconds>(end2 - start);
         std::cout << "ooooo with measure took: " << dd2.count() << " withKey " << wishItem.key << std::endl;
+        std::cout << "ooo vsync inflateItem " << std::endl;
         return wishItem;
 }
