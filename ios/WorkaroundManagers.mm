@@ -10,13 +10,14 @@
 #include <jsi/jsi.h>
 #include <react/renderer/components/view/ViewEventEmitter.h>
 #include <react/renderer/core/EventListener.h>
+#include "MGObjCJSIUtils.h"
 #import "MGWishListComponent.h"
 #include "ReanimatedRuntimeHandler.hpp"
 
 using EventListener = facebook::react::EventListener;
 using RawEvent = facebook::react::RawEvent;
 
-@interface Workaround : NSObject <RCTBridgeModule, RCTInvalidating, RCTInitializing>
+@interface Workaround : NSObject <RCTBridgeModule, RCTInvalidating, RCTInitializing, RCTEventDispatcherObserver>
 
 @property (nonatomic, weak) RCTBridge *bridge;
 
@@ -33,28 +34,70 @@ RCT_EXPORT_MODULE(Workaround);
 {
   _bridge = bridge;
   _surfacePresenter = _bridge.surfacePresenter;
-  _eventListener = std::make_shared<EventListener>([](const RawEvent &event) -> bool {
-    if (!RCTIsMainQueue() or event.eventTarget == nullptr) {
-      // TODO Scheduler reset
+  __weak __typeof(self) weakSelf = self;
+  _eventListener = std::make_shared<EventListener>([weakSelf](const RawEvent &event) -> bool {
+    __typeof(self) strongSelf = weakSelf;
+    if (!strongSelf) {
       return false;
     }
-    std::string type = event.type;
-    int tag = event.eventTarget->getTag();
-    if (tag >= 0)
-      return false;
-
-    std::shared_ptr<jsi::Runtime> rt = ReanimatedRuntimeHandler::rtPtr;
-    if (rt != nullptr) {
-      try {
-        jsi::Function f = rt->global().getPropertyAsObject(*rt, "global").getPropertyAsFunction(*rt, "handleEvent");
-        f.call(*rt, jsi::String::createFromUtf8(*rt, type), tag, event.payloadFactory(*rt));
-      } catch (std::exception e) {
-        // do Nothing most likly the handler funciton is not registered yet
-      }
-    }
-    return true;
+    return [strongSelf handleFabricEvent:event];
   });
   [_surfacePresenter.scheduler addEventListener:_eventListener];
+
+  [[bridge.moduleRegistry moduleForName:"EventDispatcher" lazilyLoadIfNecessary:YES] addDispatchObserver:self];
+}
+
+- (void)eventDispatcherWillDispatchEvent:(id<RCTEvent>)event
+{
+  // Events can be dispatched from any queue so we have to make sure handleAnimatedEvent
+  // is run from the main queue.
+  RCTExecuteOnMainQueue(^{
+    [self handlePaperEvent:event];
+  });
+}
+
+- (bool)handleFabricEvent:(const RawEvent &)event
+{
+  if (!RCTIsMainQueue() || event.eventTarget == nullptr) {
+    // TODO Scheduler reset
+    return false;
+  }
+  std::string type = event.type;
+  int tag = event.eventTarget->getTag();
+  if (tag >= 0)
+    return false;
+
+  std::shared_ptr<jsi::Runtime> rt = ReanimatedRuntimeHandler::rtPtr;
+  if (rt == nullptr) {
+    return false;
+  }
+  [self sendEventWithType:jsi::String::createFromUtf8(*rt, type) tag:tag payload:event.payloadFactory(*rt)];
+  return true;
+}
+
+- (void)handlePaperEvent:(id<RCTEvent>)event
+{
+  NSNumber *tag = event.viewTag;
+  NSString *type = event.eventName;
+
+  std::shared_ptr<jsi::Runtime> rt = ReanimatedRuntimeHandler::rtPtr;
+  if (rt == nullptr) {
+    return;
+  }
+  [self sendEventWithType:jsi::String::createFromUtf8(*rt, [type UTF8String])
+                      tag:tag.intValue
+                  payload:convertObjCObjectToJSIValue(*rt, event.arguments[2])];
+}
+
+- (void)sendEventWithType:(const jsi::String &)type tag:(int)tag payload:(const jsi::Value &)payload
+{
+  std::shared_ptr<jsi::Runtime> &rt = ReanimatedRuntimeHandler::rtPtr;
+  try {
+    jsi::Function f = rt->global().getPropertyAsObject(*rt, "global").getPropertyAsFunction(*rt, "handleEvent");
+    f.call(*rt, type, tag, payload);
+  } catch (std::exception &error) {
+    RCTLogError(@"%@", [NSString stringWithUTF8String:error.what()]);
+  }
 }
 
 - (void)initialize

@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-} from 'react-native';
+import { StyleSheet, View, Text, TextInput } from 'react-native';
+import { BorderlessButton } from 'react-native-gesture-handler';
 
 type MessageInputProps = {
   onSend: (text: string) => void;
@@ -27,9 +22,9 @@ export function MessageInput({ onSend }: MessageInputProps) {
         value={value}
         onChangeText={setValue}
       />
-      <TouchableOpacity onPress={handlePress} style={styles.button}>
+      <BorderlessButton onPress={handlePress} style={styles.button}>
         <Text style={[styles.text, !!value && styles.active]}>Send</Text>
-      </TouchableOpacity>
+      </BorderlessButton>
     </View>
   );
 }

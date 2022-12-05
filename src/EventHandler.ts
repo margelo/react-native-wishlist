@@ -9,36 +9,39 @@ const maybeInit = () => {
       'worklet';
       global.handlers = {};
 
-      global.handleEvent = (type: any, tag: any) => {
+      global.handleEvent = (type: string, tag: number, event: any) => {
         const callback = global.handlers[tag.toString() + type];
         if (callback) {
-          callback();
+          callback(event);
         }
       };
     })();
   }
 };
 
-export type TemplateCallbackWorklet = (value: any, rootValue: any) => unknown;
+export type TemplateCallbackWorklet = (
+  nativeEvent: any,
+  value: any,
+  rootValue: any,
+) => unknown;
 
 export class TemplateCallback {
-  _worklet: TemplateCallbackWorklet;
+  worklet: TemplateCallbackWorklet;
+  eventName: string | undefined;
 
-  constructor(worklet: TemplateCallbackWorklet) {
-    this._worklet = worklet;
-  }
-
-  getWorklet() {
-    return this._worklet;
+  constructor(worklet: TemplateCallbackWorklet, eventName?: string) {
+    this.worklet = worklet;
+    this.eventName = eventName;
   }
 }
 
 export function useTemplateCallback(
-  worklet: (value: any, rootValue: any) => unknown,
+  worklet: (nativeEvent: any, value: any, rootValue: any) => unknown,
+  eventName?: string,
 ) {
   return useMemo(() => {
-    return new TemplateCallback(worklet);
-  }, [worklet]);
+    return new TemplateCallback(worklet, eventName);
+  }, [worklet, eventName]);
 }
 
 export function initEventHandler() {
