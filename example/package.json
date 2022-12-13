@@ -12,7 +12,7 @@
   "dependencies": {
     "react": "18.1.0",
     "react-native": "0.70.3",
-    "react-native-reanimated": "3.0.0-rc.2"
+    "react-native-worklets": "janicduplessis/react-native-worklets#react-native-worklets-v0.1.1-gitpkg"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

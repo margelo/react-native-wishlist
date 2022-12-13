@@ -1,5 +1,4 @@
-#ifndef ComponentsPool_hpp
-#define ComponentsPool_hpp
+#pragma once
 
 #include <react/renderer/core/ConcreteComponentDescriptor.h>
 #include <stdio.h>
@@ -11,6 +10,8 @@
 
 using namespace facebook::react;
 using namespace jsi;
+
+namespace Wishlist {
 
 struct ComponentsPool;
 
@@ -107,7 +108,7 @@ struct ComponentsPool : std::enable_shared_from_this<ComponentsPool> {
   }
 
   void templatesUpdated() { // optimise by reusing some of elements if they are
-                            // the same
+    // the same
     tagToType.clear();
     reusable.clear();
   }
@@ -173,4 +174,4 @@ struct ComponentsPool : std::enable_shared_from_this<ComponentsPool> {
   };
 };
 
-#endif /* ComponentsPool_hpp */
+}; // namespace Wishlist

@@ -2,7 +2,6 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button } from './Button';
 import { useTemplateValue, Wishlist } from 'wishlist';
-import { useWorkletCallback } from 'react-native-reanimated';
 import type { AssetListSeparatorWithState } from './AssetListExample';
 
 type AssetListSeparatorProps = {
@@ -28,8 +27,12 @@ export function AssetListSeparator({
     item.isEditing ? 'Done' : 'Edit',
   );
 
-  const onPin = useWorkletCallback(() => {});
-  const onHide = useWorkletCallback(() => {});
+  const onPin = () => {
+    'worklet';
+  };
+  const onHide = () => {
+    'worklet';
+  };
 
   return (
     <View style={styles.container}>

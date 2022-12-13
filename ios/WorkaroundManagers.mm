@@ -6,15 +6,17 @@
 #import <React/RCTScheduler.h>
 #import <React/RCTSurfacePresenter.h>
 #import <React/RCTSurfacePresenterStub.h>
+#import <ReactCommon/RCTTurboModule.h>
 #include <jsi/JSIDynamic.h>
 #include <jsi/jsi.h>
 #include <react/renderer/components/view/ViewEventEmitter.h>
 #include <react/renderer/core/EventListener.h>
 #import "MGWishListComponent.h"
-#include "ReanimatedRuntimeHandler.hpp"
+#include "WishlistJsRuntime.h"
 
 using EventListener = facebook::react::EventListener;
 using RawEvent = facebook::react::RawEvent;
+using namespace Wishlist;
 
 @interface Workaround : NSObject <RCTBridgeModule, RCTInvalidating, RCTInitializing>
 
@@ -43,18 +45,31 @@ RCT_EXPORT_MODULE(Workaround);
     if (tag >= 0)
       return false;
 
-    std::shared_ptr<jsi::Runtime> rt = ReanimatedRuntimeHandler::rtPtr;
-    if (rt != nullptr) {
-      try {
-        jsi::Function f = rt->global().getPropertyAsObject(*rt, "global").getPropertyAsFunction(*rt, "handleEvent");
-        f.call(*rt, jsi::String::createFromUtf8(*rt, type), tag, event.payloadFactory(*rt));
-      } catch (std::exception e) {
-        // do Nothing most likly the handler funciton is not registered yet
-      }
+    auto &rt = WishlistJsRuntime::getInstance().getRuntime();
+
+    try {
+      jsi::Function f = rt.global().getPropertyAsObject(rt, "global").getPropertyAsFunction(rt, "handleEvent");
+      f.call(rt, jsi::String::createFromUtf8(rt, type), tag, event.payloadFactory(rt));
+    } catch (std::exception e) {
+      // do Nothing most likly the handler funciton is not registered yet
     }
     return true;
   });
   [_surfacePresenter.scheduler addEventListener:_eventListener];
+
+  RCTCxxBridge *cxxBridge = (RCTCxxBridge *)_bridge;
+  auto callInvoker = cxxBridge.jsCallInvoker;
+  facebook::jsi::Runtime *jsRuntime = (facebook::jsi::Runtime *)cxxBridge.runtime;
+
+  WishlistJsRuntime::getInstance().initialize(
+      jsRuntime,
+      [=](std::function<void()> &&f) {
+        __block auto retainedWork = std::move(f);
+        dispatch_async(dispatch_get_main_queue(), ^{
+          retainedWork();
+        });
+      },
+      [=](std::function<void()> &&f) { callInvoker->invokeAsync(std::move(f)); });
 }
 
 - (void)initialize

@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
-import { runOnJS, useWorkletCallback } from 'react-native-reanimated';
-import { Wishlist } from 'wishlist';
+import { createRunInJsFn, Wishlist } from 'wishlist';
 import { AssetItem } from './AssetItem';
 import { AssetListHeader } from './AssetListHeader';
 import { AssetListSeparator } from './AssetListSeparator';
@@ -80,13 +79,9 @@ export const AssetListExample: React.FC<{}> = () => {
     );
   }, [data, isExpanded, isEditing]);
 
-  const handleExpandWorklet = useWorkletCallback(() => {
-    runOnJS(handleExpand)();
-  }, []);
+  const handleExpandWorklet = createRunInJsFn(handleExpand);
 
-  const handleEditWorklet = useWorkletCallback(() => {
-    runOnJS(handleEdit)();
-  }, []);
+  const handleEditWorklet = createRunInJsFn(handleEdit);
 
   const showItemAlert = (address: string) => {
     Alert.alert(address);
@@ -106,13 +101,15 @@ export const AssetListExample: React.FC<{}> = () => {
     );
   };
 
-  const handleItemPress = useWorkletCallback((item: AssetListItemWithState) => {
+  const handleItemPress = (item: AssetListItemWithState) => {
+    'worklet';
+
     if (item.isEditing) {
-      runOnJS(toggleSelectedItem)(item);
+      createRunInJsFn(toggleSelectedItem)(item);
     } else {
-      runOnJS(showItemAlert)(item.address!);
+      createRunInJsFn(showItemAlert)(item.address!);
     }
-  }, []);
+  };
 
   return (
     <View style={styles.container}>

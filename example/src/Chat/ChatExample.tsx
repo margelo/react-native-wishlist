@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
-import { runOnJS, useWorkletCallback } from 'react-native-reanimated';
-import type { WishListInstance } from 'wishlist';
+import { createRunInJsFn, WishListInstance } from 'wishlist';
 import { ChatHeader } from './ChatHeader';
 import { ChatListView } from './ChatList';
 import { ChatItem, fetchData, getSendedMessage } from './Data';
@@ -17,9 +16,7 @@ export default function App() {
     const newItem = getSendedMessage(text);
     const index = (await listRef.current?.update((dataCopy) => {
       'worklet';
-      // get rid of frozen object that Reanimated creates
-      const val = JSON.parse(JSON.stringify(newItem));
-      dataCopy.push(val);
+      dataCopy.push(newItem);
       return dataCopy.length() - 1;
     })) as number;
     listRef.current?.scrollToItem(index);
@@ -39,9 +36,7 @@ export default function App() {
     setActiveReactionPicker(item);
   }, []);
 
-  const onAddReaction = useWorkletCallback((item: ChatItem) => {
-    runOnJS(showAddReactionModal)(item);
-  });
+  const onAddReaction = createRunInJsFn(showAddReactionModal);
 
   const onPickReaction = (emoji: string) => {
     console.log(emoji);

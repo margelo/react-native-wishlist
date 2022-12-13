@@ -10,7 +10,9 @@
 #endif
 
 #include "ComponentsPool.h"
-#include "ViewportObserver.hpp"
+#include "ViewportObserver.h"
+
+using namespace Wishlist;
 
 namespace facebook {
 namespace react {

@@ -1,5 +1,5 @@
 import type { TemplateValueUIState } from './TemplateValue';
-import { runOnUI } from './Utils';
+import { createRunInWishlistFn } from './WishlistJsRuntime';
 
 export type TemplateItem = {
   [key: string]: TemplateItem | undefined;
@@ -61,7 +61,7 @@ let done = false;
 const maybeInit = () => {
   if (!done) {
     done = true;
-    runOnUI(() => {
+    createRunInWishlistFn(() => {
       'worklet';
 
       const registry = new Map<string, InflateMethod>();
@@ -177,7 +177,7 @@ export function getUIInflatorRegistry(): UIInflatorRegistry {
 export default class InflatorRepository {
   static register(id: string, inflateMethod: InflateMethod) {
     maybeInit();
-    runOnUI(() => {
+    createRunInWishlistFn(() => {
       'worklet';
       getUIInflatorRegistry().registerInflator(id, inflateMethod);
     })();
@@ -185,7 +185,7 @@ export default class InflatorRepository {
 
   static unregister(id: string) {
     maybeInit();
-    runOnUI(() => {
+    createRunInWishlistFn(() => {
       'worklet';
       getUIInflatorRegistry().unregisterInflator(id);
     })();
@@ -198,7 +198,7 @@ export default class InflatorRepository {
     inflateMethod: MappingInflateMethod,
   ) {
     maybeInit();
-    runOnUI(() => {
+    createRunInWishlistFn(() => {
       'worklet';
       getUIInflatorRegistry().registerMapping(
         inflatorId,

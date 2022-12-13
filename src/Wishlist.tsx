@@ -15,7 +15,6 @@ import { WishlistImage } from './Components/WishlistImage';
 import { WishlistText } from './Components/WishlistText';
 import { WishlistView } from './Components/WishlistView';
 import { initEventHandler } from './EventHandler';
-import { UpdateJob, useInternalWishlistData } from './WishlistData';
 import InflatorRepository, {
   ComponentPool,
   InflateMethod,
@@ -26,8 +25,10 @@ import NativeWishList, {
   Commands as WishlistCommands,
 } from './NativeViews/WishlistNativeComponent';
 import { TemplateContext } from './TemplateContext';
+import { generateId } from './Utils';
 import { useWishlistContext, WishlistContext } from './WishlistContext';
-import { generateId, runOnUI } from './Utils';
+import { UpdateJob, useInternalWishlistData } from './WishlistData';
+import { createRunInWishlistFn } from './WishlistJsRuntime';
 
 const OffsetComponent = '__offsetComponent';
 
@@ -99,7 +100,7 @@ function ComponentBase<T extends BaseItem>(
       },
       update: async (updateJob: UpdateJob<T>) => {
         return new Promise((resolve, _reject) => {
-          runOnUI(() => {
+          createRunInWishlistFn(() => {
             'worklet';
             // we have to do sth here to get rid of frozen objs
             // otherwise data can't be modified
