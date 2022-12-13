@@ -6,16 +6,18 @@
 #import <React/RCTScheduler.h>
 #import <React/RCTSurfacePresenter.h>
 #import <React/RCTSurfacePresenterStub.h>
+#import <ReactCommon/RCTTurboModule.h>
 #include <jsi/JSIDynamic.h>
 #include <jsi/jsi.h>
 #include <react/renderer/components/view/ViewEventEmitter.h>
 #include <react/renderer/core/EventListener.h>
 #include "MGObjCJSIUtils.h"
 #import "MGWishListComponent.h"
-#include "ReanimatedRuntimeHandler.hpp"
+#include "WishlistJsRuntime.h"
 
 using EventListener = facebook::react::EventListener;
 using RawEvent = facebook::react::RawEvent;
+using namespace Wishlist;
 
 @interface Workaround : NSObject <RCTBridgeModule, RCTInvalidating, RCTInitializing, RCTEventDispatcherObserver>
 
@@ -45,6 +47,20 @@ RCT_EXPORT_MODULE(Workaround);
   [_surfacePresenter.scheduler addEventListener:_eventListener];
 
   [[bridge.moduleRegistry moduleForName:"EventDispatcher" lazilyLoadIfNecessary:YES] addDispatchObserver:self];
+
+  RCTCxxBridge *cxxBridge = (RCTCxxBridge *)_bridge;
+  auto callInvoker = cxxBridge.jsCallInvoker;
+  facebook::jsi::Runtime *jsRuntime = (facebook::jsi::Runtime *)cxxBridge.runtime;
+
+  WishlistJsRuntime::getInstance().initialize(
+      jsRuntime,
+      [=](std::function<void()> &&f) {
+        __block auto retainedWork = std::move(f);
+        dispatch_async(dispatch_get_main_queue(), ^{
+          retainedWork();
+        });
+      },
+      [=](std::function<void()> &&f) { callInvoker->invokeAsync(std::move(f)); });
 }
 
 - (void)eventDispatcherWillDispatchEvent:(id<RCTEvent>)event
@@ -91,10 +107,10 @@ RCT_EXPORT_MODULE(Workaround);
 
 - (void)sendEventWithType:(const jsi::String &)type tag:(int)tag payload:(const jsi::Value &)payload
 {
-  std::shared_ptr<jsi::Runtime> &rt = ReanimatedRuntimeHandler::rtPtr;
+  auto &rt = WishlistJsRuntime::getInstance().getRuntime();
   try {
-    jsi::Function f = rt->global().getPropertyAsObject(*rt, "global").getPropertyAsFunction(*rt, "handleEvent");
-    f.call(*rt, type, tag, payload);
+    jsi::Function f = rt.global().getPropertyAsObject(rt, "global").getPropertyAsFunction(rt, "handleEvent");
+    f.call(rt, type, tag, payload);
   } catch (std::exception &error) {
     RCTLogError(@"%@", [NSString stringWithUTF8String:error.what()]);
   }

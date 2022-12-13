@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { useWishlistContext } from './WishlistContext';
 import { useOnFlushCallback, useScheduleSyncUp } from './OrchestratorBinding';
-import { runOnJS } from 'react-native-reanimated';
+import { useWishlistContext } from './WishlistContext';
+import { createRunInJsFn } from './WishlistJsRuntime';
 
 export type Item = {
   key: string;
@@ -52,7 +52,7 @@ export function useInternalWishlistData<T extends Item>(
           // classes doesn't work :(
           // TODO it can be implmented so that all ops are O(log n)
           const thiz: DataCopy<T> = {
-            deque: JSON.parse(JSON.stringify(initialData)) as Array<T>, // get rid of frozen array
+            deque: initialData,
             getIndex: function getIndex(key: string) {
               // That's linear but can be log n (only for testing)
               for (let i = 0; i < this.deque.length; ++i) {
@@ -130,7 +130,7 @@ export function useInternalWishlistData<T extends Item>(
           pendingUpdates.push((dataCopy: DataCopy<T>) => {
             const result = updateJob(dataCopy);
             if (callback) {
-              runOnJS(callback)(result);
+              createRunInJsFn(callback)(result);
             }
           });
           scheduleSyncUp();

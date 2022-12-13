@@ -1,16 +1,15 @@
-#ifndef ShadowNodeCopyMachine_hpp
-#define ShadowNodeCopyMachine_hpp
+#pragma once
 
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
 #include <react/renderer/components/wishlist/Props.h>
+#include <stdio.h>
 #include <iostream>
 #include "LayoutConstraints.h"
 #include "LayoutContext.h"
 
-#include <stdio.h>
+using namespace facebook::react;
 
-namespace facebook {
-namespace react {
+namespace Wishlist {
 
 class ShadowNodeCopyMachine {
  public:
@@ -44,7 +43,4 @@ class ShadowNodeFamilyHack final {
   mutable bool hasParent_{false};
 };
 
-}; // namespace react
-}; // namespace facebook
-
-#endif /* ShadowNodeCopyMachine_hpp */
+}; // namespace Wishlist

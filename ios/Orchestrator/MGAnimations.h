@@ -1,5 +1,7 @@
 #import <Foundation/Foundation.h>
-#import "ViewportObserver.hpp"
+#import "ViewportObserver.h"
+
+using namespace Wishlist;
 
 NS_ASSUME_NONNULL_BEGIN
 

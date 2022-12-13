@@ -1,6 +1,5 @@
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
-import { useWorkletCallback } from 'react-native-reanimated';
 import { useTemplateValue, Wishlist, useData } from 'wishlist';
 import type { ChatItem, ReactionItem } from './Data';
 
@@ -28,9 +27,11 @@ export const Reaction = () => {
     return count.value() > 1;
   });
 
-  const handler = useWorkletCallback((value, rootValue) => {
+  const handler = (value: any, rootValue: any) => {
+    'worklet';
+
     console.log('Touch', value, rootValue);
-  }, []);
+  };
 
   return (
     <Wishlist.Pressable onPress={handler}>
@@ -95,21 +96,25 @@ export const ChatItemView: React.FC<Props> = ({ type, onAddReaction }) => {
 
   const data = useData<ChatItem>();
 
-  const likeItemListener = useWorkletCallback((value) => {
+  const likeItemListener = (value: ChatItem) => {
+    'worklet';
+
     data().update((dataCopy) => {
       const oldValue = dataCopy.get(value.key);
       oldValue!.liked = !oldValue!.liked;
       dataCopy.set(value.key, oldValue!);
     });
-  }, []);
+  };
 
-  const toggleImage = useWorkletCallback((value) => {
+  const toggleImage = (value: ChatItem) => {
+    'worklet';
+
     data().update((dataCopy) => {
       const oldValue = dataCopy.get(value.key);
       oldValue!.showBiggerAvatar = !oldValue!.showBiggerAvatar;
       dataCopy.set(value.key, oldValue!);
     });
-  }, []);
+  };
 
   const avatarSide = useTemplateValue((item: ChatItem) => {
     return item.showBiggerAvatar ? 60 : 30;

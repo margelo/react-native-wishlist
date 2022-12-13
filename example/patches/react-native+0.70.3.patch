@@ -1,16 +1,8 @@
 diff --git a/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.cpp b/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.cpp
-index 894ddf8..1f8e9f7 100644
+index 894ddf8..6ca53bf 100644
 --- a/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.cpp
 +++ b/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.cpp
-@@ -11,6 +11,7 @@
- #include <jsi/JSIDynamic.h>
- #include <jsi/jsi.h>
- #include <react/renderer/debug/SystraceSection.h>
-+#include <MGWishList/ReanimatedRuntimeHandler.hpp>
- 
- #include "RawEvent.h"
- 
-@@ -54,6 +55,9 @@ void EventEmitter::dispatchEvent(
+@@ -54,6 +54,9 @@ void EventEmitter::dispatchEvent(
      const folly::dynamic &payload,
      EventPriority priority,
      RawEvent::Category category) const {

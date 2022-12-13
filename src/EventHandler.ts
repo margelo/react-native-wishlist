@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
-import { runOnUI } from './Utils';
+import { createRunInWishlistFn } from './WishlistJsRuntime';
 
 let done = false;
 const maybeInit = () => {
   if (!done) {
     done = true;
-    runOnUI(() => {
+    createRunInWishlistFn(() => {
       'worklet';
       global.handlers = {};
 
