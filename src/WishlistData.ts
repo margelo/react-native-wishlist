@@ -44,6 +44,7 @@ export function useInternalWishlistData<T extends Item>(
   const data = useMemo(() => {
     return () => {
       'worklet';
+
       if (!global.dataCtx) {
         global.dataCtx = {};
       }
@@ -118,8 +119,24 @@ export function useInternalWishlistData<T extends Item>(
           return thiz;
         }
 
-        const __nextCopy = createItemsDataStructure(initialData);
-        const __currentlyRenderedCopy = createItemsDataStructure(initialData);
+        function deepClone(x: unknown): unknown {
+          if (x.map != null) {
+            return x.map((ele: unknown) => deepClone(ele));
+          }
+  
+          if (typeof x === 'object') {
+            const res = {};
+            for (let key of Object.keys(x)) {
+              res[key] = deepClone(x[key]);
+            }
+            return res;
+          }
+          return x;
+        }
+        const initialDataCopy__next = deepClone(initialData);
+        const initialDataCopy__cur = deepClone(initialData);
+        const __nextCopy = createItemsDataStructure(initialDataCopy__next);
+        const __currentlyRenderedCopy = createItemsDataStructure(initialDataCopy__cur);
 
         const pendingUpdates: Array<UpdateJob<T>> = [];
         function update(
@@ -167,6 +184,7 @@ export function useInternalWishlistData<T extends Item>(
   useOnFlushCallback((viewportObserver) => {
     'worklet';
 
+    _log('ooo flush');
     const pendingUpdates = data().pendingUpdates;
     const pendingUpdatesCopy = pendingUpdates.splice(0, pendingUpdates.length);
 
