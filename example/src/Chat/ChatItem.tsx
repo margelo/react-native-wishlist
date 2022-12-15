@@ -101,9 +101,7 @@ export const ChatItemView: React.FC<Props> = ({ type, onAddReaction }) => {
 
     data().update((dataCopy) => {
       const oldValue = dataCopy.get(value.key);
-      _log('ooo oldValue' + JSON.stringify(oldValue));
       oldValue!.liked = !oldValue!.liked;
-      _log('ooo newValue' + JSON.stringify(oldValue));
       dataCopy.set(value.key, oldValue!);
     });
   };
