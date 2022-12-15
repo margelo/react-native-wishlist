@@ -83,11 +83,8 @@ RCT_EXPORT_MODULE(Workaround);
   if (tag >= 0)
     return false;
 
-  std::shared_ptr<jsi::Runtime> rt = ReanimatedRuntimeHandler::rtPtr;
-  if (rt == nullptr) {
-    return false;
-  }
-  [self sendEventWithType:jsi::String::createFromUtf8(*rt, type) tag:tag payload:event.payloadFactory(*rt)];
+  auto &rt = WishlistJsRuntime::getInstance().getRuntime();
+  [self sendEventWithType:jsi::String::createFromUtf8(rt, type) tag:tag payload:event.payloadFactory(rt)];
   return true;
 }
 
@@ -96,13 +93,10 @@ RCT_EXPORT_MODULE(Workaround);
   NSNumber *tag = event.viewTag;
   NSString *type = event.eventName;
 
-  std::shared_ptr<jsi::Runtime> rt = ReanimatedRuntimeHandler::rtPtr;
-  if (rt == nullptr) {
-    return;
-  }
-  [self sendEventWithType:jsi::String::createFromUtf8(*rt, [type UTF8String])
+  auto &rt = WishlistJsRuntime::getInstance().getRuntime();
+  [self sendEventWithType:jsi::String::createFromUtf8(rt, [type UTF8String])
                       tag:tag.intValue
-                  payload:convertObjCObjectToJSIValue(*rt, event.arguments[2])];
+                  payload:convertObjCObjectToJSIValue(rt, event.arguments[2])];
 }
 
 - (void)sendEventWithType:(const jsi::String &)type tag:(int)tag payload:(const jsi::Value &)payload

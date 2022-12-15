@@ -83,11 +83,11 @@ export const AssetListExample: React.FC<{}> = () => {
 
   const handleEditWorklet = createRunInJsFn(handleEdit);
 
-  const showItemAlert = (address: string) => {
+  const showItemAlert = createRunInJsFn((address: string) => {
     Alert.alert(address);
-  };
+  });
 
-  const toggleSelectedItem = (item: ListItemsType) => {
+  const toggleSelectedItem = createRunInJsFn((item: ListItemsType) => {
     setData((items) =>
       items.map((i) =>
         // @ts-expect-error
@@ -99,15 +99,15 @@ export const AssetListExample: React.FC<{}> = () => {
           : i,
       ),
     );
-  };
+  });
 
   const handleItemPress = (item: AssetListItemWithState) => {
     'worklet';
 
     if (item.isEditing) {
-      createRunInJsFn(toggleSelectedItem)(item);
+      toggleSelectedItem(item);
     } else {
-      createRunInJsFn(showItemAlert)(item.address!);
+      showItemAlert(item.address!);
     }
   };
 

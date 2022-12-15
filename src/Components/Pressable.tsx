@@ -58,7 +58,7 @@ type PressableProps = ViewProps & {
   onPress: (item: any, rootItem: any) => void;
 };
 
-const attachGestureHandler = (tag: number) => {
+const attachGestureHandler = createRunInJsFn((tag: number) => {
   const handlerTag = getNextHandlerTag();
   RNGestureHandlerModule.createGestureHandler(
     'TapGestureHandler',
@@ -71,7 +71,7 @@ const attachGestureHandler = (tag: number) => {
     ActionType.JS_FUNCTION_OLD_API,
   );
   RNGestureHandlerModule.flushOperations();
-};
+});
 
 const PressableView = createTemplateComponent(View, (item, props) => {
   'worklet';
@@ -79,7 +79,7 @@ const PressableView = createTemplateComponent(View, (item, props) => {
   const tag = item.getTag();
   item.addProps(props);
 
-  createRunInJsFn(attachGestureHandler)(tag);
+  attachGestureHandler(tag);
 });
 
 export const Pressable = forwardRef<any, PressableProps>(
