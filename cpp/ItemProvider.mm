@@ -1,4 +1,5 @@
 #include "ItemProvider.hpp"
+#include <React/RCTLog.h>
 #include <react/renderer/uimanager/UIManager.h>
 #include <react/renderer/uimanager/primitives.h>
 
@@ -16,8 +17,13 @@ struct
                                   .getPropertyAsObject(rt, "InflatorRegistry")
                                   .getPropertyAsFunction(rt, "inflateItem");
 
-  jsi::Value returnedValue =
-      inflateItem.call(rt, jsi::String::createFromUtf8(rt, tag), jsi::Value(index), cp->prepareProxy(rt));
+  jsi::Value returnedValue;
+  try {
+    returnedValue = inflateItem.call(rt, jsi::String::createFromUtf8(rt, tag), jsi::Value(index), cp->prepareProxy(rt));
+  } catch (std::exception &error) {
+    RCTLogError(@"%@", [NSString stringWithUTF8String:error.what()]);
+    return wishItem;
+  }
 
   if (returnedValue.isUndefined()) {
     return wishItem;

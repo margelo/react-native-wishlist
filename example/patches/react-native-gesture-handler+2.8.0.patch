@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-gesture-handler/ios/RNGestureHandlerManager.mm b/node_modules/react-native-gesture-handler/ios/RNGestureHandlerManager.mm
+index 8c2d99d..062c145 100644
+--- a/node_modules/react-native-gesture-handler/ios/RNGestureHandlerManager.mm
++++ b/node_modules/react-native-gesture-handler/ios/RNGestureHandlerManager.mm
+@@ -276,7 +276,7 @@
+ {
+   // Delivers the event to JS (old RNGH API).
+ #ifdef RN_FABRIC_ENABLED
+-  [self sendEventForDeviceEvent:event];
++  [self sendEventForDirectEvent:event];
+ #else
+   [self sendEventForDirectEvent:event];
+ #endif // RN_FABRIC_ENABLED
