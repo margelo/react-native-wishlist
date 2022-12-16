@@ -1,23 +1,46 @@
 import React, { forwardRef } from 'react';
 import { View, ViewProps, NativeModules } from 'react-native';
-// import { BaseButton } from 'react-native-gesture-handler';
-import type { RNGestureHandlerModuleProps } from 'react-native-gesture-handler/src/RNGestureHandlerModule';
 import { runOnJS } from 'react-native-reanimated';
 import { createTemplateComponent } from '../createTemplateComponent';
 import { useTemplateCallback } from '../EventHandler';
 
-let _handlerTag = 1000;
-
-export function getNextHandlerTag(): number {
-  return _handlerTag++;
-}
-
+// TODO(janic): Figure out why those cannot be imported directly from RNGH in the example app.
 const ActionType = {
   REANIMATED_WORKLET: 1,
   NATIVE_ANIMATED_EVENT: 2,
   JS_FUNCTION_OLD_API: 3,
   JS_FUNCTION_NEW_API: 4,
 } as const;
+
+type ActionTypeT = typeof ActionType[keyof typeof ActionType];
+
+type RNGestureHandlerModuleProps = {
+  handleSetJSResponder: (tag: number, blockNativeResponder: boolean) => void;
+  handleClearJSResponder: () => void;
+  createGestureHandler: (
+    handlerName: string,
+    handlerTag: number,
+    config: Readonly<Record<string, unknown>>,
+  ) => void;
+  attachGestureHandler: (
+    handlerTag: number,
+    newView: number,
+    actionType: ActionTypeT,
+  ) => void;
+  updateGestureHandler: (
+    handlerTag: number,
+    newConfig: Readonly<Record<string, unknown>>,
+  ) => void;
+  dropGestureHandler: (handlerTag: number) => void;
+  install: () => void;
+  flushOperations: () => void;
+};
+
+let _handlerTag = 1000;
+
+export function getNextHandlerTag(): number {
+  return _handlerTag++;
+}
 
 const RNGestureHandlerModule: RNGestureHandlerModuleProps =
   NativeModules.RNGestureHandlerModule;
