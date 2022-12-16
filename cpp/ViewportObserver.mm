@@ -1,8 +1,11 @@
-#include "ViewportObserver.hpp"
+#include "ViewportObserver.h"
 #include "MGWishlistShadowNode.h"
 #import "RCTFollyConvert.h"
+#include "WishlistJsRuntime.h"
 
 using namespace facebook::react;
+
+namespace Wishlist {
 
 thread_local bool ViewportObserver::isPushingChildren = false;
 
@@ -64,7 +67,7 @@ void ViewportObserver::pushChildren()
 // TODO create it only once
 jsi::Value ViewportObserver::getBinding()
 {
-  jsi::Runtime &rt = *ReanimatedRuntimeHandler::rtPtr;
+  auto &rt = WishlistJsRuntime::getInstance().getRuntime();
   jsi::Object obj(rt);
 
   obj.setProperty(
@@ -133,3 +136,5 @@ jsi::Value ViewportObserver::getBinding()
 
   return std::move(obj);
 }
+
+}; // namespace Wishlist

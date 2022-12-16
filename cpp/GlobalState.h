@@ -1,5 +1,4 @@
-#ifndef GlobalState_hpp
-#define GlobalState_hpp
+#pragma once
 
 #include <react/renderer/uimanager/primitives.h>
 #include <stdio.h>
@@ -9,8 +8,10 @@
 
 using namespace facebook::react;
 
+namespace Wishlist {
+
 struct GlobalState {
   static void printAnythingMethod(int tag);
 };
 
-#endif /* GlobalState_hpp */
+}; // namespace Wishlist

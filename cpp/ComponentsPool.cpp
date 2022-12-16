@@ -1,7 +1,10 @@
 #include "ComponentsPool.h"
 #include <iostream>
+
 using namespace facebook::react;
 using namespace jsi;
+
+namespace Wishlist {
 
 Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
   std::string name = nameProp.utf8(rt);
@@ -181,7 +184,7 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
   }
 
   if (name == "getByWishId") { // TODO(Szymon) That can be optimised to O(depth)
-                               // when template preprocessing
+    // when template preprocessing
     return jsi::Function::createFromHostFunction(
         rt,
         nameProp,
@@ -251,3 +254,5 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
 
   return jsi::Value::undefined();
 }
+
+}; // namespace Wishlist

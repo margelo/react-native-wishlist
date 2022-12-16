@@ -50,8 +50,6 @@ export interface TemplateComponent<T extends React.ComponentType<any>>
   extends React.FC<TemplateProps<React.ComponentPropsWithRef<T>>> {}
 
 function setInObject(obj: any, path: string[], value: any) {
-  'worklet';
-
   let current = obj;
   for (let i = 0; i < path.length - 1; i++) {
     current[path[i]] = current[path[i]] ?? {};
@@ -182,6 +180,19 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
         templateType,
         (value, templateItem, pool, rootValue) => {
           'worklet';
+
+          // TODO: Calling worklets from inside a worklet causes values to be
+          // wrapped which breaks mutating args. For now we just copy the function
+          // inside the worklet to avoid the problem.
+          // eslint-disable-next-line @typescript-eslint/no-shadow
+          function setInObject(obj: any, path: string[], value: any) {
+            let current = obj;
+            for (let i = 0; i < path.length - 1; i++) {
+              current[path[i]] = current[path[i]] ?? {};
+              current = current[path[i]];
+            }
+            current[path[path.length - 1]] = value;
+          }
 
           templateValues.forEach(({ templateValue }) => {
             templateValue.__setDirty();

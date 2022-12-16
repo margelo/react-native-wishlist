@@ -1,8 +1,8 @@
 import React, { forwardRef } from 'react';
-import { View, ViewProps, NativeModules } from 'react-native';
-import { runOnJS } from 'react-native-reanimated';
+import { NativeModules, View, ViewProps } from 'react-native';
 import { createTemplateComponent } from '../createTemplateComponent';
 import { useTemplateCallback } from '../EventHandler';
+import { createRunInJsFn } from '../WishlistJsRuntime';
 
 // TODO(janic): Figure out why those cannot be imported directly from RNGH in the example app.
 const ActionType = {
@@ -58,7 +58,7 @@ type PressableProps = ViewProps & {
   onPress: (item: any, rootItem: any) => void;
 };
 
-const attachGestureHandler = (tag: number) => {
+const attachGestureHandler = createRunInJsFn((tag: number) => {
   const handlerTag = getNextHandlerTag();
   RNGestureHandlerModule.createGestureHandler(
     'TapGestureHandler',
@@ -71,7 +71,7 @@ const attachGestureHandler = (tag: number) => {
     ActionType.JS_FUNCTION_OLD_API,
   );
   RNGestureHandlerModule.flushOperations();
-};
+});
 
 const PressableView = createTemplateComponent(View, (item, props) => {
   'worklet';
@@ -79,7 +79,7 @@ const PressableView = createTemplateComponent(View, (item, props) => {
   const tag = item.getTag();
   item.addProps(props);
 
-  runOnJS(attachGestureHandler)(tag);
+  attachGestureHandler(tag);
 });
 
 export const Pressable = forwardRef<any, PressableProps>(

@@ -1,7 +1,11 @@
-#include "ItemProvider.hpp"
+#include "ItemProvider.h"
+
 #include <React/RCTLog.h>
 #include <react/renderer/uimanager/UIManager.h>
 #include <react/renderer/uimanager/primitives.h>
+#include "WishlistJsRuntime.h"
+
+namespace Wishlist {
 
 struct
 
@@ -10,7 +14,7 @@ struct
 {
   WishItem wishItem;
 
-  jsi::Runtime &rt = *ReanimatedRuntimeHandler::rtPtr;
+  auto &rt = WishlistJsRuntime::getInstance().getRuntime();
 
   jsi::Function inflateItem = rt.global()
                                   .getPropertyAsObject(rt, "global")
@@ -46,3 +50,5 @@ struct
   wishItem.key = shadowNodeWrapper->key;
   return wishItem;
 }
+
+}; // namespace Wishlist

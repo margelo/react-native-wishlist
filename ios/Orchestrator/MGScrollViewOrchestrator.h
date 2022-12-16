@@ -6,6 +6,8 @@
 #import <vector>
 #import "MGAnimations.h"
 
+using namespace Wishlist;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface PanEvent : NSObject

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { useWishlistContext } from './WishlistContext';
 import { useOnFlushCallback, useScheduleSyncUp } from './OrchestratorBinding';
-import { runOnJS } from 'react-native-reanimated';
+import { useWishlistContext } from './WishlistContext';
+import { createRunInJsFn } from './WishlistJsRuntime';
 
 export type Item = {
   key: string;
@@ -44,6 +44,7 @@ export function useInternalWishlistData<T extends Item>(
   const data = useMemo(() => {
     return () => {
       'worklet';
+
       if (!global.dataCtx) {
         global.dataCtx = {};
       }
@@ -52,7 +53,7 @@ export function useInternalWishlistData<T extends Item>(
           // classes doesn't work :(
           // TODO it can be implmented so that all ops are O(log n)
           const thiz: DataCopy<T> = {
-            deque: JSON.parse(JSON.stringify(initialData)) as Array<T>, // get rid of frozen array
+            deque: initialData,
             getIndex: function getIndex(key: string) {
               // That's linear but can be log n (only for testing)
               for (let i = 0; i < this.deque.length; ++i) {
@@ -118,8 +119,26 @@ export function useInternalWishlistData<T extends Item>(
           return thiz;
         }
 
-        const __nextCopy = createItemsDataStructure(initialData);
-        const __currentlyRenderedCopy = createItemsDataStructure(initialData);
+        function deepClone<ObjT>(x: ObjT): ObjT {
+          if ((x as any).map != null) {
+            return (x as any).map((ele: unknown) => deepClone(ele));
+          }
+
+          if (typeof x === 'object') {
+            const res: any = {};
+            for (let key of Object.keys(x as any)) {
+              res[key] = deepClone((x as any)[key]);
+            }
+            return res;
+          }
+          return x;
+        }
+
+        const initialDataCopy__next = deepClone(initialData);
+        const initialDataCopy__cur = deepClone(initialData);
+        const __nextCopy = createItemsDataStructure(initialDataCopy__next);
+        const __currentlyRenderedCopy =
+          createItemsDataStructure(initialDataCopy__cur);
 
         const pendingUpdates: Array<UpdateJob<T>> = [];
         function update(
@@ -130,7 +149,7 @@ export function useInternalWishlistData<T extends Item>(
           pendingUpdates.push((dataCopy: DataCopy<T>) => {
             const result = updateJob(dataCopy);
             if (callback) {
-              runOnJS(callback)(result);
+              createRunInJsFn(callback)(result);
             }
           });
           scheduleSyncUp();
