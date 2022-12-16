@@ -13,7 +13,7 @@
     "react": "18.1.0",
     "react-native": "0.70.3",
     "react-native-gesture-handler": "^2.8.0",
-    "react-native-worklets": "janicduplessis/react-native-worklets#react-native-worklets-v0.1.2-gitpkg"
+    "react-native-worklets": "janicduplessis/react-native-worklets#react-native-worklets-v0.1.4-gitpkg"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
