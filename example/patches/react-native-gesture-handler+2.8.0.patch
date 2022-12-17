@@ -1,13 +1,37 @@
+diff --git a/node_modules/react-native-gesture-handler/ios/RNGestureHandlerActionType.h b/node_modules/react-native-gesture-handler/ios/RNGestureHandlerActionType.h
+index f05fc12..e543e9a 100644
+--- a/node_modules/react-native-gesture-handler/ios/RNGestureHandlerActionType.h
++++ b/node_modules/react-native-gesture-handler/ios/RNGestureHandlerActionType.h
+@@ -5,4 +5,5 @@ typedef NS_ENUM(NSInteger, RNGestureHandlerActionType) {
+     RNGestureHandlerActionTypeNativeAnimatedEvent, // Animated.event with useNativeDriver: true
+     RNGestureHandlerActionTypeJSFunctionOldAPI, // JS function or Animated.event with useNativeDriver: false using old RNGH API
+     RNGestureHandlerActionTypeJSFunctionNewAPI, // JS function or Animated.event with useNativeDriver: false using new RNGH API
++    RNGestureHandlerActionTypeDirectEvent, // Direct event that can be intercepted by native modules
+ };
 diff --git a/node_modules/react-native-gesture-handler/ios/RNGestureHandlerManager.mm b/node_modules/react-native-gesture-handler/ios/RNGestureHandlerManager.mm
-index 8c2d99d..062c145 100644
+index 8c2d99d..095011a 100644
 --- a/node_modules/react-native-gesture-handler/ios/RNGestureHandlerManager.mm
 +++ b/node_modules/react-native-gesture-handler/ios/RNGestureHandlerManager.mm
-@@ -276,7 +276,7 @@
- {
-   // Delivers the event to JS (old RNGH API).
- #ifdef RN_FABRIC_ENABLED
--  [self sendEventForDeviceEvent:event];
-+  [self sendEventForDirectEvent:event];
- #else
-   [self sendEventForDirectEvent:event];
- #endif // RN_FABRIC_ENABLED
+@@ -243,6 +243,10 @@
+     case RNGestureHandlerActionTypeJSFunctionNewAPI:
+       [self sendEventForJSFunctionNewAPI:event];
+       break;
++      
++    case RNGestureHandlerActionTypeDirectEvent:
++      [self sendEventForDirectEvent:event];
++      break;
+   }
+ }
+ 
+diff --git a/node_modules/react-native-gesture-handler/src/ActionType.ts b/node_modules/react-native-gesture-handler/src/ActionType.ts
+index ac11a32..f78c3f6 100644
+--- a/node_modules/react-native-gesture-handler/src/ActionType.ts
++++ b/node_modules/react-native-gesture-handler/src/ActionType.ts
+@@ -3,6 +3,7 @@ export const ActionType = {
+   NATIVE_ANIMATED_EVENT: 2,
+   JS_FUNCTION_OLD_API: 3,
+   JS_FUNCTION_NEW_API: 4,
++  DIRECT_EVENT: 5,
+ } as const;
+ 
+ // eslint-disable-next-line @typescript-eslint/no-redeclare -- backward compatibility; it can be used as a type and as a value
