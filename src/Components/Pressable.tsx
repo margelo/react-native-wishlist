@@ -10,6 +10,7 @@ const ActionType = {
   NATIVE_ANIMATED_EVENT: 2,
   JS_FUNCTION_OLD_API: 3,
   JS_FUNCTION_NEW_API: 4,
+  DIRECT_EVENT: 5,
 } as const;
 
 type ActionTypeT = typeof ActionType[keyof typeof ActionType];
@@ -68,7 +69,7 @@ const attachGestureHandler = createRunInJsFn((tag: number) => {
   RNGestureHandlerModule.attachGestureHandler(
     handlerTag,
     tag,
-    ActionType.JS_FUNCTION_OLD_API,
+    ActionType.DIRECT_EVENT,
   );
   RNGestureHandlerModule.flushOperations();
 });
