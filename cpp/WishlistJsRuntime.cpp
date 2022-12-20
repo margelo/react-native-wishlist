@@ -16,9 +16,9 @@ void WishlistJsRuntime::initialize(
     jsi::Runtime *runtime,
     std::function<void(std::function<void()> &&)> jsCallInvoker,
     std::function<void(std::function<void()> &&)> workletCallInvoker) {
-  workletContext_ = std::make_shared<RNWorklet::JsiWorkletContext>(
-      "wishlist", runtime, workletCallInvoker, jsCallInvoker);
-  workletContext_->decorate(this);
+  workletContext_ = std::make_shared<RNWorklet::JsiWorkletContext>();
+  workletContext_->initialize("wishlist", runtime, workletCallInvoker, jsCallInvoker);
+  workletContext_->addDecorator(std::make_shared<Decorator>());
 
   runtime->global().setProperty(
       *runtime,
@@ -30,10 +30,7 @@ jsi::Runtime &WishlistJsRuntime::getRuntime() const {
   return workletContext_->getWorkletRuntime();
 }
 
-void WishlistJsRuntime::decorateRuntime(jsi::Runtime &rt) {
-  // TODO: Basic globals should be added to rn-worklets.
-  rt.global().setProperty(rt, "global", rt.global());
-
+void WishlistJsRuntime::Decorator::decorateRuntime(jsi::Runtime &rt) {
   auto callback = [](jsi::Runtime &rt,
                      const jsi::Value &thisValue,
                      const jsi::Value *args,

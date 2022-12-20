@@ -28,7 +28,7 @@ import { TemplateContext } from './TemplateContext';
 import { generateId } from './Utils';
 import { useWishlistContext, WishlistContext } from './WishlistContext';
 import { UpdateJob, useInternalWishlistData } from './WishlistData';
-import { createRunInWishlistFn } from './WishlistJsRuntime';
+import { createRunInJsFn, createRunInWishlistFn } from './WishlistJsRuntime';
 
 const OffsetComponent = '__offsetComponent';
 
@@ -100,11 +100,12 @@ function ComponentBase<T extends BaseItem>(
       },
       update: async (updateJob: UpdateJob<T>) => {
         return new Promise((resolve, _reject) => {
+          const resolveJs = createRunInJsFn(resolve);
           createRunInWishlistFn(() => {
             'worklet';
             // we have to do sth here to get rid of frozen objs
             // otherwise data can't be modified
-            data().update(updateJob, resolve);
+            data().update(updateJob, resolveJs);
           })();
         });
       },
