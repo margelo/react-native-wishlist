@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { createRunInJsFn, WishListInstance } from 'wishlist';
 import { ChatHeader } from './ChatHeader';
 import { ChatListView } from './ChatList';

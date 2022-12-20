@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-worklets/cpp/JsiWorkletContext.cpp b/node_modules/react-native-worklets/cpp/JsiWorkletContext.cpp
+index 854606d..979ac14 100644
+--- a/node_modules/react-native-worklets/cpp/JsiWorkletContext.cpp
++++ b/node_modules/react-native-worklets/cpp/JsiWorkletContext.cpp
+@@ -116,7 +116,7 @@ void JsiWorkletContext::addDecorator(
+     std::shared_ptr<JsiBaseDecorator> decorator) {
+   decorators.push_back(decorator);
+   // decorate default context
+-  JsiWorkletContext::getInstance()->decorate(decorator);
++  // JsiWorkletContext::getInstance()->decorate(decorator);
+ }
+ 
+ template <typename... Args> void JsiWorkletContext::decorate(Args &&...args) {
