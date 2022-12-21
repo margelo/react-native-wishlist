@@ -4,14 +4,14 @@
 #include <react/renderer/uimanager/UIManager.h>
 #include <react/renderer/uimanager/primitives.h>
 #include "WishlistJsRuntime.h"
+#import <chrono>
+#import <iostream>
 
 namespace Wishlist {
 
-struct
-
-    WishItem
-    WorkletItemProvider::provide(int index)
+WishItem WorkletItemProvider::provide(int index)
 {
+    auto start = std::chrono::high_resolution_clock::now();
   WishItem wishItem;
 
   auto &rt = WishlistJsRuntime::getInstance().getRuntime();
@@ -48,6 +48,9 @@ struct
   wishItem.height = sz.height;
   wishItem.index = index;
   wishItem.key = shadowNodeWrapper->key;
+    auto end = std::chrono::high_resolution_clock::now();
+    auto d = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "uuuuuuu inflate " << d.count() << std::endl;
   return wishItem;
 }
 

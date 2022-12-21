@@ -1,6 +1,10 @@
 #import "MGScrollViewOrchestrator.h"
 #include <set>
 #include "WishlistJsRuntime.h"
+#import <chrono>
+#import <iostream>
+#import <atomic>
+#import <memory>
 
 using namespace Wishlist;
 
@@ -25,6 +29,8 @@ using namespace Wishlist;
 
   id<MGScrollAnimation> _currentAnimation;
   std::string _wishlistId;
+    
+  std::shared_ptr<std::atomic<bool>> heavyWork;
 }
 
 - (instancetype)initWith:(UIScrollView *)scrollView
@@ -36,6 +42,8 @@ using namespace Wishlist;
               wishlistId:(std::string)wishlistId
 {
   if (self = [super init]) {
+      heavyWork = std::make_shared<std::atomic<bool>>(false);
+      
     _scrollView = scrollView;
     _wishlistId = wishlistId;
 
@@ -104,6 +112,7 @@ using namespace Wishlist;
 
 - (void)maybeRegisterForNextVSync
 {
+    [self startSomeBackgroundWork];
   if ([_displayLink isPaused]) {
     [_displayLink setPaused:NO];
   }
@@ -111,6 +120,7 @@ using namespace Wishlist;
 
 - (void)handleVSync:(CADisplayLink *)displayLink
 {
+    auto start = std::chrono::high_resolution_clock::now();
   CGFloat yDiff = 0;
   // Check Touch Events
   if (_touchEvents.count > 0) {
@@ -210,7 +220,12 @@ using namespace Wishlist;
   // pause Vsync listener if there is nothing to do
   if ([_touchEvents count] == 0 && _currentAnimation == nil && !_doWeHavePendingTemplates && !_needToSyncUpWithJS) {
     [_displayLink setPaused:YES];
+      [self endBackgroundWork];
   }
+    
+  auto end = std::chrono::high_resolution_clock::now();
+    auto d = std::chrono::duration_cast<std::chrono::microseconds>(end-start);
+    std::cout << "uuuu vsync took" << d.count() << " " << std::endl;
 }
 
 - (void)notifyAboutEvent:(PanEvent *)event
@@ -309,6 +324,30 @@ using namespace Wishlist;
   [self unregisterWishlistBinding];
   _scrollView = nil;
   [_displayLink invalidate];
+  [self endBackgroundWork];
+}
+
+- (void)startSomeBackgroundWork
+{
+    if (!(*heavyWork)) {
+        std::cout << "uuuu heavy work start" << std::endl;
+        *heavyWork = true;
+        std::thread thread([=]() {
+            int x = 3;
+            while (*heavyWork) {
+                x *= 4;
+                x %= 1235464;
+                
+            }
+        });
+        thread.detach();
+    }
+}
+
+- (void)endBackgroundWork
+{
+    (*heavyWork) = false;
+    std::cout << "uuuu heavy work end" << std::endl;
 }
 
 @end

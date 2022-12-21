@@ -7,6 +7,15 @@ import { ChatItem, fetchData, getSendedMessage } from './Data';
 import { MessageInput } from './MessageInput';
 import { ReactionPicker } from './ReactionPicker';
 
+/*setTimeout(() => {
+  let x = 4;
+  while (1) {
+    x *= 2;
+    x %= 12345687;
+    console.log('heavy work', x);
+  }
+}, 10000);*/
+
 export default function App() {
   const [data, setData] = useState<ChatItem[]>([]);
 

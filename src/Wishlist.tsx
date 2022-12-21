@@ -144,15 +144,6 @@ function ComponentBase<T extends BaseItem>(
         return undefined;
       }
 
-      console.log(
-        'returned',
-        value,
-        'for index',
-        index,
-        'data len',
-        data().length(),
-      );
-
       const item = pool.getComponent(value.type);
       if (!item) {
         return undefined;

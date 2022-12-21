@@ -80,7 +80,7 @@ const PressableView = createTemplateComponent(View, (item, props) => {
   const tag = item.getTag();
   item.addProps(props);
 
-  attachGestureHandler(tag);
+  //attachGestureHandler(tag);
 });
 
 export const Pressable = forwardRef<any, PressableProps>(

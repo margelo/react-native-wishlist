@@ -96,7 +96,6 @@ const maybeInit = () => {
               value, // rootValue
             );
           } else {
-            console.log('Inflator not found for id: ' + id);
             return undefined;
           }
         },
@@ -121,11 +120,10 @@ const maybeInit = () => {
           return item;
         },
         registerInflator: (id, inflateMethod) => {
-          console.log('InflatorRegistry::register', id);
+         
           registry.set(id, inflateMethod);
         },
         unregisterInflator: (id) => {
-          console.log('InflatorRegistry::unregister', id); // TODO(Szymon) It should be done on UI Thread as it may be still in use
           registry.delete(id);
           mappings.delete(id);
         },
@@ -135,13 +133,6 @@ const maybeInit = () => {
           templateType: string,
           inflateMethod: MappingInflateMethod,
         ) => {
-          console.log(
-            'InflatorRegistry::registerMapping',
-            inflatorId,
-            nativeId,
-            templateType,
-            inflateMethod,
-          );
           const mapping = mappings.get(inflatorId) ?? new Map();
           const innerMapping = mapping.get(templateType) ?? new Map();
           innerMapping.set(nativeId, inflateMethod);
@@ -165,8 +156,6 @@ const maybeInit = () => {
         },
       };
       global.InflatorRegistry = InflatorRegistry;
-
-      console.log('InflatorRegister initialized');
     })();
   }
 };
