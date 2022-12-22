@@ -8,7 +8,7 @@ import { MessageInput } from './MessageInput';
 import { ReactionPicker } from './ReactionPicker';
 
 export default function App() {
-  const [data, setData] = useState<ChatItem[]>([]);
+  const [data, setData] = useState<ChatItem[]>(fetchData(200));
 
   const listRef = useRef<WishListInstance<ChatItem> | null>(null);
 
