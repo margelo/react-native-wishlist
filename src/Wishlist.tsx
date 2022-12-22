@@ -2,6 +2,7 @@ import React, {
   createContext,
   Ref,
   useContext,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -27,8 +28,8 @@ import NativeWishList, {
 import { TemplateContext } from './TemplateContext';
 import { generateId } from './Utils';
 import { useWishlistContext, WishlistContext } from './WishlistContext';
-import { UpdateJob, useInternalWishlistData } from './WishlistData';
-import { createRunInJsFn, createRunInWishlistFn } from './WishlistJsRuntime';
+import type { WishlistData, WishlistDataInternal } from './WishlistData';
+import { createRunInWishlistFn } from './WishlistJsRuntime';
 
 const OffsetComponent = '__offsetComponent';
 
@@ -53,24 +54,23 @@ function getTemplatesFromChildren(children: React.ReactNode, width: number) {
   return nextTemplates;
 }
 
-export type WishListInstance<T extends BaseItem> = {
+export type WishListInstance = {
   scrollToItem: (index: number, animated?: boolean) => void;
   scrollToTop: () => void;
-  update: (updateJob: UpdateJob<T>) => Promise<unknown>;
 };
 
 export type BaseItem = { type: string; key: string };
 
 type Props<ItemT extends BaseItem> = ViewProps & {
-  initialData: ItemT[];
+  data: () => WishlistData<ItemT>;
   onStartReached?: () => void;
   onEndReached?: () => void;
   initialIndex?: number;
 };
 
 function ComponentBase<T extends BaseItem>(
-  { children, style, initialData, ...rest }: Props<T>,
-  ref: React.Ref<WishListInstance<T>>,
+  { children, style, data, ...rest }: Props<T>,
+  ref: React.Ref<WishListInstance>,
 ) {
   const nativeWishlist = useRef(null); // TODO type it properly
   const wishlistId = useRef<string | null>(null);
@@ -78,11 +78,11 @@ function ComponentBase<T extends BaseItem>(
     wishlistId.current = generateId();
   }
 
-  const data = useInternalWishlistData<T>(wishlistId.current, initialData);
+  console.log('render', wishlistId.current);
 
   useImperativeHandle(
     ref,
-    (): WishListInstance<T> => ({
+    (): WishListInstance => ({
       scrollToItem: (index: number, animated?: boolean) => {
         if (nativeWishlist.current != null) {
           console.log('scrollTo', index);
@@ -97,17 +97,6 @@ function ComponentBase<T extends BaseItem>(
         if (nativeWishlist.current != null) {
           WishlistCommands.scrollToItem(nativeWishlist.current, 0, true);
         }
-      },
-      update: async (updateJob: UpdateJob<T>) => {
-        return new Promise((resolve, _reject) => {
-          const resolveJs = createRunInJsFn(resolve);
-          createRunInWishlistFn(() => {
-            'worklet';
-            // we have to do sth here to get rid of frozen objs
-            // otherwise data can't be modified
-            data().update(updateJob, resolveJs);
-          })();
-        });
       },
     }),
   );
@@ -144,15 +133,6 @@ function ComponentBase<T extends BaseItem>(
         return undefined;
       }
 
-      console.log(
-        'returned',
-        value,
-        'for index',
-        index,
-        'data len',
-        data().length(),
-      );
-
       const item = pool.getComponent(value.type);
       if (!item) {
         return undefined;
@@ -185,6 +165,22 @@ function ComponentBase<T extends BaseItem>(
     }
     return inflatorIdRef.current!;
   }, [resolvedInflater]);
+
+  useEffect(() => {
+    createRunInWishlistFn(() => {
+      'worklet';
+
+      (data() as WishlistDataInternal<T>).__attach(wishlistId.current!);
+    })();
+
+    return () => {
+      createRunInWishlistFn(() => {
+        'worklet';
+
+        (data() as WishlistDataInternal<T>).__detach(wishlistId.current!);
+      })();
+    };
+  }, [data]);
 
   const wishlistContext = useMemo(
     () => ({
@@ -228,7 +224,7 @@ function ComponentBase<T extends BaseItem>(
 
 const Component = React.forwardRef(
   ComponentBase as <T extends BaseItem>(
-    props: Props<T> & { ref?: Ref<WishListInstance<T>> },
+    props: Props<T> & { ref?: Ref<WishListInstance> },
   ) => ReturnType<typeof ComponentBase>,
 );
 
