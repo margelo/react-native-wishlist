@@ -25,5 +25,6 @@ MGTemplateContainerComponentProps::MGTemplateContainerComponentProps(
     inflatorId(convertRawProp(context, rawProps, "inflatorId", sourceProps.inflatorId, {}))
       {}
 
+
 } // namespace react
 } // namespace facebook

@@ -34,10 +34,11 @@ MGTemplateContainerComponentShadowNode::MGTemplateContainerComponentShadowNode(
 
 void MGTemplateContainerComponentShadowNode::appendChild(ShadowNode::Shared const &childNode) {
    this->templates.push_back(childNode);
-   auto props = std::dynamic_pointer_cast<const MGTemplateContainerComponentProps>(this->getProps());
+   std::shared_ptr<const MGTemplateContainerComponentProps> props = std::dynamic_pointer_cast<const MGTemplateContainerComponentProps>(this->getProps());
    if (props->names.size() == this->templates.size()) { // last Child
        PropsParserContext propsParserContext{getSurfaceId(), *this->getComponentDescriptor().getContextContainer().get()};
-       std::shared_ptr<MGTemplateContainerComponentProps> newProps = this->getComponentDescriptor().cloneProps(propsParserContext, props, {});
+       auto rawProps = RawProps();
+       auto newProps = std::make_shared<MGTemplateContainerComponentProps>(propsParserContext, *props, rawProps);
        newProps->templates = templates;
        props_ = newProps;
    }
