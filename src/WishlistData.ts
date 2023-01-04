@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { useOnFlushCallback, useScheduleSyncUp } from './OrchestratorBinding';
 import { useWishlistContext } from './WishlistContext';
-import { createRunInJsFn } from './WishlistJsRuntime';
 
 export type Item = {
   key: string;
@@ -148,9 +147,7 @@ export function useInternalWishlistData<T extends Item>(
           updateJob(__nextCopy);
           pendingUpdates.push((dataCopy: DataCopy<T>) => {
             const result = updateJob(dataCopy);
-            if (callback) {
-              createRunInJsFn(callback)(result);
-            }
+            callback?.(result);
           });
           scheduleSyncUp();
         }

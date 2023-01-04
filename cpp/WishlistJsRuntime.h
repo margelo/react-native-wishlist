@@ -11,7 +11,7 @@ using namespace facebook;
 
 namespace Wishlist {
 
-class WishlistJsRuntime : RNWorklet::JsiBaseDecorator {
+class WishlistJsRuntime {
  public:
   static WishlistJsRuntime &getInstance();
 
@@ -22,12 +22,15 @@ class WishlistJsRuntime : RNWorklet::JsiBaseDecorator {
 
   jsi::Runtime &getRuntime() const;
 
+
  private:
   WishlistJsRuntime();
   WishlistJsRuntime(const WishlistJsRuntime &) = delete;
   WishlistJsRuntime &operator=(const WishlistJsRuntime &) = delete;
-
-  void decorateRuntime(jsi::Runtime &rt) override;
+  
+  class Decorator : public RNWorklet::JsiBaseDecorator {
+    void decorateRuntime(jsi::Runtime &runtime) override;
+  };
 
   std::shared_ptr<RNWorklet::JsiWorkletContext> workletContext_;
 };
