@@ -15,11 +15,19 @@ export function AssetListSeparator({
 }: AssetListSeparatorProps) {
   return (
     <View style={styles.container}>
-      <Button
-        active={false}
-        text={isExpanded ? 'Less' : 'More'}
-        onPress={onExpand}
-      />
+      {isEditing ? (
+        <View style={styles.buttonGroup}>
+          <Button disabled text="Pin" active={false} onPress={onExpand} />
+          <View style={styles.margin} />
+          <Button disabled text="Hide" active={false} onPress={onExpand} />
+        </View>
+      ) : (
+        <Button
+          active={false}
+          text={isExpanded ? 'Less ᐱ' : 'More ᐯ'}
+          onPress={onExpand}
+        />
+      )}
 
       {/* TODO: Replace with IF */}
       {isExpanded && (
@@ -53,5 +61,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 0.4,
     textAlign: 'right',
+  },
+  buttonGroup: {
+    flexDirection: 'row',
+  },
+  margin: {
+    width: 8,
   },
 });

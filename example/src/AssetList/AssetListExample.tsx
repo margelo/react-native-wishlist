@@ -8,7 +8,7 @@ import { AssetListSeparator } from './AssetListSeparator';
 
 import data, { AssetItemType } from './assets';
 import { Header } from './Header';
-type WithType<TType extends String, T> = { type: TType } & T;
+type WithType<TType extends String, T> = T & { type: TType };
 
 type AssetListItemType = WithType<'asset', AssetItemType>;
 
@@ -23,7 +23,7 @@ type ListItemsType =
   | { type: 'asset-list-header' };
 
 export const AssetListExample: React.FC<{}> = () => {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(true);
   // Change this line to false show less by default
   const [isExpanded, setIsExpanded] = useState(true);
 
@@ -37,7 +37,7 @@ export const AssetListExample: React.FC<{}> = () => {
   }, []);
 
   const list = useMemo<ListItemsType[]>(() => {
-    const arr = [{ type: 'asset-list-header' }].concat(tokens);
+    const arr: ListItemsType[] = [{ type: 'asset-list-header' }].concat(tokens);
 
     const topItems: ListItemsType[] = arr
       .slice(0, 6)
@@ -72,7 +72,7 @@ export const AssetListExample: React.FC<{}> = () => {
           />
         </WishList.Template>
         <WishList.Template type="asset">
-          <AssetItem />
+          <AssetItem isEditing={isEditing} />
         </WishList.Template>
       </WishList.Component>
     </View>
