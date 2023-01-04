@@ -59,7 +59,10 @@ public:
     }
     
     void realAppendChild(ShadowNode::Shared const &childNode) {
-        ConcreteViewShadowNode::appendChild(childNode);
+      if(childNode == nullptr) {
+        return;
+      }
+      ConcreteViewShadowNode::appendChild(childNode);
     }
     
     void appendChild(ShadowNode::Shared const &childNode) {
