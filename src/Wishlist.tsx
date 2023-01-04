@@ -16,6 +16,7 @@ import { WishlistImage } from './Components/WishlistImage';
 import { WishlistText } from './Components/WishlistText';
 import { WishlistView } from './Components/WishlistView';
 import { initEventHandler } from './EventHandler';
+import { useInternalWishlistData } from './WishlistData';
 import InflatorRepository, {
   ComponentPool,
   InflateMethod,
@@ -81,7 +82,12 @@ const Component = forwardRef(
     ref: React.Ref<WishListInstance>,
   ) => {
     const nativeWishlist = useRef(null); // TODO type it properly
-    const data = useInternalWishlistData(wishlistId, initialData);
+    const wishlistId = useRef<string | null>(null);
+    if (!wishlistId.current) {
+      wishlistId.current = generateId();
+    }
+
+    const data = useInternalWishlistData(wishlistId.current, initialData);
 
     useImperativeHandle(
       ref,
@@ -103,7 +109,7 @@ const Component = forwardRef(
         update: (worklet: any /* TODO type properly */) => {
           runOnUI()(
             'worklet';
-            data.registerUpdate(worklet);
+            data().registerUpdate(worklet);
           );
         }
       }),
@@ -136,7 +142,7 @@ const Component = forwardRef(
     const resolvedInflater: InflateMethod = useMemo(() => {
       return (index: number, pool: ComponentPool) => {
         'worklet';
-        const value = data.at(index);
+        const value = data().at(index);
         if (!value) {
           return undefined;
         }
@@ -173,12 +179,6 @@ const Component = forwardRef(
       }
       return inflatorIdRef.current!;
     }, [resolvedInflater]);
-
-    const wishlistId = useRef<string | null>(null);
-    if (!wishlistId.current) {
-      wishlistId.current = generateId();
-    }
-
     
     const wishlistContext = useMemo(
       () => ({
