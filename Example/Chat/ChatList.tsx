@@ -33,28 +33,28 @@ export const ChatListView: React.FC<Props> = ({data, onLikeItem, style}) => {
         return data[index];
       }}>
       <WishList.Mapping
-        mappingKey="content"
+        nativeId="content"
         onResolve={(value: any, item: any) => {
           'worklet';
           item.RawText.addProps({text: value.message});
         }}
       />
       <WishList.Mapping
-        mappingKey="author"
+        nativeId="author"
         onResolve={(value: any, item: any) => {
           'worklet';
           item.RawText.addProps({text: value.author});
         }}
       />
       <WishList.Mapping
-        mappingKey="avatar"
+        nativeId="avatar"
         onResolve={(value: any, item: any) => {
           'worklet';
           item.addProps({source: {uri: value.avatarUrl}});
         }}
       />
       <WishList.Mapping
-        mappingKey="likes"
+        nativeId="likes"
         templateType="other"
         onResolve={(value: any, item: any) => {
           'worklet';
@@ -65,7 +65,7 @@ export const ChatListView: React.FC<Props> = ({data, onLikeItem, style}) => {
         }}
       />
       <WishList.Mapping
-        mappingKey="likeButton"
+        nativeId="likeButton"
         templateType="other"
         onResolve={(value: any, item: any) => {
           'worklet';

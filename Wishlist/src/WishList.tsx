@@ -172,7 +172,7 @@ const Template: React.FC<TemplateProps> = ({ children }) => {
 };
 
 type MappingProps = {
-  mappingKey: string;
+  nativeId: string;
   templateType?: string;
   onResolve: (value: any, item: any) => any;
 };
