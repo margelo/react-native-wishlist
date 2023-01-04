@@ -33,7 +33,6 @@ RCT_EXPORT_METHOD(registerInterceptor)
 
 RCT_EXPORT_MODULE(MGWishListComponentManager)
 
-RCT_CUSTOM_VIEW_PROPERTY(names, NSArray<NSString*>* , UIView){}
 RCT_CUSTOM_VIEW_PROPERTY(inflatorId, NSString* , UIView){}
 
 - (UIView *)view
@@ -48,6 +47,9 @@ RCT_CUSTOM_VIEW_PROPERTY(inflatorId, NSString* , UIView){}
 RCT_EXPORT_MODULE(MGNativeTemplateContainerManager)
 
 RCT_CUSTOM_VIEW_PROPERTY(inflatorId, NSString* , UIView){}
+
+
+RCT_CUSTOM_VIEW_PROPERTY(names, NSArray<NSString*>* , UIView){}
 
 - (UIView *)view
 {

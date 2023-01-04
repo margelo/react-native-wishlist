@@ -1,16 +1,18 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import { View, Dimensions } from "react-native";
 import NativeWishList from "./NativeViews/NativeWishlistComponent";
-import NativeTemplateContainer from "./NativeViews/NativeTemplateContainer";
-import NativeTemplateInterceptor from "./NativeViews/NativeTemplateInterceptor";
-import InflatorRepository from "./InflatorRepository";
-import { initEventHandler } from "./EventHandler";
+//import NativeTemplateContainer from "./NativeViews/NativeTemplateContainer";
+//import NativeTemplateInterceptor from "./NativeViews/NativeTemplateInterceptor";
+//import InflatorRepository from "./InflatorRepository";
+//import { initEventHandler } from "./EventHandler";
 
-const TemplateContainer = React.memo(NativeTemplateContainer);
-const SCREEN_WIDTH = Dimensions.get("window").width;
+const we = NativeWishList;
+
+//const TemplateContainer = React.memo(NativeTemplateContainer);
+//const SCREEN_WIDTH = Dimensions.get("window").width;
 
 function Component(props) {
-  const componentsRegistry = useMemo(() => {
+  /*const componentsRegistry = useMemo(() => {
     const retVal = new Map<string, React.ReactElement>();
     retVal.set(
       "__offsetComponent",
@@ -64,9 +66,10 @@ function Component(props) {
   }, [children]);
 
   const keys = Array.from(componentsRegistry.keys());
-
+ */
   return (
-    <NativeTemplateInterceptor inflatorId={inflatorId.current} style={{flex:1}} collapsable={false} removeClippedSubviews={false}>
+    <View>
+    { /*<NativeTemplateInterceptor inflatorId={inflatorId.current} style={{flex:1}} collapsable={false} removeClippedSubviews={false}>
       <NativeWishList
         {...props}
         removeClippedSubviews={false}
@@ -78,7 +81,9 @@ function Component(props) {
           <View key={keys[i]}>{c}</View>
         ))}
       <TemplateContainer/>
-    </NativeTemplateInterceptor>
+      </NativeTemplateInterceptor>*/ }
+      
+      </View>  
   );
 }
 type TemplateProps = {
