@@ -91,6 +91,9 @@ const Component = forwardRef(
             WishlistCommands.scrollToItem(nativeWishlist.current, 0, true);
           }
         },
+        update: () => {
+          
+        }
       }),
     );
 
@@ -188,10 +191,14 @@ const Component = forwardRef(
     if (!wishlistId.current) {
       wishlistId.current = generateId();
     }
+
+    const data = useInternalWishlistData();
+
     const wishlistContext = useMemo(
       () => ({
         id: wishlistId.current!,
         inflatorId,
+        data, 
       }),
       [inflatorId],
     );
