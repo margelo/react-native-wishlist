@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { useWorkletCallback } from 'react-native-reanimated';
+import { Alert, StyleSheet, View } from 'react-native';
+import { runOnJS, useWorkletCallback } from 'react-native-reanimated';
 import { WishList } from 'wishlist';
 import { AssetItem } from './AssetItem';
 import { AssetListHeader } from './AssetListHeader';
@@ -17,39 +17,101 @@ const tokens: AssetListItemType[] = data.map((item) => ({
   type: 'asset',
 }));
 
+type AssetListState = {
+  isEditing: boolean;
+  isSelected: boolean;
+  isExpanded: boolean;
+};
+
+export type AssetListItemWithState = AssetListItemType & AssetListState;
+
+export type AssetListSeparatorWithState = {
+  type: 'asset-list-separator';
+} & AssetListState;
+
 type ListItemsType =
-  | AssetListItemType
-  | { type: 'asset-list-separator' }
-  | { type: 'asset-list-header' };
+  | AssetListItemWithState
+  | AssetListSeparatorWithState
+  | ({ type: 'asset-list-header' } & AssetListState);
 
 export const AssetListExample: React.FC<{}> = () => {
-  const [isEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   // Change this line to false show less by default
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
-  // const handleEdit = useCallback(() => {
-  //   setIsEditing((v) => !v);
-  // }, []);
+  const handleEdit = useCallback(() => {
+    setIsEditing((v) => !v);
+  }, []);
 
   const handleExpand = useCallback(() => {
     setIsExpanded((v) => !v);
   }, []);
 
-  const list = useMemo<ListItemsType[]>(() => {
-    const arr = [{ type: 'asset-list-header' }].concat(tokens);
+  const [data, setData] = useState<ListItemsType[]>(tokens as ListItemsType[]);
 
+  const list = useMemo<ListItemsType[]>(() => {
+    const arr = [{ type: 'asset-list-header', isExpanded }].concat(data);
+
+    // @ts-expect-error
     const topItems = arr
       .slice(0, 6)
-      .concat({ type: 'asset-list-separator' }) as ListItemsType[];
+      .concat({
+        type: 'asset-list-separator',
+      })
+      .map((item) => ({
+        ...item,
+        isEditing,
+        isExpanded,
+      })) as ListItemsType[];
 
     if (!isExpanded) {
       return topItems;
     }
 
-    return topItems.concat(arr.slice(6, arr.length) as ListItemsType[]);
-  }, [isExpanded]);
+    return topItems.concat(
+      arr.slice(6, arr.length).map((item) => ({
+        ...item,
+        isEditing,
+        isExpanded,
+      })) as ListItemsType[],
+    );
+  }, [data, isExpanded, isEditing]);
 
   const onItemNeeded = useWorkletCallback((index) => list[index], [list]);
+
+  const handleExpandWorklet = useWorkletCallback(() => {
+    runOnJS(handleExpand)();
+  }, []);
+
+  const handleEditWorklet = useWorkletCallback(() => {
+    runOnJS(handleEdit)();
+  }, []);
+
+  const showItemAlert = (address: string) => {
+    Alert.alert(address);
+  };
+
+  const toggleSelectedItem = (item: ListItemsType) => {
+    setData((items) =>
+      items.map((i) =>
+        // @ts-expect-error
+        i.id === item.id
+          ? {
+              ...i,
+              isSelected: !item.isSelected,
+            }
+          : i,
+      ),
+    );
+  };
+
+  const handleItemPress = useWorkletCallback((item: AssetListItemWithState) => {
+    if (item.isEditing) {
+      runOnJS(toggleSelectedItem)(item);
+    } else {
+      runOnJS(showItemAlert)(item.address!);
+    }
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -65,13 +127,12 @@ export const AssetListExample: React.FC<{}> = () => {
         </WishList.Template>
         <WishList.Template type="asset-list-separator">
           <AssetListSeparator
-            isEditing={isEditing}
-            onExpand={handleExpand}
-            isExpanded={isExpanded}
+            onEdit={handleEditWorklet}
+            onExpand={handleExpandWorklet}
           />
         </WishList.Template>
         <WishList.Template type="asset">
-          <AssetItem isEditing={isEditing} />
+          <AssetItem onItemPress={handleItemPress} />
         </WishList.Template>
       </WishList.Component>
     </View>
