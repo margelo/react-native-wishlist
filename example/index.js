@@ -1,5 +1,6 @@
 import { AppRegistry } from 'react-native';
-import App from './src/App';
+// import Chat from './src/Chat/ChatExample';
+import { AssetListExample } from './src/AssetList/AssetListExample';
 import { name as appName } from './app.json';
 
-AppRegistry.registerComponent(appName, () => App);
+AppRegistry.registerComponent(appName, () => AssetListExample);
