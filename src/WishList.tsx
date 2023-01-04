@@ -31,6 +31,7 @@ import NativeWishList, {
 import { TemplateContext } from './TemplateContext';
 import { WishListContext } from './WishListContext';
 import { IF } from './IF';
+import { Switch, Case } from './Switch';
 
 const OffsetComponent = '__offsetComponent';
 let InflatorId = 1000;
@@ -356,6 +357,8 @@ export const WishList = {
   }),
 
   IF,
+  Switch,
+  Case,
 
   /**
    * TODO(Szymon) It's just a prototype we have to think about matching new and old children
