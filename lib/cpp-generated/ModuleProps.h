@@ -11,6 +11,7 @@
 
 #include <react/renderer/components/view/ViewProps.h>
 #include <react/renderer/core/PropsParserContext.h>
+#include <vector>
 
 namespace facebook {
 namespace react {
@@ -22,7 +23,7 @@ class ModuleProps final : public ViewProps {
 
 #pragma mark - Props
 
-  
+  std::vector<std::string> names{};
 };
 
 } // namespace react

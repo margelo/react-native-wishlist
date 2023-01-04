@@ -86,6 +86,7 @@ export type Int = Int32;
 export type Void = void;
 
 export type ModuleProps = Readonly<ViewProps & {
+  names: ReadonlyArray<string>;
   onBubblingEventDefinedInline: BubblingEventHandler<EventInFile>;
   onBubblingEventDefinedInlineWithPaperName: BubblingEventHandler<EventInFile, 'paperBubblingEventDefinedInlineWithPaperName'>;
   onDirectEventDefinedInline: DirectEventHandler<EventInFile>;
