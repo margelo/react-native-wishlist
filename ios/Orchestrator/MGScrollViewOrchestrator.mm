@@ -1,4 +1,5 @@
 #import "MGScrollViewOrchestrator.h"
+#include <set>
 
 @implementation MGScrollViewOrchestrator {
   UIScrollView *_scrollView;
@@ -17,8 +18,10 @@
   // ViewportObserer
   std::shared_ptr<ViewportObserver> _viewportObserver;
   std::string _inflatorId;
+  std::set<std::string> dirtyItems;
 
   id<MGScrollAnimation> _currentAnimation;
+  std::string _wishlistId;
 }
 
 - (instancetype)initWith:(UIScrollView *)scrollView
@@ -27,9 +30,13 @@
         viewportObserver:(std::shared_ptr<ViewportObserver>)vo
               inflatorId:(std::string)inflatorId
             initialIndex:(int)initialIndex
+              wishlistId:(std::string)wishlistId
 {
   if (self = [super init]) {
     _scrollView = scrollView;
+    _wishlistId = wishlistId;
+
+    [self registerWishlistBinding];
 
     _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(handleVSync:)];
     [_displayLink addToRunLoop:NSRunLoop.currentRunLoop forMode:NSDefaultRunLoopMode];
@@ -52,8 +59,43 @@
     _doWeHaveOngoingEvent = NO;
     _inflatorId = inflatorId;
     _touchEvents = [NSMutableArray new];
+
+    [self adjustOffsetIfInitialValueIsCloseToEnd];
   }
   return self;
+}
+
+// when someone sets initial element to last element we need to correct an offset
+// because otherwise we will only display first element
+- (void)adjustOffsetIfInitialValueIsCloseToEnd
+{
+  CGFloat topElementY = _viewportObserver->window[0].offset;
+  CGFloat bottomElementY = _viewportObserver->window.back().offset;
+
+  CGFloat topViewportEdge = _scrollView.contentOffset.y;
+  CGFloat bottomViewPortEdge = topViewportEdge + _scrollView.frame.size.height;
+
+  if (bottomElementY < bottomViewPortEdge) {
+    CGFloat diff = bottomElementY - bottomViewPortEdge;
+    CGPoint oldOffset = _scrollView.contentOffset;
+
+    _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + diff);
+    bottomViewPortEdge += diff;
+    topViewportEdge += diff;
+  }
+
+  // topElementY > topViewPortEdge (top overscroll)
+  if (topElementY > topViewportEdge) {
+    CGFloat diff = topElementY - topViewportEdge;
+    CGPoint oldOffset = _scrollView.contentOffset;
+
+    _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + diff);
+    bottomViewPortEdge += diff;
+    topViewportEdge += diff;
+    _currentAnimation = nil;
+
+    _viewportObserver->reactToOffsetChange(_scrollView.contentOffset.y);
+  }
 }
 
 - (void)maybeRegisterForNextVSync
@@ -102,6 +144,13 @@
   if (yDiff != 0) {
     CGPoint oldOffset = _scrollView.contentOffset;
     _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y - yDiff);
+  }
+
+  // rerender dirty items
+  if (!dirtyItems.empty()) {
+    std::set<std::string> localDirtyItems;
+    localDirtyItems.swap(dirtyItems);
+    _viewportObserver->rerenderDirtyItems(std::move(localDirtyItems));
   }
 
   // update teamplates if needed
@@ -156,7 +205,7 @@
   }
 
   // pause Vsync listener if there is nothing to do
-  if ([_touchEvents count] == 0 && _currentAnimation == nil && !_doWeHavePendingTemplates) {
+  if ([_touchEvents count] == 0 && _currentAnimation == nil && !_doWeHavePendingTemplates && dirtyItems.empty()) {
     [_displayLink setPaused:YES];
   }
 }
@@ -190,8 +239,61 @@
   [self maybeRegisterForNextVSync];
 }
 
+- (void)markItemsDirty:(std::vector<std::string>)items
+{
+  for (auto &key : items) {
+    dirtyItems.insert(key);
+  }
+  [self maybeRegisterForNextVSync];
+}
+
+- (void)registerWishlistBinding
+{
+  jsi::Runtime &rt = *ReanimatedRuntimeHandler::rtPtr;
+  jsi::Object global = rt.global().getPropertyAsObject(rt, "global");
+  if (!global.hasProperty(rt, "wishlists")) {
+    global.setProperty(rt, "wishlists", jsi::Object(rt));
+  }
+
+  jsi::Object wishlists = global.getPropertyAsObject(rt, "wishlists");
+
+  jsi::Object binding(rt);
+  __weak MGScrollViewOrchestrator *weakSelf = self;
+  binding.setProperty(
+      rt,
+      "markItemsDirty",
+      jsi::Function::createFromHostFunction(
+          rt,
+          jsi::PropNameID::forAscii(rt, "markItemsDirty"),
+          1,
+          [=](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) -> jsi::Value {
+            jsi::Array arr = args[0].getObject(rt).getArray(rt);
+
+            std::vector<std::string> keys;
+
+            for (int i = 0; i < arr.size(rt); ++i) {
+              keys.push_back(arr.getValueAtIndex(rt, i).asString(rt).utf8(rt));
+            }
+
+            [weakSelf markItemsDirty:keys];
+            return jsi::Value::undefined();
+          }));
+
+  wishlists.setProperty(rt, _wishlistId.c_str(), binding);
+  NSLog(@"registered binding for wishlistId: %@", [NSString stringWithUTF8String:_wishlistId.c_str()]);
+}
+
+- (void)unregisterWishlistBinding
+{
+  jsi::Runtime &rt = *ReanimatedRuntimeHandler::rtPtr;
+  jsi::Object global = rt.global().getPropertyAsObject(rt, "global");
+  jsi::Object wishlists = global.getPropertyAsObject(rt, "wishlists");
+  wishlists.setProperty(rt, _wishlistId.c_str(), jsi::Value::undefined());
+}
+
 - (void)dealloc
 {
+  [self unregisterWishlistBinding];
   _scrollView = nil;
   [_displayLink invalidate];
 }

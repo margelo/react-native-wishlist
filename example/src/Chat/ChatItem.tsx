@@ -2,13 +2,13 @@ import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { useWorkletCallback } from 'react-native-reanimated';
 import { useTemplateValue, WishList, WishList as Wishlist } from 'wishlist';
+import { useMarkItemsDirty } from 'wishlist';
 import type { ChatItem, ReactionItem } from './Data';
 
 const addReaction = require('./assets/add_reaction.png');
 
 interface Props {
   type: 'me' | 'other';
-  onLikeItem: (item: ChatItem) => void;
   onAddReaction: (item: ChatItem) => void;
 }
 
@@ -18,7 +18,7 @@ type ReactionItemCombined = ReactionItem & {
 
 export const Reaction = () => {
   const emoji = useTemplateValue((item: ReactionItemCombined) => {
-    return item.emoji || 'b';
+    return item.emoji;
   });
 
   const count = useTemplateValue((item: ReactionItemCombined) => {
@@ -59,20 +59,30 @@ export const AddReaction = ({
   );
 };
 
-export const ChatItemView: React.FC<Props> = ({
-  type,
-  onLikeItem,
-  onAddReaction,
-}) => {
+export const ChatItemView: React.FC<Props> = ({ type, onAddReaction }) => {
   const author = useTemplateValue((item: ChatItem) => item.author);
   const avatarUrl = useTemplateValue((item: ChatItem) => item.avatarUrl);
   const message = useTemplateValue((item: ChatItem) => item.message);
-  const likeText = useTemplateValue((item: ChatItem) =>
-    item.likes > 0 ? '♥️' : '🖤',
-  );
-  const likeOpacity = useTemplateValue((item: ChatItem) =>
-    item.likes > 0 ? 1 : 0.4,
-  );
+  const likeText = useTemplateValue((item: ChatItem) => {
+    if (global.liked == null) {
+      global.liked = {};
+    }
+    if (global.liked[item.key]) {
+      return '♥️';
+    } else {
+      return '🖤';
+    }
+  });
+  const likeOpacity = useTemplateValue((item: ChatItem) => {
+    if (global.liked == null) {
+      global.liked = {};
+    }
+    if (global.liked[item.key]) {
+      return 1;
+    } else {
+      return 0.4;
+    }
+  });
 
   const reactions = useTemplateValue((item: ChatItem) => {
     const obj = item.reactions.reduce((acc, i) => {
@@ -88,6 +98,14 @@ export const ChatItemView: React.FC<Props> = ({
     return Object.values(obj);
   });
 
+  const mark = useMarkItemsDirty();
+
+  const likeItemListener = useWorkletCallback((value) => {
+    // eslint-disable-next-line eqeqeq
+    global.liked[value.key] = !(global.liked[value.key] == true);
+    mark([value.key]);
+  }, []);
+
   return (
     <View style={[styles.container, type === 'me' ? styles.me : styles.other]}>
       <View style={styles.imageAndAuthor}>
@@ -98,7 +116,7 @@ export const ChatItemView: React.FC<Props> = ({
         <View style={styles.authorContainer}>
           <Wishlist.Text style={styles.authorText}>{author}</Wishlist.Text>
           {type === 'other' ? (
-            <WishList.Pressable onPress={onLikeItem}>
+            <WishList.Pressable onPress={likeItemListener}>
               <Wishlist.Text style={{ opacity: likeOpacity }}>
                 {likeText}
               </Wishlist.Text>

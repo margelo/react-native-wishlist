@@ -31,11 +31,13 @@ import NativeWishList, {
 } from './NativeViews/WishlistNativeComponent';
 import { TemplateContext } from './TemplateContext';
 import { WishListContext } from './WishListContext';
+import { WishlistIDContext, useWishlistId } from './WishlistIdContext';
 import { IF } from './IF';
 import { Switch, Case } from './Switch';
 
 const OffsetComponent = '__offsetComponent';
 let InflatorId = 1000;
+let wishCtr = 0;
 
 type Mapping = {
   templateType?: string;
@@ -190,6 +192,13 @@ const Component = forwardRef(
           return undefined;
         }
 
+        if (value.key == undefined) {
+          throw new Error('Every data cell has to contain unique key prop!');
+        }
+        // We set the key of the item here so that
+        // viewportObserver knows what's the key and is able to rerender it later on
+        item.key = value.key;
+
         const rootValue = value; // TODO(terry): use proxy for this
 
         Object.keys(mappingRef.current!).forEach((key) => {
@@ -246,34 +255,41 @@ const Component = forwardRef(
       [inflatorId],
     );
 
-    return (
-      <WishListContext.Provider value={mappingContext}>
-        <TemplatesRegistryContext.Provider value={templatesRegistry}>
-          <>
-            {/* Prerender templates to register all the nested templates */}
-            <View style={styles.noDisplay}>
-              {Object.keys(childrenTemplates).map((c) => (
-                <View key={c + 'prerender'}>
-                  <TemplateContext.Provider
-                    value={{ templateType: c, renderChildren: true }}
-                  >
-                    {childrenTemplates[c]}
-                  </TemplateContext.Provider>
-                </View>
-              ))}
-            </View>
+    const wishlistId = useRef<{ id: string } | null>(null);
+    if (!wishlistId.current) {
+      wishlistId.current = { id: `ID#${wishCtr++}` };
+    }
 
-            <InnerComponent
-              inflatorId={inflatorId}
-              style={style}
-              nativeWishlist={nativeWishlist}
-              rest={rest}
-              templates={childrenTemplates}
-              nestedTemplates={templatesRegistry.templates}
-            />
-          </>
-        </TemplatesRegistryContext.Provider>
-      </WishListContext.Provider>
+    return (
+      <WishlistIDContext.Provider value={wishlistId.current}>
+        <WishListContext.Provider value={mappingContext}>
+          <TemplatesRegistryContext.Provider value={templatesRegistry}>
+            <>
+              {/* Prerender templates to register all the nested templates */}
+              <View style={styles.noDisplay}>
+                {Object.keys(childrenTemplates).map((c) => (
+                  <View key={c + 'prerender'}>
+                    <TemplateContext.Provider
+                      value={{ templateType: c, renderChildren: true }}
+                    >
+                      {childrenTemplates[c]}
+                    </TemplateContext.Provider>
+                  </View>
+                ))}
+              </View>
+
+              <InnerComponent
+                inflatorId={inflatorId}
+                style={style}
+                nativeWishlist={nativeWishlist}
+                rest={rest}
+                templates={childrenTemplates}
+                nestedTemplates={templatesRegistry.templates}
+              />
+            </>
+          </TemplatesRegistryContext.Provider>
+        </WishListContext.Provider>
+      </WishlistIDContext.Provider>
     );
   },
 );
@@ -295,6 +311,10 @@ function InnerComponent({
   nestedTemplates,
 }: InnerComponentProps) {
   const combinedTemplates = { ...templates, ...nestedTemplates };
+
+  const wishlistId = useWishlistId();
+
+  console.log('wishlistIDDD js', wishlistId);
 
   const keys = Object.keys(combinedTemplates);
   // console.log('@@@ Render WishList', inflatorId, keys.join(', '));
@@ -319,6 +339,7 @@ function InnerComponent({
       <NativeTemplateContainer
         names={keys}
         inflatorId={inflatorId}
+        wishlistId={wishlistId}
         key={Math.random().toString()}
         collapsable={false}
       >

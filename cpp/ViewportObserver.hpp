@@ -5,6 +5,7 @@
 #include "ItemProvider.hpp"
 #include <deque>
 #include <iostream>
+#include <set>
 // Temporary solution only for PoC
 #include <react/renderer/uimanager/UIManager.h>
 
@@ -56,6 +57,21 @@ struct ViewportObserver {
         std::cout << "BBB initial index  " << originItem << std::endl;
         window.back().offset = originItemOffset;
         updateWindow(true);
+    }
+    
+    void rerenderDirtyItems(std::set<std::string> && items) {
+        float offset = window.front().offset;
+        
+        for (auto & item : window) {
+            item.offset = offset;
+            if (items.find(item.key) != items.end()) {
+                WishItem wishItem = itemProvider->provide(item.index);
+                wishItem.offset = offset;
+                std::swap(item, wishItem);
+                componentsPool->returnToPool(wishItem.sn);
+            }
+            offset = item.offset + item.height;
+        }
     }
     
     void update(float windowHeight, float windowWidth,

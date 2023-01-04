@@ -8,11 +8,9 @@ export const ForEach = createTemplateComponent(
     'worklet';
 
     const subItems: unknown[] = props.items;
-    console.log('subItems', subItems);
     const items = subItems.map((subItem) => {
       const childItem = pool.getComponent(props.template)!;
       const childValue = subItem;
-      console.log('value', childValue);
       const child = getUIInflatorRegistry().useMappings(
         childItem,
         childValue,
@@ -23,8 +21,6 @@ export const ForEach = createTemplateComponent(
       );
       return child;
     });
-
-    console.log('len', items.length);
 
     item.setChildren(items);
   },
