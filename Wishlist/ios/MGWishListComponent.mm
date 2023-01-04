@@ -45,6 +45,11 @@ using namespace facebook::react;
 
 -(void) setInflatorId:(std::string)nextInflatorId {
   inflatorId = nextInflatorId;
+- (void)layoutSubviews
+{
+    
+}
+
 - (void)handlePan:(UIPanGestureRecognizer *)gesture
 {
     NSLog(@"jest");
@@ -60,7 +65,7 @@ using namespace facebook::react;
         CGPoint tr = [gesture translationInView:self.scrollView];
         CGPoint offset = self.scrollView.contentOffset;
         if (offset.y - tr.y)
-        float overscroll = offset.y
+        float overscroll = offset.y;
         self.scrollView.contentOffset = CGPointMake(offset.x, offset.y - tr.y);
         
         [gesture setTranslation:CGPointMake(0, 0) inView:self.scrollView];
@@ -85,8 +90,8 @@ using namespace facebook::react;
         CGRect frame = self.frame;
         self.scrollView.contentSize = CGSizeMake(frame.size.width, 1000000);
         _sharedState->getData().viewportObserver->boot(
-                                          5000,
-                                          frame.size.height, frame.size.width, 5000, 10, templates, names, inflatorId);
+                                          0,
+                                          frame.size.height, frame.size.width, 0, 0, templates, names, inflatorId);
     } else {
         CGRect frame = self.frame;
         self.scrollView.contentSize = CGSizeMake(frame.size.width, 1000000);
@@ -100,6 +105,9 @@ using namespace facebook::react;
 + (ComponentDescriptorProvider)componentDescriptorProvider
 {
   return concreteComponentDescriptorProvider<WishlistComponentDescriptor>();
+- (void)drawRect:(CGRect)rect
+{
+    [super drawRect:rect];
 }
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
@@ -115,7 +123,6 @@ using namespace facebook::react;
     auto newState = std::static_pointer_cast<WishlistShadowNode::ConcreteState const>(state);
     auto &data = newState->getData();
     _sharedState = newState;
-    self.scrollView.contentOffset = CGPointMake(0, data.viewportObserver->offset);
 
   CGSize contentSize = RCTCGSizeFromSize(data.contentBoundingRect.size);
 
