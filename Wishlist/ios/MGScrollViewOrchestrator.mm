@@ -7,6 +7,68 @@
 
 #import "MGScrollViewOrchestrator.h"
 
+// https://medium.com/@esskeetit/scrolling-mechanics-of-uiscrollview-142adee1142c
+// most likly it can be optimised by estimating that function on [lastTimestamp, timestamp] interval
+@interface MGDecayAnimation : NSObject <MGScrollAnimation>
+- (instancetype)initWithVelocity:(double)v;
+@end
+
+@implementation MGDecayAnimation {
+    double _lastTimestamp;
+    double _initialTimestamp;
+    double _intialVelocity;
+    BOOL _isFinished;
+    double _destination;
+    double _totalDistanceTraveled;
+    double _decRate;
+}
+
+- (instancetype)initWithVelocity:(double)v
+{
+    if (self = [super init]) {
+        _intialVelocity = v;
+        _totalDistanceTraveled = 0;
+        _decRate = 0.998;
+        _isFinished = NO;
+        [self computeDestination];
+    }
+    return self;
+}
+
+- (void)computeDestination
+{
+    double d = 1000 * log(_decRate);
+    _destination = 0 - _intialVelocity / d;
+}
+
+- (CGFloat)getValueAtTimestamp:(double)timestamp {
+    double d = 1000 * log(_decRate);
+    return (pow(_decRate, 1000 * (timestamp - _initialTimestamp)) - 1.0) / d * _intialVelocity;
+}
+
+- (CGFloat)getDiffWithTimestamp:(double)timestamp {
+    double nextVal = [self getValueAtTimestamp:timestamp];
+    double diff = nextVal - _totalDistanceTraveled;
+    _totalDistanceTraveled = nextVal;
+    _lastTimestamp = timestamp;
+    if (abs(_totalDistanceTraveled - _destination) < 0.01) {
+        _isFinished = YES;
+    }
+    return diff;
+}
+
+- (BOOL)isFinished {
+    return _isFinished;
+}
+
+- (void)setupWithTimestamp:(double)timestamp {
+    _initialTimestamp = timestamp;
+    _lastTimestamp = timestamp;
+}
+
+@end
+
+
 @implementation MGScrollViewOrchestrator {
     UIScrollView * _scrollView;
     CADisplayLink * _displayLink;
@@ -68,7 +130,7 @@
     CGFloat yDiff = 0;
     // Check Touch Events
     if (_touchEvents.count > 0) {
-     /* _currentAnimation = nil */
+        _currentAnimation = nil;
         for (PanEvent * event in _touchEvents) {
             if (event.state == UIGestureRecognizerStateBegan) {
                 _lastTranslation = 0;
@@ -82,14 +144,20 @@
             if (event.state == UIGestureRecognizerStateEnded) {
                 _doWeHaveOngoingEvent = NO;
                 // start Animation with velocity
-                /* _currentAnimation = [MGDecayAnimation ]*/
+                _currentAnimation = [[MGDecayAnimation alloc] initWithVelocity:event.velocity];
+                [_currentAnimation setupWithTimestamp:displayLink.timestamp];
             }
         }
            
         [_touchEvents removeAllObjects];
     }
     // Run Animations
-    /* if (_currentAnimation != nil) [_currentAnimation timeFrame: ...]*/
+    if (_currentAnimation != nil) {
+        yDiff += [_currentAnimation getDiffWithTimestamp:displayLink.timestamp];
+        if ([_currentAnimation isFinished]) {
+            _currentAnimation = nil;
+        }
+    }
     
     // Update content Offset
     if (yDiff != 0) {
@@ -126,7 +194,7 @@
         bottomViewPortEdge += diff;
         topViewportEdge += diff;
         
-        /* _currentAnimation = nil; */
+        _currentAnimation = nil;
     }
     
     // topElementY > topViewPortEdge (top overscroll)
@@ -137,11 +205,11 @@
         _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + diff);
         bottomViewPortEdge += diff;
         topViewportEdge += diff;
-        /* _currentAnimation = nil; */
+        _currentAnimation = nil;
     }
     
     // pause Vsync listener if there is nothing to do
-    if ([_touchEvents count] == 0 /*&& _currentAnimation == nil */ && !_doWeHavePendingTemplates) {
+    if ([_touchEvents count] == 0 && _currentAnimation == nil && !_doWeHavePendingTemplates) {
         _paused = YES;
         [_displayLink setPaused:YES];
     }
