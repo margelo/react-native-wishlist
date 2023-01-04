@@ -23,11 +23,10 @@ export default function App() {
     <View style={{borderWidth: 4, borderColor: 'purple', flex: 1}}>
       <WishList.Component 
       inflateItem={(index, pool) => {
-        /*'worklet'
+        'worklet'
         const item = pool.getComponent(`type${index % 2}`);
         item.text.value = "erigjo3ijgoiejgoiejgoiejroigjerg";
-        item.text.style.backgroundColor = "yellow";
-        */
+        item.text.backgroundColor = "yellow";
       }}
       style={{flex:1}}/>
     </View>

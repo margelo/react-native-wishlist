@@ -33,9 +33,6 @@ struct ComponentsPool : std::enable_shared_from_this<ComponentsPool>
     
     void returnToPool(std::shared_ptr<const ShadowNode> sn) {
         std::string type = tagToType[sn->getTag()];
-        if (type == "") {
-            int x = 4;
-        }
         reusable[type].push_back(sn);
     }
     
@@ -70,15 +67,18 @@ struct ComponentsPool : std::enable_shared_from_this<ComponentsPool>
             std::string name = nameProp.utf8(rt);
             
             if (name == "getComponent") {
-                return jsi::Function::createFromHostFunction(rt, createPropNameIDFromString(std::string("getComponent")), 1, [](Runtime & rt, const Value& thisVal, const Value* args, size_t count) -> Value {
-                    //TODO return shadow node wrapper
+                return jsi::Function::createFromHostFunction(rt, jsi::PropNameID::forUtf8(rt, std::string("getComponent")), 1, [](Runtime & rt, const Value& thisVal, const Value* args, size_t count) -> Value {
+                    
+                    
                 });
             }
+            
+            return jsi::Value::undefined();
         }
 
       
         virtual void set(Runtime & rt, const PropNameID& name, const Value& value) {
-            
+            throw jsi::JSError(rt, "set hasn't been implemented yet");
         }
     };
 };

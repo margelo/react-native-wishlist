@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import { View, Dimensions } from 'react-native';
 import NativeWishList from './NativeComponent';
+import InflatorRepository from './InflatorRepository';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
@@ -11,9 +12,24 @@ export default function createWishList() {
   ));
 
   function WishList(props) {
-    console.log(componentsRegistry.keys())
+    const { inflateItem } = props;
+    const ref = useRef(null);
+   
+    const handleRef = useCallback((compRef) => {
+      if (compRef != null) {
+        ref.current = compRef;
+        InflatorRepository.register(compRef, inflateItem);
+      }
+    }, [inflateItem]);
+
+    useEffect(() => (() => {
+      if (ref.current != null) {
+        InflatorRepository.unregister(ref.current);
+      }
+    }), []);
+    
     return (
-      <NativeWishList {...props}  removeClippedSubviews={false} names={Array.from(componentsRegistry.keys())} >
+      <NativeWishList ref={handleRef} {...props}  removeClippedSubviews={false} names={Array.from(componentsRegistry.keys())} >
         { Array.from(componentsRegistry.values())}
       </NativeWishList>
     );
