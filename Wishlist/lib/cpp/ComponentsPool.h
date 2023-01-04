@@ -220,6 +220,9 @@ struct ComponentsPool : std::enable_shared_from_this<ComponentsPool>
     }
     
     void returnToPool(std::shared_ptr<const ShadowNode> sn) {
+        if(sn == nullptr) {
+          return;
+        }
         std::string type = tagToType[sn->getTag()];
         reusable[type].push_back(sn);
     }

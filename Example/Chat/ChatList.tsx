@@ -23,20 +23,17 @@ export const ChatListView: React.FC<Props> = ({data, style}) => {
 
         // Update content
         const contentView = item.getByWishId('content');
-        console.log(contentView.getName());
         contentView.RawText.addProps({text: element.message});
 
         const authorView = item.getByWishId('author');
-        console.log(authorView.getName(), authorView.RawText);
         authorView.RawText.addProps({text: element.author});
 
         const imageView = item.getByWishId('avatar');
-        console.log(imageView.getName());
         imageView.addProps({source: {uri: element.avatarUrl}});
-        imageView.setCallback('loadEnd', () => {
-          // modify data
-          // console.log('loadEvent' + index);
-        });
+        // imageView.setCallback('loadEnd', () => {
+        //   // modify data
+        //   // console.log('loadEvent' + index);
+        // });
 
         //   const button = item.getByWishId('button');
         //   button.addProps({pointerEvents: 'box-only'});

@@ -863,7 +863,7 @@ DEPENDENCIES:
   - FlipperKit/FlipperKitUserDefaultsPlugin (= 0.125.0)
   - FlipperKit/SKIOSNetworkPlugin (= 0.125.0)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
-  - MGWishList (from `../node_modules/Wishlist`)
+  - MGWishList (from `../../Wishlist`)
   - OpenSSL-Universal (= 1.1.1100)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCT-Folly/Fabric (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
@@ -932,7 +932,7 @@ EXTERNAL SOURCES:
   glog:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
   MGWishList:
-    :path: "../node_modules/Wishlist"
+    :path: "../../Wishlist"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:

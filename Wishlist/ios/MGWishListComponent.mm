@@ -36,14 +36,11 @@ using namespace facebook::react;
   return self;
 }
 
-#pragma mark - RCTComponentViewProtocol
-
-+ (ComponentDescriptorProvider)componentDescriptorProvider
-{
-  return concreteComponentDescriptorProvider<WishlistComponentDescriptor>();
+-(void) setInflatorId:(std::string)nextInflatorId {
+  inflatorId = nextInflatorId;
 }
 
--(void)setTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates withNames:(std::vector<std::string>)names
+-(void) setTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates withNames:(std::vector<std::string>)names
 {
     if (!alreadyRendered && names.size() > 0 && names.size() == templates.size()) {
         alreadyRendered = true;
@@ -58,6 +55,13 @@ using namespace facebook::react;
         _sharedState->getData().viewportObserver->update(
                                           frame.size.height, frame.size.width, templates, names, inflatorId);
     }
+}
+
+#pragma mark - RCTComponentViewProtocol
+
++ (ComponentDescriptorProvider)componentDescriptorProvider
+{
+  return concreteComponentDescriptorProvider<WishlistComponentDescriptor>();
 }
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps

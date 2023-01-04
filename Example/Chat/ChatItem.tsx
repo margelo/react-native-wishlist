@@ -19,14 +19,14 @@ export const ChatItemView: React.FC<Props> = ({type}) => {
         <View style={styles.authorContainer}>
           <Text style={styles.authorText} nativeID="author">
             {/*  FIXME: We shouldnt need placeholders - but currently we need'em */}
-            author
+            Author
           </Text>
         </View>
       </View>
 
       <View style={styles.messageContainer}>
         <Text style={styles.messageText} nativeID="content">
-          simple Message
+          Simple Message
         </Text>
       </View>
 
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   },
   me: {
     alignSelf: 'flex-end',
-    backgroundColor: '#6495ED',
+    backgroundColor: '#A4A5EF',
   },
   other: {
     backgroundColor: '#EDEDED',
