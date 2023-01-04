@@ -790,7 +790,7 @@ DEPENDENCIES:
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes/hermes-engine.podspec`)
   - libevent (~> 2.1.12)
-  - MGWishList (from `../../`)
+  - MGWishList (from `../../Wishlist`)
   - OpenSSL-Universal (= 1.1.1100)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCT-Folly/Fabric (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
@@ -862,7 +862,7 @@ EXTERNAL SOURCES:
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes/hermes-engine.podspec"
   MGWishList:
-    :path: "../../"
+    :path: "../../Wishlist"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -987,6 +987,6 @@ SPEC CHECKSUMS:
   Yoga: 4935173923cabaa830e195be3e8e4cac045a8f90
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 7c9d8ed76a3cacd30887b28b7f5e0713d079a9b7
+PODFILE CHECKSUM: fb0a4dc1ee228a0a1c3b7e989aa250add3bb9b08
 
 COCOAPODS: 1.11.2
