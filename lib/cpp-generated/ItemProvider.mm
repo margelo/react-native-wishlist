@@ -35,9 +35,9 @@ WishItem WorkletItemProvider::provide(int index) {
         return wishItem;
     }
     
-    std::shared_ptr<ShadowNodeWrapper> shadowNodeWrapper = returnedValue.asObject(rt).getHostObject<ShadowNodeWrapper>(rt);
+    std::shared_ptr<ShadowNodeBinding> shadowNodeWrapper = returnedValue.asObject(rt).getHostObject<ShadowNodeBinding>(rt);
     
-    std::shared_ptr<const ShadowNode> sn = shadowNodeWrapper->shadowNode;
+    std::shared_ptr<const ShadowNode> sn = shadowNodeWrapper->sn;
     
     auto affected = std::vector<const LayoutableShadowNode *>();
     this->lc.affectedNodes = &affected;
