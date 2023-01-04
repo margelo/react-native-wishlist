@@ -15,7 +15,7 @@ export const ChatListView: React.FC<Props> = React.memo(
       <Wishlist.Component
         style={style}
         initialIndex={data.length - 1}
-        data={data}
+        initialData={data}
       >
         <Wishlist.Template type="me">
           <ChatItemView onAddReaction={onAddReaction} type="me" />

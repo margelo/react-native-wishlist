@@ -1,7 +1,7 @@
 import React, { isValidElement } from 'react';
 import { Image, ImageEditor, StyleSheet, View } from 'react-native';
 import { useWorkletCallback } from 'react-native-reanimated';
-import { useTemplateValue, Wishlist } from 'wishlist';
+import { useTemplateValue, Wishlist, useData } from 'wishlist';
 import type { ChatItem, ReactionItem } from './Data';
 
 const addReaction = require('./assets/add_reaction.png');
@@ -94,6 +94,7 @@ export const ChatItemView: React.FC<Props> = ({ type, onAddReaction }) => {
   const data = useData<ChatItem>();
 
   const likeItemListener = useWorkletCallback((value) => {
+    value.update();
     data().update((dataCopy) => {
       const oldValue = dataCopy.get(value.key);
       oldValue.liked = !oldValue.liked;
