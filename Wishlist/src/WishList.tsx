@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import { View, Dimensions } from "react-native";
-import NativeWishList from "./NativeComponent";
+import NativeWishList from "./NativeViews/NativeComponent";
+import NativeTemplateContainer from "./NativeViews/NativeTemplateContainer";
+import NativeTemplateInterceptor from "./NativeViews/NativeTemplateInterceptor";
 import InflatorRepository from "./InflatorRepository";
 import { initEventHandler } from "./EventHandler";
 
@@ -63,17 +65,20 @@ function Component(props) {
   const keys = Array.from(componentsRegistry.keys());
 
   return (
-    <NativeWishList
-      {...props}
-      removeClippedSubviews={false}
-      inflatorId={inflatorId.current}
-      kkk={6}
-      names={keys}
-    >
+    <NativeTemplateInterceptor inflatorId={inflatorId.current} style={{flex:1}} collapsable={false} removeClippedSubviews={false}>
+      <NativeWishList
+        {...props}
+        removeClippedSubviews={false}
+        inflatorId={inflatorId.current}
+        names={keys}
+      />
+        
+      <NativeTemplateContainer inflatorId={inflatorId.current} collapsable={false} />
       {Array.from(componentsRegistry.values()).map((c, i) => (
-        <View key={keys[i]}>{c}</View>
-      ))}
-    </NativeWishList>
+          <View key={keys[i]}>{c}</View>
+        ))}
+      <NativeTemplateContainer/>
+    </NativeTemplateInterceptor>
   );
 }
 type TemplateProps = {
