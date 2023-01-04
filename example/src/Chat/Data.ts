@@ -1,5 +1,6 @@
 export type ReactionItem = {
   emoji: string;
+  id: string;
 };
 
 export type ChatItem = {
@@ -30,12 +31,17 @@ and more recently with desktop publishing software like Aldus PageMaker includin
 
 const authors = ['John', 'Bob', 'Szymon', 'Marc', 'Elon Musk', 'Me'];
 
-const emoticons = ['🙂', '⚡️', '😵‍💫', '💩'];
+export const emoticons = ['🙂', '⚡️', '😵‍💫', '💩'];
 
 function getRandomReactions() {
   const number = Math.floor(Math.random() * 5);
-  shuffleArray(emoticons);
-  return [...emoticons].splice(0, number);
+  let arr = emoticons.slice();
+  if (Math.random() > 0.5) {
+    arr.push(...emoticons);
+  }
+
+  shuffleArray(arr);
+  return [...arr].splice(0, number);
 }
 
 const createChatItem = (index: number): ChatItem => {
@@ -62,6 +68,22 @@ const createChatItem = (index: number): ChatItem => {
     })),
   };
 };
+
+export const addSendedMessage = (data: ChatItem[], text: string) => {
+  const myMessage = data.find((item) => item.type === 'me');
+  const message: ChatItem = {
+    id: data.length,
+    type: 'me',
+    author: myMessage?.author!,
+    message: text,
+    avatarUrl: myMessage?.avatarUrl!,
+    likes: 0,
+    reactions: [],
+  };
+
+  return data.concat(message);
+};
+
 export const fetchData = (limit: number = 100) => {
   //   return new Promise<ChatItem[]>(resolve => {
   //     resolve(
