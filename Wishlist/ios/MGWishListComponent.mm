@@ -11,6 +11,7 @@
 #import "WishlistShadowNodes.h"
 #import <React/RCTBridgeModule.h>
 #import <React/RCTComponentViewFactory.h>
+#import "MGScrollViewOrchestrator.h"
 
 using namespace facebook::react;
 
@@ -24,6 +25,7 @@ using namespace facebook::react;
     WishlistShadowNode::ConcreteState::Shared _sharedState;
     bool alreadyRendered;
     std::string inflatorId;
+    MGScrollViewOrchestrator * _orchestrator;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -38,7 +40,6 @@ using namespace facebook::react;
       UIPanGestureRecognizer * customR = [UIPanGestureRecognizer new];
       [self.scrollView addGestureRecognizer:customR];
       [customR addTarget:self action:@selector(handlePan:)];
-      
   }
   return self;
 }
@@ -53,6 +54,13 @@ using namespace facebook::react;
 - (void)handlePan:(UIPanGestureRecognizer *)gesture
 {
     NSLog(@"jest");
+    if (_orchestrator != nil) {
+        PanEvent * panEvent = [PanEvent new];
+        panEvent.state = gesture.state;
+        panEvent.velocity = [gesture velocityInView:self].y;
+        panEvent.translation = [gesture translationInView:self].y;
+        [_orchestrator notifyAboutEvent:panEvent];
+    }
     if (gesture.state == UIGestureRecognizerStateBegan) {
         
     }
@@ -88,15 +96,14 @@ using namespace facebook::react;
     if (!alreadyRendered && names.size() > 0 && names.size() == templates.size()) {
         alreadyRendered = true;
         CGRect frame = self.frame;
-        self.scrollView.contentSize = CGSizeMake(frame.size.width, 1000000);
-        _sharedState->getData().viewportObserver->boot(
-                                          0,
-                                          frame.size.height, frame.size.width, 0, 0, templates, names, inflatorId);
+        
+        self.scrollView.contentSize = CGSizeMake(frame.size.width, 10000000);
+        self.scrollView.frame = CGRectMake(self.scrollView.frame.origin.x,self.scrollView.frame.origin.y, frame.size.width, frame.size.height);
+        
+        _orchestrator = [[MGScrollViewOrchestrator alloc] initWith:self.scrollView templates:templates names:names viewportObserver: _sharedState->getData().viewportObserver inflatorId:inflatorId];
+        
     } else {
-        CGRect frame = self.frame;
-        self.scrollView.contentSize = CGSizeMake(frame.size.width, 1000000);
-        _sharedState->getData().viewportObserver->update(
-                                          frame.size.height, frame.size.width, templates, names, inflatorId);
+        [_orchestrator notifyAboutNewTemplates:templates withNames:names];
     }
 }
 
@@ -134,10 +141,8 @@ using namespace facebook::react;
     if (_sharedState == nullptr) {
         return;
     }
-    //[super scrollViewDidScroll: scrollView];
-   // NSLog(@"offset: %f", scrollView.contentOffset.y);
-    _sharedState->getData().viewportObserver->reactToOffsetChange(scrollView.contentOffset.y);
-    //TODO update list
+    //_sharedState->getData().viewportObserver->reactToOffsetChange(scrollView.contentOffset.y);
+
 }
 
 - (void)prepareForRecycle

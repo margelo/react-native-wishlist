@@ -12,13 +12,23 @@
     CADisplayLink * _displayLink;
     BOOL _paused;
     
+    // Events
     NSMutableArray<PanEvent *> *_touchEvents;
+    CGFloat _lastTranslation;
+    BOOL _doWeHaveOngoingEvent;
     
-    std::vector<std::shared_ptr<facebook::react::ShadowNode const>> _templates;
-    std::vector<std::string> _names;
+    // PendingTemplates
+    BOOL _doWeHavePendingTemplates;
+    std::vector<std::shared_ptr<facebook::react::ShadowNode const>> _pendingTemplates;
+    std::vector<std::string> _pendingNames;
+    
+    // ViewportObserer
+    std::shared_ptr<ViewportObserver> _viewportObserver;
+    std::string _inflatorId;
 }
 
-- (instancetype)initWith:(UIScrollView*)scrollView;
+- (instancetype)initWith:(UIScrollView*)scrollView templates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates names:(std::vector<std::string>)names viewportObserver:(std::shared_ptr<ViewportObserver>)vo
+  inflatorId:(std::string)inflatorId
 {
     if (self = [super init]) {
         _scrollView = scrollView;
@@ -27,6 +37,17 @@
         _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(handleVSync:)];
         [_displayLink addToRunLoop:NSRunLoop.currentRunLoop forMode:NSDefaultRunLoopMode];
         [_displayLink setPaused:YES];
+        
+        _viewportObserver = vo;
+        
+        _viewportObserver->boot( //TODO Mostlikly needs to adujst offset?
+                              0,
+                              _scrollView.frame.size.height, _scrollView.frame.size.width, 0, 0, templates, names, inflatorId);
+        
+    
+        _doWeHavePendingTemplates = NO;
+        _doWeHaveOngoingEvent = NO;
+        _inflatorId = inflatorId;
     }
     return self;
 }
@@ -42,14 +63,44 @@
 - (void)handleVSync:(CADisplayLink *)displayLink
 {
     // Check Touch Events
-    
+    if (_touchEvents.count > 0) {
+     /* _currentAnimation = nil */
+        for (PanEvent * event in _touchEvents) {
+            if (event.state == UIGestureRecognizerStateBegan) {
+                _lastTranslation = 0;
+                _doWeHaveOngoingEvent = YES;
+            }
+            if (event.state == UIGestureRecognizerStateChanged) {
+                CGFloat yDiff = event.translation - _lastTranslation;
+                _lastTranslation = event.translation;
+            }
+            if (event.state == UIGestureRecognizerStateEnded) {
+                _doWeHaveOngoingEvent = NO;
+                // start Animation with velocity
+                /* _currentAnimation = [MGDecayAnimation ]*/
+            }
+        }
+           
+        [_touchEvents removeAllObjects];
+    }
     // Run Animations
+    /* if (_currentAnimation != nil) [_currentAnimation timeFrame: ...]*/
     
     // update teamplates if needed
+    if (_doWeHavePendingTemplates) {
+        _viewportObserver->update(_scrollView.frame.size.height, _scrollView.frame.size.width, _pendingTemplates, _pendingNames, _inflatorId);
+        _doWeHavePendingTemplates = NO;
+    }
     
     // update viewport
     
     // update offset if new elements require it
+    
+    // pause Vsync listener if there is nothing to do
+    if ([_touchEvents count] == 0 /*&& _currentAnimation == nil */ && !_doWeHavePendingTemplates) {
+        _paused = YES;
+        [_displayLink setPaused:YES];
+    }
 }
 
 - (void)notifyAboutEvent:(PanEvent *)event
@@ -60,8 +111,9 @@
 
 - (void)notifyAboutNewTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates withNames:(std::vector<std::string>)names
 {
-    _templates = templates;
-    _names = names;
+    _pendingTemplates = templates;
+    _pendingNames = names;
+    _doWeHavePendingTemplates = YES;
     [self maybeRegisterForNextVSync];
 }
 

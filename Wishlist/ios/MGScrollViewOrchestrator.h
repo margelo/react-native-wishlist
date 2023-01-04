@@ -16,9 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PanEvent : NSObject;
 
-@property (nonatomic, strong, readonly) UIGestureRecognizerState *state;
-@property (nonatomic, assign, readonly) CGFloat translation;
-@property (nonatomic, assign, readonly) CGFloat velocity;
+@property (nonatomic, assign) UIGestureRecognizerState state;
+@property (nonatomic, assign) CGFloat translation;
+@property (nonatomic, assign) CGFloat velocity;
 
 @end
 
@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MGScrollViewOrchestrator : NSObject
 
-- (instancetype)initWith:(UIScrollView *)scrollView;
+- (instancetype)initWith:(UIScrollView*)scrollView templates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates names:(std::vector<std::string>)names viewportObserver:(std::shared_ptr<ViewportObserver>)vo inflatorId:(std::string)inflatorId;
 - (void)notifyAboutEvent:(PanEvent *)event;
 - (void)notifyAboutNewTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates withNames:(std::vector<std::string>)names;
 
