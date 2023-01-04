@@ -39,7 +39,7 @@ using namespace facebook::react;
 {
   const auto &newProps = *std::static_pointer_cast<const MGTemplateContainerComponentProps>(props);
   if (_wishList != NULL) {
-    [_wishList setWishlistId: newProps.wishlistId];
+    [_wishList setWishlistId:newProps.wishlistId];
     [_wishList setInflatorId:newProps.inflatorId];
     [_wishList setTemplates:newProps.templates withNames:newProps.names];
   }

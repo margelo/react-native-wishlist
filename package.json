@@ -34,7 +34,8 @@
     "prepare": "bob build",
     "release": "release-it",
     "example": "yarn --cwd example",
-    "bootstrap": "yarn example && yarn install && yarn example pods"
+    "bootstrap": "yarn example && yarn install && yarn example pods",
+    "clang-format": "clang-format -i --glob='{ios,android,lib}/**/*.{h,cpp,m,mm}'"
   },
   "keywords": [
     "react-native",
@@ -72,6 +73,7 @@
     "react-native-reanimated": "3.0.0-rc.2",
     "react-native-builder-bob": "^0.20.0",
     "release-it": "^15.0.0",
+    "clang-format": "^1.8.0",
     "typescript": "^4.5.2"
   },
   "resolutions": {

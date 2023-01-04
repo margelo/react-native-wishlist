@@ -25,7 +25,7 @@ using namespace facebook::react;
   WishlistShadowNode::ConcreteState::Shared _sharedState;
   bool alreadyRendered;
   std::string inflatorId;
-    std::string _wishlistId;
+  std::string _wishlistId;
   MGScrollViewOrchestrator *_orchestrator;
   std::shared_ptr<const WishlistEventEmitter> _emitter;
   int _initialIndex;
@@ -53,7 +53,8 @@ using namespace facebook::react;
   inflatorId = nextInflatorId;
 }
 
-- (void)setWishlistId:(std::string)wishlistId {
+- (void)setWishlistId:(std::string)wishlistId
+{
   _wishlistId = wishlistId;
 }
 
