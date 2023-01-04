@@ -20,8 +20,8 @@ WishList.registerComponent("type2", (
 
 export default function App() {
   return (
-    <View>
-      <WishList.Component/>
+    <View style={{borderWidth: 4, borderColor: 'purple', flex: 1}}>
+      {<WishList.Component style={{flex:1}}/>}
     </View>
   );
 }

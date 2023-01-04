@@ -11,7 +11,7 @@
 namespace facebook {
 namespace react {
 
-int tag = 1e9+1;
+int tag = 1e9+2;
 
 std::shared_ptr<const ShadowNode> ShadowNodeCopyMachine::copyShadowSubtree(std::shared_ptr<const ShadowNode> sn) {
     const ComponentDescriptor &cd = sn->getComponentDescriptor();

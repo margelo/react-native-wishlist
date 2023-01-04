@@ -54,8 +54,15 @@ public:
         }
     }
     
+    void realAppendChild(ShadowNode::Shared const &childNode) {
+        ConcreteViewShadowNode::appendChild(childNode);
+    }
+    
     void appendChild(
                      ShadowNode::Shared const &childNode) {
+        if (registeredViews.size() == 0) {
+            realAppendChild(ShadowNodeCopyMachine::copyShadowSubtree(childNode));
+        }
         //ConcreteViewShadowNode::appendChild(childNode);
         /*std::shared_ptr<const LayoutableShadowNode> lsn = std::dynamic_pointer_cast<const LayoutableShadowNode>(childNode);
         LayoutContext lc;
@@ -71,12 +78,12 @@ public:
         registeredViews.push_back(childNode);
         auto props = std::dynamic_pointer_cast<const ModuleProps>(this->getProps());
         if (props->names.size() == registeredViews.size()) { // last Child
-            for (int i = 0; i < 5; ++i) {
-                appendChild(ShadowNodeCopyMachine::copyShadowSubtree(registeredViews[0]));
+           /* for (int i = 0; i < 5; ++i) {
+                realAppendChild(ShadowNodeCopyMachine::copyShadowSubtree(registeredViews[0]));
             }
             for (int i = 0; i < 5; ++i) {
-                appendChild(ShadowNodeCopyMachine::copyShadowSubtree(registeredViews[1]));
-            }
+                realAppendChild(ShadowNodeCopyMachine::copyShadowSubtree(registeredViews[1]));
+            }*/
         }
     }
     
