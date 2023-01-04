@@ -1,6 +1,6 @@
 {
   "name": "react-native-wishlist",
-  "version": "0.0.1-alpha.0",
+  "version": "0.0.1-alpha.1",
   "description": "The fastest List component for React Native.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -58,9 +58,9 @@
   ],
   "repository": "https://github.com/margelo/react-native-wishlist",
   "author": {
-    "name" : "Margelo",
-    "email" : "hello@margelo.io",
-    "url" : "http://margelo.io/"
+    "name": "Margelo",
+    "email": "hello@margelo.io",
+    "url": "http://margelo.io/"
   },
   "contributors": [
     {
