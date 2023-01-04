@@ -9,10 +9,9 @@ import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNati
 
 import {NativeModules} from 'react-native';
 NativeModules.Workaround.registerInterceptor();
-
-export type NativeTemplateInterceptorProps = Readonly<ViewProps & {
+export interface NativeTemplateInterceptorProps extends ViewProps {
   inflatorId: string;
-}>;
+}
 
 
 export default (codegenNativeComponent<NativeTemplateInterceptorProps>('MGTemplateInterceptorComponent'));

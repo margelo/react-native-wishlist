@@ -23,24 +23,16 @@ export type EventInFile = Readonly<{
   value: Double;
 }>;
 
-export type Boolean = boolean;
-
-export type Int = Int32;
-
-export type Void = void;
-
-export type WishlistProps = Readonly<ViewProps & {
+export interface WishlistProps extends ViewProps {
   reanimatedRuntime: Double,
   inflatorId: string;
-  onBubblingEventDefinedInline: BubblingEventHandler<EventInFile>;
-  onBubblingEventDefinedInlineWithPaperName: BubblingEventHandler<EventInFile, 'paperBubblingEventDefinedInlineWithPaperName'>;
-  onDirectEventDefinedInline: DirectEventHandler<EventInFile>;
-  onDirectEventDefinedInlineWithPaperName: DirectEventHandler<EventInFile, 'paperDirectEventDefinedInlineWithPaperName'>;
-}>;
+  onStartReached: DirectEventHandler<Readonly<{}>>;
+  onEndReached: DirectEventHandler<Readonly<{}>>;
+}
 
 type NativeType = NativeComponentType<WishlistProps>;
 
-export type ScrollToItem = (viewRef: React.ElementRef<NativeType>, index: Int, animated: Boolean) => Void;
+export type ScrollToItem = (viewRef: React.ElementRef<NativeType>, index: Int32, animated: boolean) => void;
 
 interface NativeCommands {
   readonly scrollToItem: ScrollToItem;

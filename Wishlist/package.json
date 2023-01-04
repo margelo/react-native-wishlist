@@ -1,5 +1,5 @@
 {
-  "name": "Wishlist",
+  "name": "wishlist",
   "version": "1.0.0",
   "description": "The ultimate virtualised list solution",
   "main": "index.ts",
@@ -8,9 +8,7 @@
   "private": true,
   "scripts": {},
   "devDependencies": {
-    "@types/react-native": "^0.70.0",
-    "react-native-tscodegen": "^0.68.4",
-    "react-native-tscodegen-types": "^0.69.1"
+    "@types/react-native": "^0.70.0"
   },
   "peerDependencies": {
     "react-native": "^0.70.0"
