@@ -25,9 +25,14 @@ struct WishItem
 class ItemProvider {
 public:
     float maxWidth = 0;
+    LayoutConstraints lcc;
+    LayoutContext lc;
     
-    ItemProvider(float maxWidth) {
+    ItemProvider(float maxWidth, LayoutContext lc) {
         this->maxWidth = maxWidth;
+        this->lc = lc;
+        lcc.layoutDirection = facebook::react::LayoutDirection::LeftToRight;
+        lcc.maximumSize.width = maxWidth;
     }
     
     virtual void setComponentsPool(std::shared_ptr<ComponentsPool> pool) = 0;
@@ -43,7 +48,7 @@ struct ItemProviderTestImpl : ItemProvider
 {
     std::shared_ptr<ComponentsPool> cp;
     
-    ItemProviderTestImpl(float maxWidth): ItemProvider(maxWidth) {}
+    ItemProviderTestImpl(float maxWidth, LayoutContext lc): ItemProvider(maxWidth, lc) {}
     
     void setComponentsPool(std::shared_ptr<ComponentsPool> pool) {
         cp = pool;
@@ -65,10 +70,9 @@ struct ItemProviderTestImpl : ItemProvider
             // TODO change some things
         }
         
-        LayoutContext lc;
-        LayoutConstraints lcc;
-        lcc.maximumSize.width = maxWidth;
-        facebook::react::Size sz = sn->measure(lc, lcc);
+        auto affected = std::vector<const LayoutableShadowNode *>();
+        this->lc.affectedNodes = &affected;
+        facebook::react::Size sz = sn->measure(this->lc, this->lcc);
         
         wishItem.sn = sn;
         wishItem.height = sz.height;

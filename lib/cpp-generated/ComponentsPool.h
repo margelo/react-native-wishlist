@@ -22,6 +22,12 @@ struct ComponentsPool
     std::map<std::string, std::vector<std::shared_ptr<const ShadowNode>>> reusable;
     std::vector<std::shared_ptr<ShadowNode const>> registeredViews;
     
+    void setNames(std::vector<std::string> names) {
+        for (int i = 0; i < names.size(); ++i) {
+            nameToIndex[names[i]] = i;
+        }
+    }
+    
     void returnToPool(std::shared_ptr<const ShadowNode> sn) {
         std::string type = tagToType[sn->getTag()];
         reusable[type].push_back(sn);

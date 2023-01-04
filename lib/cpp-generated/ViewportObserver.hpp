@@ -27,10 +27,15 @@ struct ViewportObserver {
     std::deque<WishItem> window;
     std::weak_ptr<ShadowNode> weakWishListNode;
     
-    void boot(int surfaceId, float offset, float windowHeight, float windowWidth, float originItemOffset, int originItem, std::weak_ptr<ShadowNode> weakWishListNode) {
+    void boot(int surfaceId, float offset, float windowHeight, float windowWidth, float originItemOffset, int originItem, std::weak_ptr<ShadowNode> weakWishListNode,
+        std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
+        LayoutContext lc,
+        std::vector<std::string> names) {
         
         this->weakWishListNode = weakWishListNode;
-        itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<ItemProviderTestImpl>(windowWidth));
+        componentsPool->registeredViews = registeredViews;
+        componentsPool->setNames(names);
+        itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<ItemProviderTestImpl>(windowWidth, lc));
         itemProvider->setComponentsPool(componentsPool);
         
         for (WishItem & item : window) {
@@ -51,7 +56,7 @@ struct ViewportObserver {
     void update(int surfaceId, float offset, float windowHeight, float originItemOffset, int originItem, std::weak_ptr<ShadowNode> weakWishListNode) {
         
         this->weakWishListNode = weakWishListNode;
-        itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<ItemProviderTestImpl>(3453453));
+        itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<ItemProviderTestImpl>(3453453, LayoutContext{}));
         itemProvider->setComponentsPool(componentsPool);
         
         for (WishItem & item : window) {
