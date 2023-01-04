@@ -13,7 +13,7 @@
 namespace facebook {
 namespace react {
 
-extern const char MGWishListComponentComponentName[] = "MGWishListComponent";
+extern const char MGTemplateInterceptorComponentComponentName[] = "MGTemplateInterceptorComponent";
 
 } // namespace react
 } // namespace facebook

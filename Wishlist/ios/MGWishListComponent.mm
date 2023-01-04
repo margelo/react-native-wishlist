@@ -22,11 +22,16 @@ using namespace facebook::react;
 
 @implementation MGWishListComponent{
     WishlistShadowNode::ConcreteState::Shared _sharedState;
+    bool alreadyRendered;
+    std::string inflatorId;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
   if (self = [super initWithFrame:frame]) {
+      self.scrollView.delaysContentTouches = NO;
+      self.scrollView.canCancelContentTouches = true;
+      alreadyRendered = false;
   }
   return self;
 }
@@ -38,16 +43,28 @@ using namespace facebook::react;
   return concreteComponentDescriptorProvider<WishlistComponentDescriptor>();
 }
 
+-(void)setTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates withNames:(std::vector<std::string>)names
+{
+    if (!alreadyRendered && names.size() > 0 && names.size() == templates.size()) {
+        alreadyRendered = true;
+        CGRect frame = self.frame;
+        self.scrollView.contentSize = CGSizeMake(frame.size.width, 1000000);
+        _sharedState->getData().viewportObserver->boot(
+                                          5000,
+                                          frame.size.height, frame.size.width, 5000, 10, templates, names, inflatorId);
+    } else {
+        CGRect frame = self.frame;
+        self.scrollView.contentSize = CGSizeMake(frame.size.width, 1000000);
+        _sharedState->getData().viewportObserver->update(
+                                          frame.size.height, frame.size.width, templates, names, inflatorId);
+    }
+}
+
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
-    NSLog(@"wegwgw");
-  const auto &oldSliderProps = *std::static_pointer_cast<const WishlistProps>(_props);
-  const auto &newSliderProps = *std::static_pointer_cast<const WishlistProps>(props);
-    int z = 3;
-    self.scrollView.contentSize = CGSizeMake(1000, 100000);
-    _eventEmitter = nil; // temporary TODO fix this
-    //self.contentSize = 10000;
-    //self.con
+    inflatorId = std::dynamic_pointer_cast<const WishlistProps>(props)->inflatorId;
+    //[super updateProps:props oldProps:oldProps];
+    _eventEmitter = nil;
 }
 
 - (void)updateState:(State::Shared const &)state oldState:(State::Shared const &)oldState
@@ -57,28 +74,11 @@ using namespace facebook::react;
     auto newState = std::static_pointer_cast<WishlistShadowNode::ConcreteState const>(state);
     auto &data = newState->getData();
     _sharedState = newState;
-    self.scrollView.contentOffset = CGPointMake(0, data.viewportObserver->offset);//
-    
- /* _state = std::static_pointer_cast<ScrollViewShadowNode::ConcreteState const>(state);
-  auto &data = _state->getData();
+    self.scrollView.contentOffset = CGPointMake(0, data.viewportObserver->offset);
 
-  auto contentOffset = RCTCGPointFromPoint(data.contentOffset);
-  if (!oldState && !CGPointEqualToPoint(contentOffset, CGPointZero)) {
-    _scrollView.contentOffset = contentOffset;
-  } */
+  CGSize contentSize = RCTCGSizeFromSize(data.contentBoundingRect.size);
 
- // CGSize contentSize = RCTCGSizeFromSize(data.getContentSize());
-
- /* if (CGSizeEqualToSize(_contentSize, contentSize)) {
-    return;
-  }*/
-
-  /*_contentSize = contentSize;
-  _containerView.frame = CGRect{RCTCGPointFromPoint(data.contentBoundingRect.origin), contentSize};
-
-  [self _preserveContentOffsetIfNeededWithBlock:^{
-    self->_scrollView.contentSize = contentSize;
-  }];*/
+  self.containerView.frame = CGRect{RCTCGPointFromPoint(data.contentBoundingRect.origin), contentSize};
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
@@ -96,28 +96,6 @@ using namespace facebook::react;
 {
   _sharedState.reset();
   [super prepareForRecycle];
-}
-
-
-
-Class<RCTComponentViewProtocol> MGWishListCls(void)
-{
-  return [MGWishListComponent class];
-}
-
-@end
-
-@interface Workaround : NSObject <RCTBridgeModule>
-
-@end
-
-@implementation Workaround
-
-RCT_EXPORT_MODULE(Workaround);
-
-RCT_EXPORT_METHOD(registerList)
-{
-    [[RCTComponentViewFactory currentComponentViewFactory] registerComponentViewClass: [MGWishListComponent class]];
 }
 
 -(void)setBridge:(RCTBridge *)bridge

@@ -11,21 +11,18 @@
 
 #include <react/renderer/components/view/ViewProps.h>
 #include <react/renderer/core/PropsParserContext.h>
-#include <vector>
 
 namespace facebook {
 namespace react {
 
-class WishlistProps final : public ViewProps {
+class MGTemplateInterceptorComponentProps final : public ViewProps {
  public:
-  WishlistProps() = default;
-  WishlistProps(const PropsParserContext& context, const WishlistProps &sourceProps, const RawProps &rawProps);
+  MGTemplateInterceptorComponentProps() = default;
+  MGTemplateInterceptorComponentProps(const PropsParserContext& context, const MGTemplateInterceptorComponentProps &sourceProps, const RawProps &rawProps);
 
 #pragma mark - Props
 
-  int kkk;
-  std::string inflatorId;
-  std::vector<std::string> names{};
+  std::string inflatorId{};
 };
 
 } // namespace react
