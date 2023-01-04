@@ -6,7 +6,7 @@
 //
 
 #include "ViewportObserver.hpp"
-#include "ModuleShadowNodes.h"
+#include "WishlistShadowNodes.h"
 #import "RCTFollyConvert.h"
 
 using namespace facebook::react;
@@ -45,11 +45,11 @@ void  ViewportObserver::pushChildren(bool pushDirectly) {
     }
     
     if (pushDirectly) {
-        std::shared_ptr<ModuleShadowNode> moduleNode = std::static_pointer_cast<ModuleShadowNode>(sWishList);
-        moduleNode->realAppendChild(getOffseter(window[0].offset));
+        std::shared_ptr<WishlistShadowNode> wishlistNode = std::static_pointer_cast<WishlistShadowNode>(sWishList);
+        wishlistNode->realAppendChild(getOffseter(window[0].offset));
         
         for (WishItem & wishItem : window) {
-            moduleNode->realAppendChild(wishItem.sn);
+            wishlistNode->realAppendChild(wishItem.sn);
         }
     } else {
         KeyClassHolder::shadowTreeRegistry->visit(surfaceId, [&](const ShadowTree & st) {

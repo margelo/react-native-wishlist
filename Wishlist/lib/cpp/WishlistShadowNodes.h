@@ -69,7 +69,7 @@ public:
        }
        
        registeredViews.push_back(childNode);
-       auto props = std::dynamic_pointer_cast<const ModuleProps>(this->getProps());
+       auto props = std::dynamic_pointer_cast<const WishlistProps>(this->getProps());
        if (props->names.size() == registeredViews.size()) { // last Child
            
            /*state.viewportObserver.initOrUpdate(this->getSurfaceId(), 5000, 20, 5000, 10, this->clone(ShadowNodeFragment{}));*/
