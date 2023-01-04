@@ -15,7 +15,7 @@
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
 #include "LayoutContext.h"
 #include "LayoutConstraints.h"
-#include "ShadowNodeCopyMachine.hpp"
+#include "ShadowNodeCopyMachine.h"
 #include <iostream>
 #include <memory>
 #include "ModuleState.h"
@@ -86,17 +86,18 @@ public:
     }
                                     
     void layout(LayoutContext layoutContext) {
+      // TODO probably the best place to initialize children in the future
       ConcreteViewShadowNode::layout(layoutContext);
       //updateScrollContentOffsetIfNeeded();
       updateStateIfNeeded();
     }
                                     
     void updateStateIfNeeded() {
-      ensureUnsealed();
-    
-      auto state = getStateData();
-      state.weakSn = this->clone(ShadowNodeFragment{});
-      setStateData(std::move(state));
+        ensureUnsealed();
+
+        auto state = getStateData();
+        state.weakSn = this->clone(ShadowNodeFragment{});
+        setStateData(std::move(state));
     }
 
     

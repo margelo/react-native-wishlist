@@ -5,7 +5,7 @@
 //  Created by Szymon on 17/11/2021.
 //
 
-#include "ShadowNodeCopyMachine.hpp"
+#include "ShadowNodeCopyMachine.h"
 #include "ModuleComponentDescriptors.h"
 
 namespace facebook {

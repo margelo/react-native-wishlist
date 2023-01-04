@@ -51,7 +51,7 @@ using namespace facebook::react;
   const auto &oldSliderProps = *std::static_pointer_cast<const ModuleProps>(_props);
   const auto &newSliderProps = *std::static_pointer_cast<const ModuleProps>(props);
     int z = 3;
-    self.scrollView.contentSize = CGSizeMake(1000, 10000);
+    self.scrollView.contentSize = CGSizeMake(1000, 100000);
     _eventEmitter = nil; // temporary TODO fix this
     //self.contentSize = 10000;
     //self.con
@@ -114,5 +114,11 @@ RCT_EXPORT_METHOD(registerList)
 {
     [[RCTComponentViewFactory currentComponentViewFactory] registerComponentViewClass: [MGWishListComponent class]];
 }
+
+-(void)setBridge:(RCTBridge *)bridge
+{
+    // TODO here you can intercept uiManager by registering fake surface
+  //bridge.surfacePresentsr
+};
 
 @end
