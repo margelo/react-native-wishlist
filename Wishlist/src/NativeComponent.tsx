@@ -16,8 +16,8 @@ import {codegenNativeComponent} from 'react-native-tscodegen-types';
 import {codegenNativeCommands} from 'react-native-tscodegen-types';
 'use strict';
 
-//import {NativeModules} from 'react-native';
-//NativeModules.Workaround.registerList();
+import {NativeModules} from 'react-native';
+NativeModules.Workaround.registerList();
 
 export type EventInFile = Readonly<{
   boolean_required: boolean;
