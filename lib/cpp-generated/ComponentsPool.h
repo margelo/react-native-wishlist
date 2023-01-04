@@ -17,6 +17,49 @@
 using namespace facebook::react;
 using namespace jsi;
 
+struct ShadowNodeBinding : public jsi::HostObject, std::enable_shared_from_this<ShadowNodeBinding> {
+    
+    std::shared_ptr<ShadowNodeBinding> parent;
+    std::shared_ptr<const ShadowNode> sn;
+    
+    ShadowNodeBinding(std::shared_ptr<const ShadowNode> sn, std::shared_ptr<ShadowNodeBinding> parent=nullptr) {
+        this->sn = sn;
+        this->parent = parent;
+    }
+    
+    virtual Value get(Runtime & rt, const PropNameID& nameProp) {
+        std::string name = nameProp.utf8(rt);
+        
+        if (name == "addProps") {
+            return jsi::Function::createFromHostFunction(rt, nameProp, 1, [=](
+                jsi::Runtime &rt,
+                jsi::Value const &thisValue,
+                jsi::Value const *args,
+                size_t count) -> jsi::Value {
+                    RawProps rawProps(rt, args[0]);
+                    
+                    
+                    
+                    
+                    return jsi::Value::undefined();
+            });
+        }
+        
+        for (auto child : sn->getChildren()) {
+            if (child->getComponentName() == name) {
+                return jsi::Object::createFromHostObject(rt, std::make_shared<ShadowNodeBinding>(child, sn));
+            }
+        }
+        
+        return jsi::Value::undefined();
+    }
+
+  
+    virtual void set(Runtime & rt, const PropNameID& name, const Value& value) {
+        throw jsi::JSError(rt, "set hasn't been implemented yet");
+    }
+};
+
 struct ComponentsPool : std::enable_shared_from_this<ComponentsPool>
 {
     std::map<std::string, int> nameToIndex;
@@ -70,6 +113,8 @@ struct ComponentsPool : std::enable_shared_from_this<ComponentsPool>
                 return jsi::Function::createFromHostFunction(rt, jsi::PropNameID::forUtf8(rt, std::string("getComponent")), 1, [](Runtime & rt, const Value& thisVal, const Value* args, size_t count) -> Value {
                     
                     
+                    
+    
                 });
             }
             
