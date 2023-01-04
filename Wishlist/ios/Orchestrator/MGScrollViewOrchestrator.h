@@ -11,6 +11,7 @@
 #import <memory>
 #import "WishlistProps.h"
 #import "WishlistShadowNodes.h"
+#import "MGAnimations.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -22,20 +23,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@protocol MGScrollAnimation <NSObject>
-
-- (void)setupWithTimestamp:(double)timestamp;
-- (CGFloat)getDiffWithTimestamp:(double)timestamp;
-- (BOOL)isFinished;
-
-@end
-
 
 @interface MGScrollViewOrchestrator : NSObject
 
 - (instancetype)initWith:(UIScrollView*)scrollView templates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates names:(std::vector<std::string>)names viewportObserver:(std::shared_ptr<ViewportObserver>)vo inflatorId:(std::string)inflatorId;
 - (void)notifyAboutEvent:(PanEvent *)event;
 - (void)notifyAboutNewTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates withNames:(std::vector<std::string>)names;
+- (void)scrollToItem:(int)index;
 
 @end
 

@@ -7,70 +7,6 @@
 
 #import "MGScrollViewOrchestrator.h"
 
-// https://medium.com/@esskeetit/scrolling-mechanics-of-uiscrollview-142adee1142c
-// most likly it can be optimised by estimating that function on [lastTimestamp, timestamp] interval
-@interface MGDecayAnimation : NSObject <MGScrollAnimation>
-- (instancetype)initWithVelocity:(double)v;
-@end
-
-@implementation MGDecayAnimation {
-    double _lastTimestamp;
-    double _initialTimestamp;
-    double _intialVelocity;
-    BOOL _isFinished;
-    double _destination;
-    double _totalDistanceTraveled;
-    double _decRate;
-}
-
-- (instancetype)initWithVelocity:(double)v
-{
-    if (self = [super init]) {
-        _intialVelocity = v;
-        _totalDistanceTraveled = 0;
-        _decRate = 0.998;
-        _isFinished = NO;
-        [self computeDestination];
-    }
-    return self;
-}
-
-- (void)computeDestination
-{
-    double d = 1000.0 * log(_decRate);
-    _destination = - (_intialVelocity / d);
-    NSLog(@"aaa dest %f", _destination);
-}
-
-- (CGFloat)getValueAtTimestamp:(double)timestamp {
-    double d = 1000.0 * log(_decRate);
-    return (pow(_decRate, 1000.0 * (timestamp - _initialTimestamp)) - 1.0) / d * _intialVelocity;
-}
-
-- (CGFloat)getDiffWithTimestamp:(double)timestamp {
-    double nextVal = [self getValueAtTimestamp:timestamp];
-    double diff = nextVal - _totalDistanceTraveled;
-    NSLog(@"aaa diff %f", diff);
-    _totalDistanceTraveled = nextVal;
-    _lastTimestamp = timestamp;
-    if (abs(_totalDistanceTraveled - _destination) < 0.01) {
-        _isFinished = YES;
-    }
-    return diff;
-}
-
-- (BOOL)isFinished {
-    return _isFinished;
-}
-
-- (void)setupWithTimestamp:(double)timestamp {
-    _initialTimestamp = timestamp;
-    _lastTimestamp = timestamp;
-}
-
-@end
-
-
 @implementation MGScrollViewOrchestrator {
     UIScrollView * _scrollView;
     CADisplayLink * _displayLink;
@@ -149,7 +85,6 @@
                 _doWeHaveOngoingEvent = NO;
                 // start Animation with velocity
                 _currentAnimation = [[MGDecayAnimation alloc] initWithVelocity:event.velocity];
-                [_currentAnimation setupWithTimestamp:displayLink.timestamp];
             }
         }
            
@@ -157,6 +92,9 @@
     }
     // Run Animations
     if (_currentAnimation != nil) {
+        if ([_currentAnimation needsSetup]) {
+            [_currentAnimation setupWithTimestamp:displayLink.timestamp];
+        }
         yDiff += [_currentAnimation getDiffWithTimestamp:displayLink.timestamp];
         if ([_currentAnimation isFinished]) {
             NSLog(@"aaa stop Animation isFinished");
@@ -240,6 +178,16 @@
     _pendingTemplates = templates;
     _pendingNames = names;
     _doWeHavePendingTemplates = YES;
+    [self maybeRegisterForNextVSync];
+}
+
+- (void)scrollToItem:(int)index
+{
+    if (_doWeHaveOngoingEvent) {
+        return;
+    }
+    _currentAnimation = [[MGScrollToItemAnimation alloc] initWithIndex:index offset:_scrollView.currentOffset viewportObserver:_viewportObserver];
+
     [self maybeRegisterForNextVSync];
 }
 
