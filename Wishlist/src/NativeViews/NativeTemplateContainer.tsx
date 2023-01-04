@@ -13,6 +13,7 @@ NativeModules.Workaround.registerContainer();
 
 export type NativeTemplateContainerProps = Readonly<ViewProps & {
   inflatorId: string;
+  names: ReadonlyArray<string>;
 }>;
 
 type NativeType = HostComponent<NativeTemplateContainerProps>;

@@ -20,11 +20,13 @@ class MGTemplateContainerComponentProps final : public ViewProps {
  public:
   MGTemplateContainerComponentProps() = default;
   MGTemplateContainerComponentProps(const PropsParserContext& context, const MGTemplateContainerComponentProps &sourceProps, const RawProps &rawProps);
+  
 
 #pragma mark - Props
 
   std::string inflatorId{};
   std::vector<std::string> names{};
+  std::vector<std::shared_ptr<ShadowNode const>> templates;
 };
 
 } // namespace react

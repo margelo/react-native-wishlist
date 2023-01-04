@@ -86,10 +86,8 @@ export type Int = Int32;
 export type Void = void;
 
 export type WishlistProps = Readonly<ViewProps & {
-  kkk: Int;
   reanimatedRuntime: Double,
   inflatorId: string;
-  names: ReadonlyArray<string>;
   onBubblingEventDefinedInline: BubblingEventHandler<EventInFile>;
   onBubblingEventDefinedInlineWithPaperName: BubblingEventHandler<EventInFile, 'paperBubblingEventDefinedInlineWithPaperName'>;
   onDirectEventDefinedInline: DirectEventHandler<EventInFile>;
