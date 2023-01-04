@@ -31,7 +31,7 @@ class ModuleState final {
  public:
     double originContentOffset = 50000;
     int originItemIndex = 10; // Hardcode for now
-    ViewportObserver viewportObserver;
+    std::shared_ptr<ViewportObserver> viewportObserver = std::make_shared<ViewportObserver>();
     bool initialised = false;
 
 #ifdef ANDROID
@@ -51,6 +51,7 @@ class ModuleState final {
   MapBuffer getMapBuffer() const {
     return MapBufferBuilder::EMPTY();
   };
+  virtual ~ModuleState(){}
 #endif
 };
 
