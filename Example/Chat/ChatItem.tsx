@@ -21,6 +21,11 @@ export const ChatItemView: React.FC<Props> = ({type}) => {
             {/*  FIXME: We shouldnt need placeholders - but currently we need'em */}
             Author
           </Text>
+          {type === 'other' ? (
+            <View nativeID="likeButton">
+              <Text nativeID="likes">❤️</Text>
+            </View>
+          ) : null}
         </View>
       </View>
 
@@ -29,17 +34,6 @@ export const ChatItemView: React.FC<Props> = ({type}) => {
           Simple Message
         </Text>
       </View>
-
-      {/* {type === 'other' ? (
-        <View nativeID="button">
-          <Button
-            title="Like"
-            onPress={() => {
-              onSelected && onSelected({type, author, message, avatarUrl});
-            }}
-          />
-        </View>
-      ) : null} */}
     </View>
   );
 };
@@ -56,7 +50,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#A4A5EF',
   },
   other: {
-    backgroundColor: '#EDEDED',
+    backgroundColor: '#EFEFEF',
   },
   imageAndAuthor: {
     flexDirection: 'row',
@@ -68,7 +62,10 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   authorContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginHorizontal: 6,
+    flex: 1,
   },
   authorText: {
     fontWeight: 'bold',

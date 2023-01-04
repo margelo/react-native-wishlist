@@ -1,45 +1,76 @@
-import React from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {ViewProps} from 'react-native';
 import {WishList} from 'Wishlist';
 import {ChatItemView} from './ChatItem';
 import {ChatItem} from './Data';
-
+import {runOnJS} from 'react-native-reanimated';
 interface Props extends ViewProps {
   data: ChatItem[];
+  onLikeItem: (item: ChatItem) => void;
 }
 
-export const ChatListView: React.FC<Props> = ({data, style}) => {
+export const ChatListView: React.FC<Props> = ({data, onLikeItem, style}) => {
+  const handleLikeItem = useCallback(
+    (item: ChatItem) => {
+      onLikeItem(item);
+    },
+    [onLikeItem],
+  );
+  const Mapping = useMemo(
+    () => ({
+      content: (value: any, item: any) => {
+        'worklet';
+        item.RawText.addProps({text: value.message});
+      },
+      author: (value: any, item: any) => {
+        'worklet';
+        item.RawText.addProps({text: value.author});
+      },
+      avatar: (value: any, item: any) => {
+        'worklet';
+        item.addProps({source: {uri: value.avatarUrl}});
+      },
+      likes: (value: any, item: any) => {
+        'worklet';
+        value.likes > 0
+          ? item.RawText.addProps({text: '♥️'})
+          : item.RawText.addProps({text: '🖤'});
+        value.likes === 0 && item.addProps({opacity: 0.4});
+      },
+      likeButton: (value: any, item: any) => {
+        'worklet';
+        item.addProps({pointerEvents: 'box-only'});
+        item.setCallback('touchEnd', () => {
+          runOnJS(handleLikeItem)(value);
+        });
+      },
+    }),
+    [handleLikeItem],
+  );
+
   return (
     <WishList.Component
       style={style}
       inflateItem={(index, pool) => {
         'worklet';
+
         if (index < 0 || index >= data.length) {
           return undefined;
         }
 
-        const element = data[index];
-        const item = pool.getComponent(element.type);
+        const value = data[index];
+        const item = pool.getComponent(value.type);
 
-        // Update content
-        const contentView = item.getByWishId('content');
-        contentView.RawText.addProps({text: element.message});
-
-        const authorView = item.getByWishId('author');
-        authorView.RawText.addProps({text: element.author});
-
-        const imageView = item.getByWishId('avatar');
-        imageView.addProps({source: {uri: element.avatarUrl}});
-        // imageView.setCallback('loadEnd', () => {
-        //   // modify data
-        //   // console.log('loadEvent' + index);
-        // });
-
-        //   const button = item.getByWishId('button');
-        //   button.addProps({pointerEvents: 'box-only'});
-        //   button.setCallback('touchEnd', () => {
-        //     console.log('touched', index, element.message);
-        //   });
+        Object.keys(Mapping).forEach(key => {
+          const templateItem = item.getByWishId(key);
+          if (templateItem) {
+            try {
+              Mapping[key](value, templateItem);
+            } catch (err) {
+              console.error(err);
+            }
+          }
+        });
 
         return item;
       }}>
