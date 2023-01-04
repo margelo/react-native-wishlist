@@ -1,11 +1,11 @@
 import {useMemo} from 'react';
 
-export type TemplateValueMapper<T, K> = (item: T) => K;
+export type TemplateValueMapper<ItemT, ValueT> = (item: ItemT) => ValueT;
 
-export class TemplateValue<T, K> {
-  _mapper: TemplateValueMapper<T, K>;
+export class TemplateValue<ValueT> {
+  _mapper: TemplateValueMapper<any, ValueT>;
 
-  constructor(mapper: TemplateValueMapper<T, K>) {
+  constructor(mapper: TemplateValueMapper<any, ValueT>) {
     this._mapper = mapper;
   }
 
@@ -14,8 +14,10 @@ export class TemplateValue<T, K> {
   }
 }
 
-export function useTemplateValue<T, K>(mapper: TemplateValueMapper<T, K>) {
+export function useTemplateValue<ItemT, ValueT>(
+  mapper: TemplateValueMapper<ItemT, ValueT>,
+): TemplateValue<ValueT> {
   return useMemo(() => {
     return new TemplateValue(mapper);
-  }, [mapper]) as unknown as K;
+  }, [mapper]);
 }
