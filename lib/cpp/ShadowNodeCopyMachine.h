@@ -1,10 +1,3 @@
-//
-//  ShadowNodeCopyMachine.hpp
-//  MGWishList
-//
-//  Created by Szymon on 17/11/2021.
-//
-
 #ifndef ShadowNodeCopyMachine_hpp
 #define ShadowNodeCopyMachine_hpp
 

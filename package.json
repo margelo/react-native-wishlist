@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "The ultimate virtualised list solution",
   "main": "index.js",
-  "author": "Skapala",
+  "author": "Marc & Szymon",
   "license": "MIT",
   "private": true,
   "scripts": {

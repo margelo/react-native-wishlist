@@ -1,10 +1,3 @@
-//
-//  ItemProvider.hpp
-//  MGWishList
-//
-//  Created by Szymon on 30/11/2021.
-//
-
 #ifndef ItemProvider_hpp
 #define ItemProvider_hpp
 

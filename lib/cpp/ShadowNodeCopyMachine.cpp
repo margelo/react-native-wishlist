@@ -1,10 +1,3 @@
-//
-//  ShadowNodeCopyMachine.cpp
-//  MGWishList
-//
-//  Created by Szymon on 17/11/2021.
-//
-
 #include "ShadowNodeCopyMachine.h"
 #include "WishlistComponentDescriptors.h"
 
