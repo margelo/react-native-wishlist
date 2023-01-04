@@ -28,6 +28,20 @@ struct ShadowNodeBinding : public jsi::HostObject, std::enable_shared_from_this<
         this->sn = sn;
         this->parent = parent;
     }
+  
+    std::shared_ptr<const ShadowNode> findNodeByWishId(const std::string& nativeId, std::shared_ptr<const ShadowNode> root) {
+      auto v = root->getProps()->nativeId;
+      if(v == nativeId) {
+        return root;
+      }
+      for(auto child : root->getChildren()) {
+        auto node = findNodeByWishId(nativeId, child);
+        if(node != nullptr) {
+          return node;
+        }
+      }
+      return nullptr;
+    }
     
     virtual Value get(Runtime & rt, const PropNameID& nameProp) {
         std::string name = nameProp.utf8(rt);
@@ -93,6 +107,20 @@ struct ShadowNodeBinding : public jsi::HostObject, std::enable_shared_from_this<
                     
                     return jsi::Value::undefined();
             });
+        }
+      
+        if (name == "getByWishId") {
+          return jsi::Function::createFromHostFunction(rt, nameProp, 1, [=](jsi::Runtime &rt,
+                                                                            jsi::Value const &thisValue,
+                                                                            jsi::Value const *args,
+                                                                            size_t count) -> jsi::Value {
+            auto node = findNodeByWishId(args[0].asString(rt).utf8(rt), sn);
+            if(node != nullptr) {
+              return jsi::Object::createFromHostObject(rt, std::make_shared<ShadowNodeBinding>(node, parent.lock()));
+            }
+            
+            return jsi::Value::undefined();
+          });
         }
         
         if (name == "at") {
