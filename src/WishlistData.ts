@@ -50,6 +50,9 @@ export function useInternalWishlistData(wishlistId, initialData) {
             this.setAt(index, value);
           };
 
+          thiz.set = thiz.setItem;
+          thiz.get = thiz.forKey;
+
           thiz.setAt = function setAt(index, value) {
             this.deque[index] = value;
             if (this.isTrackingChanges) {
@@ -92,9 +95,10 @@ export function useInternalWishlistData(wishlistId, initialData) {
         _log('ooo created copies');
 
         const pendingUpdates = [];
-        function update(worklet) {
-          worklet(__nextCopy);
-          pendingUpdates.push(worklet);
+        function update(updateJob) {
+          _log('ooo update!!!');
+          updateJob(__nextCopy);
+          pendingUpdates.push(updateJob);
           scheduleSyncUp();
         }
 
@@ -123,7 +127,7 @@ export function useInternalWishlistData(wishlistId, initialData) {
         global.dataCtx[wishlistId] = internalData;
         _log('ooo init is done');
       }
-
+      _log('ooo return internal data');
       return global.dataCtx[wishlistId];
     };
   }, []);
