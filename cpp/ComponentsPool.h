@@ -72,10 +72,10 @@ struct ShadowNodeBinding : public jsi::HostObject,
   virtual Value get(Runtime &rt, const PropNameID &nameProp);
 
   virtual void set(Runtime &rt, const PropNameID &name, const Value &value) {
-      std::string str = name.utf8(rt);
-      if (str == "key") {
-          this->key = value.asString(rt).utf8(rt);
-      }
+    std::string str = name.utf8(rt);
+    if (str == "key") {
+      this->key = value.asString(rt).utf8(rt);
+    }
   }
 };
 
