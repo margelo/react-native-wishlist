@@ -15,6 +15,7 @@
 #include "decorator.h"
 #include <react/renderer/core/ConcreteComponentDescriptor.h>
 
+
 using namespace facebook::react;
 using namespace jsi;
 
@@ -30,6 +31,25 @@ struct ShadowNodeBinding : public jsi::HostObject, std::enable_shared_from_this<
     
     virtual Value get(Runtime & rt, const PropNameID& nameProp) {
         std::string name = nameProp.utf8(rt);
+        
+        if (name == "setCallback") {
+            return jsi::Function::createFromHostFunction(rt, nameProp, 1, [=](
+                jsi::Runtime &rt,
+                jsi::Value const &thisValue,
+                jsi::Value const *args,
+                size_t count) -> jsi::Value {
+                    std::string callbackName = args[0].asString(rt).utf8(rt);
+                    int tag = this->sn->getTag();
+                    std::string eventName = std::to_string(tag) + callbackName;
+                    jsi::Function callback = args[1].asObject(rt).asFunction(rt);
+                    
+                    auto handlerRegistry = rt.global().getPropertyAsObject(rt, "global").getPropertyAsObject(rt, "handlers");
+                    handlerRegistry.setProperty(rt, eventName.c_str(), callback);
+                    
+                    return jsi::Value::undefined();
+            });
+        }
+
         
         if (name == "addProps") {
             return jsi::Function::createFromHostFunction(rt, nameProp, 1, [=](
