@@ -1,5 +1,5 @@
 import React, {useCallback, useMemo} from 'react';
-import {ViewProps} from 'react-native';
+import type {ViewProps} from 'react-native';
 import {WishList} from 'wishlist';
 import {ChatItemView, Reaction} from './ChatItem';
 import {ChatItem} from './Data';
@@ -19,7 +19,7 @@ export const ChatListView: React.FC<Props> = ({data, onLikeItem, style}) => {
 
   const runOnJS = useMemo(() => {
     const f = require('react-native-reanimated').runOnJS; //delay reanimated init
-    return (...args) => {
+    return (...args: any[]) => {
       'worklet';
       return f(...args);
     };
