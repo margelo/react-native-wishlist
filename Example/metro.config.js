@@ -21,9 +21,7 @@ module.exports = {
   },
   resolver: {
     extraNodeModules: new Proxy(
-      {
-        root: root,
-      },
+      {},
       {
         get: (target, name) =>
           name in target
@@ -32,5 +30,5 @@ module.exports = {
       },
     ),
   },
-  watchFolders: [root],
+  watchFolders: [path.resolve('.'), path.resolve('../Wishlist')],
 };
