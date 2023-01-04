@@ -48,6 +48,7 @@
         _doWeHavePendingTemplates = NO;
         _doWeHaveOngoingEvent = NO;
         _inflatorId = inflatorId;
+        _touchEvents = [NSMutableArray new];
     }
     return self;
 }
@@ -91,7 +92,7 @@
     // Update content Offset
     if (yDiff != 0) {
         CGPoint oldOffset = _scrollView.contentOffset;
-        _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + yDiff);
+        _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y - yDiff);
     }
     
     // update teamplates if needed
