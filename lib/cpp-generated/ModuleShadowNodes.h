@@ -13,6 +13,8 @@
 #include "ModuleEventEmitters.h"
 #include "ModuleProps.h"
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
+#include "LayoutContext.h"
+#include "LayoutConstraints.h"
 
 namespace facebook {
 namespace react {
@@ -22,10 +24,40 @@ extern const char ModuleComponentName[];
 /*
  * `ShadowNode` for <Module> component.
  */
-using ModuleShadowNode = ConcreteViewShadowNode<
-    ModuleComponentName,
-    ModuleProps,
-ModuleEventEmitter>;
+
+class ModuleShadowNode : public ConcreteViewShadowNode<
+                                ModuleComponentName,
+                                ModuleProps,
+ModuleEventEmitter> {
+public:
+    ModuleShadowNode(
+        ShadowNodeFragment const &fragment,
+        ShadowNodeFamily::Shared const &family,
+        ShadowNodeTraits traits)
+        : ConcreteViewShadowNode(fragment, family, traits) {
+     
+    }
+
+    ModuleShadowNode(
+        ShadowNode const &sourceShadowNode,
+        ShadowNodeFragment const &fragment)
+        : ConcreteViewShadowNode(sourceShadowNode, fragment) {
+      
+    }
+    
+    void appendChild(
+                     ShadowNode::Shared const &childNode) {
+        ConcreteViewShadowNode::appendChild(childNode);
+        std::shared_ptr<const LayoutableShadowNode> lsn = std::dynamic_pointer_cast<const LayoutableShadowNode>(childNode);
+        LayoutContext lc;
+        LayoutConstraints lcc;
+        //lsn->layoutTree(lc);
+        Size sz = lsn->measure(lc, lcc);
+        int x = 5;
+    }
+    
+    virtual ~ModuleShadowNode(){}
+};
 
 } // namespace react
 } // namespace facebook
