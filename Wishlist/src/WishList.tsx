@@ -42,8 +42,11 @@ type NestedTemplatesContextValue = {
 };
 
 const MappingContext = createContext<{inflatorId: string} | null>(null);
-const TemplateContext = createContext<{templateType: string} | null>(null);
-const NestedTemplatesContext =
+const TemplateContext = createContext<{
+  templateType: string;
+  renderChildren?: boolean;
+} | null>(null);
+const TemplatesRegistryContext =
   createContext<NestedTemplatesContextValue | null>(null);
 
 function getTemplatesFromChildren(children, width) {
@@ -109,7 +112,7 @@ const Component = forwardRef<any, Props>(
       [children, width],
     );
 
-    const nestedTemplatesValue = useMemo<NestedTemplatesContextValue>(
+    const templatesRegistry = useMemo<NestedTemplatesContextValue>(
       () => ({
         templates: {},
         registerTemplate(type, component) {
@@ -198,13 +201,14 @@ const Component = forwardRef<any, Props>(
 
     return (
       <MappingContext.Provider value={mappingContext}>
-        <NestedTemplatesContext.Provider value={nestedTemplatesValue}>
+        <TemplatesRegistryContext.Provider value={templatesRegistry}>
           <>
             {/* Prerender templates to register all the nested templates */}
             <View style={{display: 'none'}}>
               {Object.keys(childrenTemplates).map((c, i) => (
                 <View key={c[i] + 'prerender'}>
-                  <TemplateContext.Provider value={{templateType: c}}>
+                  <TemplateContext.Provider
+                    value={{templateType: c, renderChildren: true}}>
                     {childrenTemplates[c]}
                   </TemplateContext.Provider>
                 </View>
@@ -217,10 +221,10 @@ const Component = forwardRef<any, Props>(
               nativeWishlist={nativeWishlist}
               rest={rest}
               templates={childrenTemplates}
-              nestedTemplates={nestedTemplatesValue.templates}
+              nestedTemplates={templatesRegistry.templates}
             />
           </>
-        </NestedTemplatesContext.Provider>
+        </TemplatesRegistryContext.Provider>
       </MappingContext.Provider>
     );
   },
@@ -237,7 +241,7 @@ function InnerComponent({
   const combinedTemplates = {...templates, ...nestedTemplates};
 
   const keys = Object.keys(combinedTemplates);
-  console.log('@@@ Render WishList', inflatorId, keys.join(', '));
+  // console.log('@@@ Render WishList', inflatorId, keys.join(', '));
 
   return (
     <NativeTemplateInterceptor
@@ -277,12 +281,13 @@ type TemplateProps = {
   children: React.ReactElement;
 };
 
-function Template({children, type, nested}: TemplateProps) {
-  const nestedContext = useContext(NestedTemplatesContext);
+function Template({children, type}: TemplateProps) {
+  const registry = useContext(TemplatesRegistryContext);
+  const templates = useContext(TemplateContext);
 
-  nestedContext?.registerTemplate(type, children);
-  // TODO(terry): Get rid of this nested prop
-  return nested ? null : children;
+  registry?.registerTemplate(type, children);
+
+  return templates?.renderChildren ? children : null;
 }
 
 let nativeIdGenerator = 0;
@@ -475,7 +480,7 @@ export const WishList = {
       'worklet';
 
       const subItems = props.items;
-      console.log('subItems', subItems);
+      // console.log('subItems', subItems);
       const items = subItems.map(subItem => {
         const childItem = pool.getComponent(props.template);
         const childValue = subItem;
