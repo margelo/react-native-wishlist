@@ -255,7 +255,10 @@ const Component = forwardRef(
       [inflatorId],
     );
 
-    const wishlistId = useRef({ id: `ID#${wishCtr++}` });
+    const wishlistId = useRef<{ id: string } | null>(null);
+    if (!wishlistId.current) {
+      wishlistId.current = { id: `ID#${wishCtr++}` };
+    }
 
     return (
       <WishlistIDContext.Provider value={wishlistId.current}>
