@@ -27,7 +27,9 @@ using namespace facebook::react;
 
 @end
 
-@implementation MGWishListComponent
+@implementation MGWishListComponent{
+    ModuleState _sharedState;
+}
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
@@ -61,7 +63,8 @@ using namespace facebook::react;
     if (state == nullptr) return;
     auto newState = std::static_pointer_cast<ModuleShadowNode::ConcreteState const>(state);
     auto &data = newState->getData();
-    int y = 4;
+    _sharedState = data;
+    
  /* _state = std::static_pointer_cast<ScrollViewShadowNode::ConcreteState const>(state);
   auto &data = _state->getData();
 
