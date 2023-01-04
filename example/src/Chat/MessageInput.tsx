@@ -21,6 +21,7 @@ export function MessageInput({ onSend }: MessageInputProps) {
         style={styles.input}
         value={value}
         onChangeText={setValue}
+        onSubmitEditing={handlePress}
       />
       <BorderlessButton onPress={handlePress} style={styles.button}>
         <Text style={[styles.text, !!value && styles.active]}>Send</Text>

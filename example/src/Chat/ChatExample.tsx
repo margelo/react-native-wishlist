@@ -29,18 +29,24 @@ export default function App() {
     }, 500);
   }, []);
 
-  const [activeMessageForReaction, setActiveReactionPicker] =
-    useState<ChatItem | null>(null);
+  const [activeMessageIdForReaction, setActiveMessageIdForReaction] = useState<
+    string | null
+  >(null);
 
   const showAddReactionModal = useCallback((item: ChatItem) => {
-    setActiveReactionPicker(item);
+    setActiveMessageIdForReaction(item.key);
   }, []);
 
   const onAddReaction = createRunInJsFn(showAddReactionModal);
 
   const onPickReaction = (emoji: string) => {
-    console.log(emoji);
-    setActiveReactionPicker(null);
+    listRef.current?.update((dataCopy) => {
+      'worklet';
+      const oldValue = dataCopy.get(activeMessageIdForReaction!)!;
+      oldValue.reactions.push({ emoji, key: Math.random().toString() });
+      dataCopy.set(activeMessageIdForReaction!, oldValue);
+    });
+    setActiveMessageIdForReaction(null);
   };
 
   if (!data.length) {
@@ -66,7 +72,7 @@ export default function App() {
         />
         <MessageInput onSend={handleSend} />
       </View>
-      {activeMessageForReaction && (
+      {activeMessageIdForReaction && (
         <ReactionPicker onPickReaction={onPickReaction} />
       )}
     </>
