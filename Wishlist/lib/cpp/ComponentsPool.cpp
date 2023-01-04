@@ -99,6 +99,9 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
             jsi::Value const &thisValue,
             jsi::Value const *args,
             size_t count) -> jsi::Value {
+          if (!args[0].isObject()) {
+            return jsi::Value::undefined();
+          }
           jsi::Array subItems = args[0].asObject(rt).asArray(rt);
 
           auto &cd = sn->getComponentDescriptor();
