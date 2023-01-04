@@ -39,7 +39,7 @@ std::shared_ptr<const ShadowNode> ShadowNodeCopyMachine::copyShadowSubtree(std::
     
     for (std::shared_ptr<const ShadowNode> child : sn->getChildren()) {
         std::shared_ptr<const ShadowNode> clonedChild = copyShadowSubtree(child);
-        clonedShadowNode->appendChild(clonedChild);
+        cd.appendChild(clonedShadowNode, clonedChild);
     }
 
     return clonedShadowNode;
