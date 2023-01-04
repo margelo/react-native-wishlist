@@ -149,7 +149,7 @@ struct ComponentsPool : std::enable_shared_from_this<ComponentsPool> {
         std::weak_ptr<ComponentsPool> blockWcp = this->wcp;
         return jsi::Function::createFromHostFunction(
             rt,
-            jsi::PropNameID::forUtf8(rt, std::string("getComponent")),
+            nameProp,
             1,
             [blockWcp](
                 Runtime &rt,

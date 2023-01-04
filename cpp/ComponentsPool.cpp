@@ -229,6 +229,17 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
         });
   }
 
+  if (name == "getTag") {
+    return jsi::Function::createFromHostFunction(
+        rt,
+        nameProp,
+        0,
+        [=](jsi::Runtime &rt,
+            jsi::Value const &thisValue,
+            jsi::Value const *args,
+            size_t count) -> jsi::Value { return jsi::Value(sn->getTag()); });
+  }
+
   for (auto child : sn->getChildren()) {
     if (child->getComponentName() == name) {
       return jsi::Object::createFromHostObject(

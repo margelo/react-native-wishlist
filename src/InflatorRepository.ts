@@ -7,9 +7,13 @@ export type TemplateItem = {
   key: string;
   getByWishId: (id: string) => TemplateItem | undefined;
   addProps: (props: any) => void;
-  setCallback: (eventName: string, callback: () => void) => void;
+  setCallback: (
+    eventName: string,
+    callback: (nativeEvent: any) => void,
+  ) => void;
   describe: () => string;
   setChildren: (children: TemplateItem[]) => void;
+  getTag: () => number;
 };
 
 export type ComponentPool = {
@@ -143,7 +147,6 @@ const maybeInit = () => {
           innerMapping.set(nativeId, inflateMethod);
           mapping.set(templateType, innerMapping);
           mappings.set(inflatorId, mapping);
-          console.log('registered!@');
         },
         getTemplateValueState: (id) => {
           return templateValueStates.get(id);
