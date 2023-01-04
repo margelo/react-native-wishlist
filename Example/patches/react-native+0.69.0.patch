@@ -1,0 +1,45 @@
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.cpp b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.cpp
+index 1e62ecc..6cde564 100644
+--- a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.cpp
++++ b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.cpp
+@@ -45,7 +45,9 @@ UIManager::UIManager(
+     : runtimeExecutor_(runtimeExecutor),
+       backgroundExecutor_(std::move(backgroundExecutor)),
+       contextContainer_(std::move(contextContainer)),
+-      leakChecker_(constructLeakCheckerIfNeeded(runtimeExecutor)) {}
++      leakChecker_(constructLeakCheckerIfNeeded(runtimeExecutor)) {
++        KeyClassHolder::shadowTreeRegistry = &shadowTreeRegistry_;
++      }
+ 
+ UIManager::~UIManager() {
+   LOG(WARNING) << "UIManager::~UIManager() was called (address: " << this
+@@ -450,4 +452,6 @@ void UIManager::animationTick() const {
+   }
+ }
+ 
++ShadowTreeRegistry * KeyClassHolder::shadowTreeRegistry = nullptr;
++
+ } // namespace facebook::react
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.h b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.h
+index ab950a0..cca9fa6 100644
+--- a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.h
++++ b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.h
+@@ -30,6 +30,11 @@ namespace facebook::react {
+ class UIManagerBinding;
+ class UIManagerCommitHook;
+ 
++class KeyClassHolder {
++public:
++    static ShadowTreeRegistry * shadowTreeRegistry;
++};
++
+ class UIManager final : public ShadowTreeDelegate {
+  public:
+   UIManager(
+diff --git a/node_modules/react-native/scripts/.packager.env b/node_modules/react-native/scripts/.packager.env
+new file mode 100644
+index 0000000..361f5fb
+--- /dev/null
++++ b/node_modules/react-native/scripts/.packager.env
+@@ -0,0 +1 @@
++export RCT_METRO_PORT=8081
