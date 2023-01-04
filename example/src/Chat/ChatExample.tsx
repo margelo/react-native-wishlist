@@ -24,7 +24,6 @@ export default function App() {
       'worklet';
       // get rid of frozen object that Reanimated creates
       const val = JSON.parse(JSON.stringify(newItem));
-      val.message += ` ind:${dataCopy.length()}`;
       dataCopy.push(val);
       return dataCopy.length() - 1;
     })) as number;

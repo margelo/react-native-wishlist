@@ -9,6 +9,7 @@ export type ChatItem = {
   type: 'me' | 'other';
   message: string;
   avatarUrl: string;
+  showBiggerAvatar: boolean;
   liked: boolean;
   reactions: ReactionItem[];
 };
@@ -57,11 +58,12 @@ const createChatItem = (index: number): ChatItem => {
     key: `id#${index}`,
     type: author === 'Me' ? 'me' : 'other',
     author,
-    message: `message ind:${index}`,
+    message,
     avatarUrl: `https://i.pravatar.cc/100?u=${
       authors[Math.round(index % authors.length)]
     }`,
     liked: false,
+    showBiggerAvatar: false,
     reactions: getRandomReactions().map((ele, i) => ({
       emoji: ele,
       key: String(i),
@@ -77,6 +79,7 @@ export const getSendedMessage = (text: string) => {
     message: text,
     avatarUrl: `https://i.pravatar.cc/100?u=Me`,
     liked: false,
+    showBiggerAvatar: false,
     reactions: [],
   };
 
