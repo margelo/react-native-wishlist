@@ -26,7 +26,9 @@
     "eslint": "^7.32.0",
     "jest": "^26.6.3",
     "metro-react-native-babel-preset": "^0.70.3",
-    "react-test-renderer": "18.0.0"
+    "react-test-renderer": "18.0.0",
+    "react-native-tscodegen": "^0.68.4",
+    "react-native-tscodegen-types": "^0.67.3"
   },
   "jest": {
     "preset": "react-native"
