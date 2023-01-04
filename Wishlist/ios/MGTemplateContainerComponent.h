@@ -7,9 +7,12 @@
 
 #import <React-RCTFabric/React/RCTViewComponentView.h>
 
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MGTemplateContainerComponent : RCTViewComponentView
+
+-(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>) getTemplates;
 
 @end
 
