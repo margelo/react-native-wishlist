@@ -12,7 +12,7 @@ export function ChatHeader({ isLoading }: HeaderProps) {
     <View style={styles.container}>
       <View style={styles.left} />
       <View style={styles.center}>
-        {!isLoading && <Text style={styles.title}>Mergelo.io</Text>}
+        {!isLoading && <Text style={styles.title}>Margelo.io</Text>}
       </View>
       <View style={styles.right}>
         <View style={[styles.avatarContainer, isLoading && styles.gray]}>
