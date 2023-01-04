@@ -4,19 +4,14 @@ import { runOnJS, useWorkletCallback } from 'react-native-reanimated';
 import type { WishListInstance } from 'wishlist';
 import { ChatHeader } from './ChatHeader';
 import { ChatListView } from './ChatList';
-import {
-  addSendedMessage,
-  ChatItem,
-  fetchData,
-  getSendedMessage,
-} from './Data';
+import { ChatItem, fetchData, getSendedMessage } from './Data';
 import { MessageInput } from './MessageInput';
 import { ReactionPicker } from './ReactionPicker';
 
 export default function App() {
   const [data, setData] = useState<ChatItem[]>([]);
 
-  const listRef = useRef<WishListInstance<ChatItem>>();
+  const listRef = useRef<WishListInstance<ChatItem> | null>(null);
 
   const handleSend = useCallback(async (text: string) => {
     const newItem = getSendedMessage(text);

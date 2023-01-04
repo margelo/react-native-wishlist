@@ -1,7 +1,6 @@
 import React, {
   createContext,
-  forwardRef,
-  useCallback,
+  Ref,
   useContext,
   useImperativeHandle,
   useMemo,
@@ -143,7 +142,14 @@ function ComponentBase<T extends BaseItem>(
         return undefined;
       }
 
-      console.log('returned', value, "for index", index, 'data len', data().length());
+      console.log(
+        'returned',
+        value,
+        'for index',
+        index,
+        'data len',
+        data().length(),
+      );
 
       const item = pool.getComponent(value.type);
       if (!item) {
@@ -218,20 +224,11 @@ function ComponentBase<T extends BaseItem>(
   );
 }
 
-/* type ComponentType<T extends BaseItem> = React.ForwardRefExoticComponent<
-  ViewProps & {
-    initialData: T[];
-    onStartReached?: (() => void) | undefined;
-    onEndReached?: (() => void) | undefined;
-    initialIndex?: number | undefined;
-  } & React.RefAttributes<WishListInstance<T>>
->;
-
-const ComponentGenerator = <T extends BaseItem>() =>
-  forwardRef<T, Props<T>>(ComponentBase) as ComponentType<T>;
-const Component = ComponentGenerator(); */
-
-const Component = React.forwardRef(ComponentBase);
+const Component = React.forwardRef(
+  ComponentBase as <T extends BaseItem>(
+    props: Props<T> & { ref?: Ref<WishListInstance<T>> },
+  ) => ReturnType<typeof ComponentBase>,
+);
 
 type InnerComponentProps = ViewProps & {
   inflatorId: string;

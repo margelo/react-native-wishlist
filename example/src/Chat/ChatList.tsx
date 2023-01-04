@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ForwardedRef } from 'react';
 import type { ViewProps } from 'react-native';
 import { Wishlist, WishListInstance } from 'wishlist';
 import { ChatItemView } from './ChatItem';
@@ -9,9 +9,12 @@ interface Props extends ViewProps {
   onAddReaction: (item: ChatItem) => void;
 }
 
-export const ChatListView: React.FC<Props> = React.memo(
-  React.forwardRef<WishListInstance<ChatItem>, Props>(
-    ({ initialData, onAddReaction, style }, ref) => {
+export const ChatListView = React.memo(
+  React.forwardRef(
+    (
+      { initialData, onAddReaction, style }: Props,
+      ref: ForwardedRef<WishListInstance<ChatItem>>,
+    ) => {
       return (
         <Wishlist.Component
           style={style}
