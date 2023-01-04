@@ -99,7 +99,7 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
             jsi::Value const &thisValue,
             jsi::Value const *args,
             size_t count) -> jsi::Value {
-          if (!args[0].isObject()) {
+          if (!args[0].isObject() or !args[0].getObject(rt).isArray(rt)) {
             return jsi::Value::undefined();
           }
           jsi::Array subItems = args[0].asObject(rt).asArray(rt);
