@@ -15,6 +15,7 @@
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
 #include "LayoutContext.h"
 #include "LayoutConstraints.h"
+#include "ShadowNodeCopyMachine.hpp"
 #include <iostream>
 
 namespace facebook {
@@ -68,6 +69,15 @@ public:
         
         std::cout << "2 sdfwefwef" << std::endl;*/
         registeredViews.push_back(childNode);
+        auto props = std::dynamic_pointer_cast<const ModuleProps>(this->getProps());
+        if (props->names.size() == registeredViews.size()) { // last Child
+            for (int i = 0; i < 5; ++i) {
+                appendChild(ShadowNodeCopyMachine::copyShadowSubtree(registeredViews[0]));
+            }
+            for (int i = 0; i < 5; ++i) {
+                appendChild(ShadowNodeCopyMachine::copyShadowSubtree(registeredViews[1]));
+            }
+        }
     }
     
     virtual ~ModuleShadowNode(){}
