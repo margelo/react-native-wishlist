@@ -13,6 +13,7 @@
 
 struct WishItem
 {
+    float offset;
     int index;
     float height;
     std::shared_ptr<const LayoutableShadowNode> sn;
@@ -21,14 +22,11 @@ struct WishItem
 struct ViewportObserver {
     float offset;
     float windowHeight;
-    float originItemOffset;
-    int originItem;
-    int indexOfOriginItem;
-    int sufraceId;
+    int surfaceId;
     
     ComponentsPool componentsPool;
-    ItemsProvider itemsProvider;
-    std::vector<WishItem> window;
+    ItemProvider itemProvider;
+    std::deque<WishItem> window;
     
     void initOrUpdate(int surfaceId, float offset, float windowHeight, float originItemOffset, float originItem) {
         for (WishItem & item : window) {
@@ -36,13 +34,12 @@ struct ViewportObserver {
         }
         window.clear();
         
-        this->surfaceId;
+        this->surfaceId = surfaceId;
         this->offset = offset;
         this->windowHeight = windowHeight;
-        this->originItemOffset = originItemOffset;
-        this->originItem = originItem;
         
-        window.push_back(itemsProvider.provide(originItem));
+        window.push_back(itemProvider.provide(originItem));
+        window.back().offset = originItemOffset;
         updateWindow();
     }
     
@@ -51,9 +48,62 @@ struct ViewportObserver {
     }
     
     void updateWindow() {
+        float topEdge = offset - windowHeight;
+        float bottomEdge = offset + 2 * windowHeight;
         
+        // Add above
+        while (1) {
+            WishItem & item = window.front();
+            float bottom = item.offset + item.height;
+            
+            if (bottom < bottomEdge) {
+                WishItem wishItem = itemProvider.provide(item.index-1);
+                if (wishItem.sn.get() == nullptr) {
+                    break;
+                }
+                wishItem.offset = item.offset - wishItem.height;
+                window.push_front(wishItem);
+            }
+        }
+        
+        // Add below
+        while (1) {
+            WishItem & item = window.front();
+            float bottom = item.offset + item.height;
+
+            if (item.offset > topEdge) {
+                WishItem wishItem = itemProvider.provide(item.index+1);
+                if (wishItem.sn.get() == nullptr) {
+                    break;
+                }
+                wishItem.offset = bottom;
+                window.push_back(wishItem);
+            }
+        }
+        
+        // remove above
+        while (1) {
+            WishItem & item = window.front();
+            float bottom = item.offset + item.height;
+            if (bottom <= topEdge) {
+                window.pop_front();
+                componentsPool.returnToPool(item.sn);
+                continue;
+            }
+        }
+        
+        // remove below
+        while (1) {
+            WishItem & item = window.front();
+            float bottom = item.offset + item.height;
+            if (item.offset >= bottomEdge) {
+                window.pop_back();
+                componentsPool.returnToPool(item.sn);
+                continue;
+            }
+        }
     }
     
-}
+};
 
 #endif /* ViewportObserver_hpp */
