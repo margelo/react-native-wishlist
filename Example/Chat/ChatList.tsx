@@ -1,6 +1,6 @@
 import React, {useCallback, useMemo} from 'react';
 import {ViewProps} from 'react-native';
-import {WishList} from 'Wishlist';
+import {WishList} from 'wishlist';
 import {ChatItemView} from './ChatItem';
 import {ChatItem} from './Data';
 

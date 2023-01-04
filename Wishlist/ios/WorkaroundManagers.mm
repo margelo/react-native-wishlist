@@ -106,7 +106,7 @@ RCT_EXPORT_VIEW_PROPERTY(onEndReached, RCTDirectEventBlock)
 
 @end
 
-@implementation MGNativeTemplateContainerManager
+@implementation MGTemplateContainerManager
 
 RCT_EXPORT_MODULE(MGTemplateContainerComponentManager)
 

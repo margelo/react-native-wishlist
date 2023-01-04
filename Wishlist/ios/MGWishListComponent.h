@@ -13,4 +13,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 -(void) handlePan:(UIPanGestureRecognizer *)gesture;
 
+@end
+
 NS_ASSUME_NONNULL_END

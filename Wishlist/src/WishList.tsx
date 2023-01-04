@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useRef, forwordRef, useImperativeHandle } from "react";
+import React, { useEffect, useMemo, useRef, forwardRef, useImperativeHandle } from "react";
 import { View, ViewProps, useWindowDimensions, Text } from "react-native";
-import NativeWishList, { WishlistCommands } from "./NativeViews/NativeWishlistComponent";
+import NativeWishList, { WishlistCommands } from "./NativeViews/WishlistNativeComponent";
 import NativeTemplateContainer from "./NativeViews/NativeTemplateContainer";
 import NativeTemplateInterceptor from "./NativeViews/NativeTemplateInterceptor";
 import InflatorRepository from "./InflatorRepository";
@@ -43,7 +43,7 @@ type Props = ViewProps & {
   onItemNeeded?: (index: number) => any;
 };
 
-const Component= forwordRef((({
+const Component = forwardRef((({
   inflateItem,
   onItemNeeded,
   children,
@@ -175,6 +175,7 @@ const Component= forwordRef((({
     </NativeTemplateInterceptor>
   );
 }) as React.FC<Props> );
+
 type TemplateProps = {
   type: string;
   children: React.ReactElement;
