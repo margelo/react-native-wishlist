@@ -36,7 +36,6 @@
  */
 - (void)mountChildComponentView:(UIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index{
     if ([childComponentView isKindOfClass:[MGTemplateContainerComponent class]]) {
-        // TODO get templates
         MGTemplateContainerComponent * container = (MGTemplateContainerComponent *)childComponentView;
         auto templates = [container getTemplates];
         auto names = [container getNames];

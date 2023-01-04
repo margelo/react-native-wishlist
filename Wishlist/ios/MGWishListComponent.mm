@@ -22,6 +22,7 @@ using namespace facebook::react;
 
 @implementation MGWishListComponent{
     WishlistShadowNode::ConcreteState::Shared _sharedState;
+    bool alreadyRendered;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -29,6 +30,7 @@ using namespace facebook::react;
   if (self = [super initWithFrame:frame]) {
       self.scrollView.delaysContentTouches = NO;
       self.scrollView.canCancelContentTouches = true;
+      alreadyRendered = false;
   }
   return self;
 }
@@ -40,17 +42,22 @@ using namespace facebook::react;
   return concreteComponentDescriptorProvider<WishlistComponentDescriptor>();
 }
 
+-(void)setTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates withNames:(std::vector<std::string>)names
+{
+    if (!alreadyRendered) {
+        alreadyRendered = true;
+        CGRect frame = self.frame;
+        self.scrollView.contentSize = CGSizeMake(frame.size.width, 1000000);
+        _sharedState.viewportObserver->boot(getSurfaceId(),
+                                          5000,
+                                          frame.size.height, frame.size.width, 5000, 10, templates, names, std::static_pointer_cast<const WishlistProps>(self.props)->inflatorId);
+    }
+}
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
-    NSLog(@"updateProps");
-  const auto &oldSliderProps = *std::static_pointer_cast<const WishlistProps>(_props);
-  const auto &newSliderProps = *std::static_pointer_cast<const WishlistProps>(props);
-    int z = 3;
-    self.scrollView.contentSize = CGSizeMake(1000, 100000);
-    _eventEmitter = nil; // temporary TODO fix this
-    //self.contentSize = 10000;
-    //self.con
+    [super updateProps:props oldProps:oldProps];
+    _eventEmitter = nil;
 }
 
 - (void)updateState:(State::Shared const &)state oldState:(State::Shared const &)oldState
@@ -60,20 +67,11 @@ using namespace facebook::react;
     auto newState = std::static_pointer_cast<WishlistShadowNode::ConcreteState const>(state);
     auto &data = newState->getData();
     _sharedState = newState;
-    self.scrollView.contentOffset = CGPointMake(0, data.viewportObserver->offset);//
-
-  /* auto contentOffset = RCTCGPointFromPoint(data.contentOffset);
-  if (!oldState && !CGPointEqualToPoint(contentOffset, CGPointZero)) {
-    _scrollView.contentOffset = contentOffset;
-  } */
+    self.scrollView.contentOffset = CGPointMake(0, data.viewportObserver->offset);
 
   CGSize contentSize = RCTCGSizeFromSize(data.contentBoundingRect.size);
 
   self.containerView.frame = CGRect{RCTCGPointFromPoint(data.contentBoundingRect.origin), contentSize};
-
-  /*[self _preserveContentOffsetIfNeededWithBlock:^{
-    self->_scrollView.contentSize = contentSize;
-  }];*/
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
