@@ -86,7 +86,7 @@ struct ViewportObserver {
             WishItem & item = window.front();
             float bottom = item.offset + item.height;
             
-            if (bottom < bottomEdge) {
+            if (item.offset > topEdge) {
                 WishItem wishItem = itemProvider->provide(item.index-1);
                 if (wishItem.sn.get() == nullptr) {
                     break;
@@ -100,10 +100,10 @@ struct ViewportObserver {
         
         // Add below
         while (1) {
-            WishItem & item = window.front();
+            WishItem & item = window.back();
             float bottom = item.offset + item.height;
 
-            if (item.offset > topEdge) {
+            if (bottom < bottomEdge) {
                 WishItem wishItem = itemProvider->provide(item.index+1);
                 if (wishItem.sn.get() == nullptr) {
                     break;
@@ -132,7 +132,7 @@ struct ViewportObserver {
         
         // remove below
         while (1) {
-            WishItem & item = window.front();
+            WishItem & item = window.back();
             if (item.offset >= bottomEdge) {
                 window.pop_back();
                 itemsToRemove.push_back(std::move(item));
