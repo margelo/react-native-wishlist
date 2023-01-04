@@ -147,6 +147,9 @@
         
         NSLog(@"aaa stop bottom overscroll");
         _currentAnimation = nil;
+        if (_delegate) {
+            [_delegate onEndReached];
+        }
     }
     
     // topElementY > topViewPortEdge (top overscroll)
@@ -159,6 +162,10 @@
         topViewportEdge += diff;
         NSLog(@"aaa stop top overscroll");
         _currentAnimation = nil;
+        
+        if (_delegate) {
+            [_delegate onStartReached];
+        }
     }
     
     // pause Vsync listener if there is nothing to do

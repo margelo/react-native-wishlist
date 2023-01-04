@@ -89,6 +89,8 @@ using namespace facebook::react;
         
         _orchestrator = [[MGScrollViewOrchestrator alloc] initWith:self.scrollView templates:templates names:names viewportObserver: _sharedState->getData().viewportObserver inflatorId:inflatorId];
         
+        _orchestrator.delegate = self;
+        
     } else {
         [_orchestrator notifyAboutNewTemplates:templates withNames:names];
     }
@@ -156,6 +158,19 @@ using namespace facebook::react;
     
     if (!animated) {
         // TODO (restart Wishlist with different initial index)
+    }
+}
+
+- (void)onEndReached {
+    if (_eventEmitter) {
+        std::static_pointer_cast<WishlistEventEmitter const>(_eventEmitter)->onEndReached({});
+    }
+
+}
+
+- (void)onStartReached {
+    if (_eventEmitter) {
+        std::static_pointer_cast<WishlistEventEmitter const>(_eventEmitter)->onStartReached({});
     }
 }
 
