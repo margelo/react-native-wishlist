@@ -50,7 +50,7 @@ void  ViewportObserver::pushChildren(bool pushDirectly) {
             WishlistNode->realAppendChild(wishItem.sn);
         }
     } else {
-        KeyClassHolder::shadowTreeRegistry->visit(surfaceId, [&](const ShadowTree & st) {
+       /* KeyClassHolder::shadowTreeRegistry->visit(surfaceId, [&](const ShadowTree & st) {
             ShadowTreeCommitTransaction transaction = [&](RootShadowNode const &oldRootShadowNode) -> std::shared_ptr<RootShadowNode> {
                 return std::static_pointer_cast<RootShadowNode>(oldRootShadowNode.cloneTree(sWishList->getFamily(), [&](const ShadowNode & sn) -> std::shared_ptr<ShadowNode> {
                     auto children = std::make_shared<ShadowNode::ListOfShared>();
@@ -65,7 +65,7 @@ void  ViewportObserver::pushChildren(bool pushDirectly) {
                 }));
             };
             st.commit(transaction);
-        });
+        });*/
     }
     isPushingChildren = false;
 }

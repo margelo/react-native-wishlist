@@ -64,19 +64,16 @@ public:
     
     void appendChild(ShadowNode::Shared const &childNode) {
         auto state = getStateData();
-        if (state.initialised) {
-            return;
-        }
-        
-        registeredViews.push_back(childNode);
+       
+        //state.nextRegisteredViews.push_back(childNode);
         auto props = std::dynamic_pointer_cast<const WishlistProps>(this->getProps());
     }
                                     
     void layout(LayoutContext layoutContext) {
       // TODO probably the best place to initialize children in the future
         auto state = getStateData();
-        if (!state.initialised) {
-            state.initialised = true;
+        if (false/*!state.initialised*/) {
+           // state.initialised = true;
             
             // remove that flushing in the future
             // I know it's not always on UI (In our case it's fine)
@@ -99,11 +96,9 @@ public:
             layoutTree(layoutContext, lcc);
             return;
         }
-        // TODO update viewportObserver if needed
         
         ConcreteViewShadowNode::layout(layoutContext);
         
-      //updateScrollContentOffsetIfNeeded();
         updateStateIfNeeded();
     }
                                     
@@ -114,6 +109,7 @@ public:
     
     virtual ~WishlistShadowNode(){}
     
+    std::vector<std::shared_ptr<ShadowNode const>> nextRegisteredViews;
     std::vector<std::shared_ptr<ShadowNode const>> registeredViews;
     std::weak_ptr<WishlistShadowNode> sharedThis;
 };

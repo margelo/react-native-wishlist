@@ -19,12 +19,12 @@ WishlistState::WishlistState() {
   };
 
 WishlistState::WishlistState(WishlistState const &previousState, folly::dynamic data) {
-    this->viewportObserver =  previousState.viewportObserver;
+   /* this->viewportObserver = previousState.viewportObserver;
     auto runtimePtr = data.find("runtimePtr");
     auto newOffset = data.find("newOffset");
 
     if (runtimePtr != data.items().end()) {
-      double runtimeAddress = runtimePtr->second.asDouble();
+      long long runtimeAddress = (long long) runtimePtr->second.asDouble();
       jsi::Runtime * reactRt = reinterpret_cast<jsi::Runtime *> (runtimeAddress);
       std::shared_ptr<UIManagerBinding> binding = UIManagerBinding::getBinding(rt);
       std::shared_ptr<UIManager> uiManager = binding->uiManager_;
@@ -34,7 +34,7 @@ WishlistState::WishlistState(WishlistState const &previousState, folly::dynamic 
     if (newOffset != data.items().end()) {
       double offset = newOffset->second.asDouble();
       viewportObserver->reactToOffsetChange(scrollView.contentOffset.y)
-    }
+    } */
   };
 
 folly::dynamic WishlistState::getDynamic() const {
