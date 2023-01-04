@@ -23,6 +23,7 @@ struct ViewportObserver {
     std::deque<WishItem> window;
     std::shared_ptr<ShadowNode> wishListNode;
     LayoutContext lc;
+    ShadowNode::SharedListOfShared wishlistChildren = std::make_shared<ShadowNode::ListOfShared>();
     
     void setInitialValues(std::shared_ptr<ShadowNode> wishListNode, LayoutContext lc) {
         this->wishListNode = wishListNode;

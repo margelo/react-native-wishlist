@@ -50,6 +50,8 @@ void ViewportObserver::pushChildren()
               }
             }
 
+            wishlistChildren = children;
+
             return sn.clone(ShadowNodeFragment{nullptr, children, nullptr});
           }));
     };

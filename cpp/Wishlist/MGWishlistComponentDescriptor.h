@@ -9,49 +9,28 @@ namespace react {
 
 class MGWishlistComponentDescriptor
     : public ConcreteComponentDescriptor<MGWishlistShadowNode> {
- public:
-  MGWishlistComponentDescriptor(ComponentDescriptorParameters const &parameters)
-      : ConcreteComponentDescriptor(parameters) {}
+  using ConcreteComponentDescriptor::ConcreteComponentDescriptor;
 
-  // TODO think about it
-  virtual ShadowNode::Shared createShadowNode(
-      const ShadowNodeFragment &fragment,
-      ShadowNodeFamily::Shared const &family) const override {
-    auto shadowNode = std::make_shared<MGWishlistShadowNode>(
-        ShadowNodeFragment{fragment.props, nullptr, fragment.state},
-        family,
-        getTraits());
-    shadowNode->sharedThis = shadowNode;
-
-    adopt(shadowNode);
-
-    return shadowNode;
-  }
-
-  // TODO fix this
-  virtual ShadowNode::Unshared cloneShadowNode(
+  ShadowNode::Unshared cloneShadowNode(
       const ShadowNode &sourceShadowNode,
       const ShadowNodeFragment &fragment) const override {
-    ShadowNode::Unshared shadowNode(nullptr);
-    if (ViewportObserver::isPushingChildren) {
-      shadowNode =
-          std::make_shared<MGWishlistShadowNode>(sourceShadowNode, fragment);
-    } else {
-      shadowNode = std::make_shared<MGWishlistShadowNode>(
-          sourceShadowNode, ShadowNodeFragment{});
-    }
+    auto &wishlistSourceShadowNode =
+        static_cast<const MGWishlistShadowNode &>(sourceShadowNode);
 
-    std::shared_ptr<MGWishlistShadowNode> wishlistShadowNode =
-        std::static_pointer_cast<MGWishlistShadowNode>(shadowNode);
-    /*MGWishlistShadowNode->registeredViews = static_cast<const
-     * MGWishlistShadowNode&>(sourceShadowNode).registeredViews;*/
-    wishlistShadowNode->sharedThis = wishlistShadowNode;
+    // When we clone this shadow node we need to make sure to use the
+    // latest children of the viewport observer, otherwise react might
+    // set the children back to what was rendered.
+    auto shadowNode = std::make_shared<MGWishlistShadowNode>(
+        sourceShadowNode,
+        ShadowNodeFragment{
+            fragment.props,
+            wishlistSourceShadowNode.getStateData()
+                .viewportObserver->wishlistChildren,
+            fragment.state});
 
     adopt(shadowNode);
     return shadowNode;
   }
-
-  virtual ~MGWishlistComponentDescriptor() {}
 };
 
 } // namespace react
