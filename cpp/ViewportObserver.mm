@@ -1,6 +1,6 @@
 #include "ViewportObserver.hpp"
+#include "MGWishlistShadowNode.h"
 #import "RCTFollyConvert.h"
-#include "WishlistShadowNodes.h"
 
 using namespace facebook::react;
 
