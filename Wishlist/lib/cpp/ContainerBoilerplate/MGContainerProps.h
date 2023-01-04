@@ -10,8 +10,8 @@
 #pragma once
 
 #include <react/renderer/components/view/ViewProps.h>
-#include <react/renderer/core/ShadowNode.h>
 #include <react/renderer/core/PropsParserContext.h>
+#include <react/renderer/core/ShadowNode.h>
 #include "MGContainerProps.h"
 
 namespace facebook {
@@ -20,8 +20,10 @@ namespace react {
 struct MGTemplateContainerComponentProps final : public ViewProps {
  public:
   MGTemplateContainerComponentProps() = default;
-  MGTemplateContainerComponentProps(const PropsParserContext& context, const MGTemplateContainerComponentProps &sourceProps, const RawProps &rawProps);
-  
+  MGTemplateContainerComponentProps(
+      const PropsParserContext &context,
+      const MGTemplateContainerComponentProps &sourceProps,
+      const RawProps &rawProps);
 
 #pragma mark - Props
 

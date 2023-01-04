@@ -12,9 +12,5 @@
 #include <react/renderer/components/view/ViewEventEmitter.h>
 
 namespace facebook {
-namespace react {
-
-
-
-} // namespace react
+namespace react {} // namespace react
 } // namespace facebook

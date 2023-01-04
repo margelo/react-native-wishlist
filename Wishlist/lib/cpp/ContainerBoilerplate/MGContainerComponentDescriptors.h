@@ -10,58 +10,61 @@
 
 #pragma once
 
-#import "MGContainerShadowNodes.h"
-#include <react/renderer/core/ConcreteComponentDescriptor.h>
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
+#include <react/renderer/core/ConcreteComponentDescriptor.h>
 #include <iostream>
+#import "MGContainerShadowNodes.h"
 
 namespace facebook {
 namespace react {
 
-class MGTemplateContainerComponentComponentDescriptor : public ConcreteComponentDescriptor<MGTemplateContainerComponentShadowNode> {
-public:
-    MGTemplateContainerComponentComponentDescriptor(ComponentDescriptorParameters const &parameters): ConcreteComponentDescriptor(parameters) {
-        
-    }
-    
-    virtual ShadowNode::Shared createShadowNode(
-        const ShadowNodeFragment &fragment,
-        ShadowNodeFamily::Shared const &family) const override {
-        
-        if (fragment.children != nullptr && fragment.children->size() != 0) {
-            std::cout << "sdfsdfs" << std::endl;
-        }
-            
-        /*PropsParserContext propsParserContext{getSurfaceId(), *this->getComponentDescriptor().getContextContainer().get()};
-        auto rawProps = RawProps();
-        auto newProps = std::make_shared<MGTemplateContainerComponentProps>(propsParserContext, *props, rawProps);
-        newProps->templates = templates;
-        props_ = newProps;*/
-            
-        auto shadowNode =
-            std::make_shared<MGTemplateContainerComponentShadowNode>(ShadowNodeFragment{fragment.props, fragment.children, fragment.state}, family, getTraits());
-        
+class MGTemplateContainerComponentComponentDescriptor
+    : public ConcreteComponentDescriptor<
+          MGTemplateContainerComponentShadowNode> {
+ public:
+  MGTemplateContainerComponentComponentDescriptor(
+      ComponentDescriptorParameters const &parameters)
+      : ConcreteComponentDescriptor(parameters) {}
 
-      adopt(shadowNode);
-
-      return shadowNode;
+  virtual ShadowNode::Shared createShadowNode(
+      const ShadowNodeFragment &fragment,
+      ShadowNodeFamily::Shared const &family) const override {
+    if (fragment.children != nullptr && fragment.children->size() != 0) {
+      std::cout << "sdfsdfs" << std::endl;
     }
-    
-    virtual ShadowNode::Unshared cloneShadowNode(
-        const ShadowNode &sourceShadowNode,
-        const ShadowNodeFragment &fragment) const override {
-        
-        ShadowNode::Unshared shadowNode(nullptr);
-        shadowNode = std::make_shared<MGTemplateContainerComponentShadowNode>(sourceShadowNode, fragment);
-        
-        
-        std::shared_ptr<MGTemplateContainerComponentShadowNode> wishlistShadowNode = std::static_pointer_cast<MGTemplateContainerComponentShadowNode>(shadowNode);
 
-        adopt(shadowNode);
-        return shadowNode;
-    }
-    
-    virtual ~MGTemplateContainerComponentComponentDescriptor(){}
+    /*PropsParserContext propsParserContext{getSurfaceId(),
+    *this->getComponentDescriptor().getContextContainer().get()}; auto rawProps
+    = RawProps(); auto newProps =
+    std::make_shared<MGTemplateContainerComponentProps>(propsParserContext,
+    *props, rawProps); newProps->templates = templates; props_ = newProps;*/
+
+    auto shadowNode = std::make_shared<MGTemplateContainerComponentShadowNode>(
+        ShadowNodeFragment{fragment.props, fragment.children, fragment.state},
+        family,
+        getTraits());
+
+    adopt(shadowNode);
+
+    return shadowNode;
+  }
+
+  virtual ShadowNode::Unshared cloneShadowNode(
+      const ShadowNode &sourceShadowNode,
+      const ShadowNodeFragment &fragment) const override {
+    ShadowNode::Unshared shadowNode(nullptr);
+    shadowNode = std::make_shared<MGTemplateContainerComponentShadowNode>(
+        sourceShadowNode, fragment);
+
+    std::shared_ptr<MGTemplateContainerComponentShadowNode> wishlistShadowNode =
+        std::static_pointer_cast<MGTemplateContainerComponentShadowNode>(
+            shadowNode);
+
+    adopt(shadowNode);
+    return shadowNode;
+  }
+
+  virtual ~MGTemplateContainerComponentComponentDescriptor() {}
 };
 
 } // namespace react

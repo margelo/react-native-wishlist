@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include "MGContainerProps.h"
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
 #include "LayoutContext.h"
+#include "MGContainerProps.h"
 
 namespace facebook {
 namespace react {
@@ -22,25 +22,26 @@ extern const char MGTemplateContainerComponentComponentName[];
 /*
  * `ShadowNode` for <MGTemplateContainerComponent> component.
  */
-struct MGTemplateContainerComponentShadowNode : public ConcreteViewShadowNode<
-    MGTemplateContainerComponentComponentName,
-MGTemplateContainerComponentProps> {
-    std::vector<std::shared_ptr<ShadowNode const>> templates;
-    
-    MGTemplateContainerComponentShadowNode(
-        ShadowNodeFragment const &fragment,
-        ShadowNodeFamily::Shared const &family,
-                       ShadowNodeTraits traits);
+struct MGTemplateContainerComponentShadowNode
+    : public ConcreteViewShadowNode<
+          MGTemplateContainerComponentComponentName,
+          MGTemplateContainerComponentProps> {
+  std::vector<std::shared_ptr<ShadowNode const>> templates;
 
-    MGTemplateContainerComponentShadowNode(
-        ShadowNode const &sourceShadowNode,
-                       ShadowNodeFragment const &fragment);
-    
-    void appendChild(ShadowNode::Shared const &childNode);
-    
-    void layout(LayoutContext layoutContext);
-    
-    virtual ~MGTemplateContainerComponentShadowNode() {}
+  MGTemplateContainerComponentShadowNode(
+      ShadowNodeFragment const &fragment,
+      ShadowNodeFamily::Shared const &family,
+      ShadowNodeTraits traits);
+
+  MGTemplateContainerComponentShadowNode(
+      ShadowNode const &sourceShadowNode,
+      ShadowNodeFragment const &fragment);
+
+  void appendChild(ShadowNode::Shared const &childNode);
+
+  void layout(LayoutContext layoutContext);
+
+  virtual ~MGTemplateContainerComponentShadowNode() {}
 };
 
 } // namespace react
