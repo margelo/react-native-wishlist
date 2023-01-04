@@ -74,7 +74,7 @@ struct ViewportObserver {
         
         // Add above
         while (1) {
-            WishItem & item = window.front();
+            WishItem item = window.front();
             float bottom = item.offset + item.height;
             
             if (item.offset > topEdge) {
@@ -91,7 +91,7 @@ struct ViewportObserver {
         
         // Add below
         while (1) {
-            WishItem & item = window.back();
+            WishItem item = window.back();
             float bottom = item.offset + item.height;
 
             if (bottom < bottomEdge) {
@@ -110,11 +110,11 @@ struct ViewportObserver {
         
         // remove above
         while (1) {
-            WishItem & item = window.front();
+            WishItem item = window.front();
             float bottom = item.offset + item.height;
             if (bottom <= topEdge) {
                 window.pop_front();
-                itemsToRemove.push_back(std::move(item));
+                itemsToRemove.push_back(item);
                 continue;
             } else {
                 break;
@@ -123,10 +123,10 @@ struct ViewportObserver {
         
         // remove below
         while (1) {
-            WishItem & item = window.back();
+            WishItem item = window.back();
             if (item.offset >= bottomEdge) {
                 window.pop_back();
-                itemsToRemove.push_back(std::move(item));
+                itemsToRemove.push_back(item);
                 continue;
             } else {
                 break;
@@ -136,7 +136,7 @@ struct ViewportObserver {
         pushChildren(updateDirectly);
         
         for (auto & item : itemsToRemove) {
-            componentsPool->returnToPool(item.sn->clone({}));
+            componentsPool->returnToPool(item.sn);
         }
     }
     

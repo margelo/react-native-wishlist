@@ -94,7 +94,7 @@ using namespace facebook::react;
         return;
     }
     //[super scrollViewDidScroll: scrollView];
-    NSLog(@"offset: %f", scrollView.contentOffset.y);
+   // NSLog(@"offset: %f", scrollView.contentOffset.y);
     _sharedState->getData().viewportObserver->reactToOffsetChange(scrollView.contentOffset.y);
     //TODO update list
 }

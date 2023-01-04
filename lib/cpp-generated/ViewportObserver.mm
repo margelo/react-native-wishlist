@@ -14,7 +14,8 @@ using namespace facebook::react;
 thread_local bool ViewportObserver::isPushingChildren = false;
 
 std::shared_ptr<ShadowNode> ViewportObserver::getOffseter(float offset) {
-    std::shared_ptr<const LayoutableShadowNode> offseterTemplate = std::static_pointer_cast<const LayoutableShadowNode>(componentsPool->getNodeForType("__offsetComponent"));
+    std::shared_ptr<const YogaLayoutableShadowNode> offseterTemplate = std::static_pointer_cast<const YogaLayoutableShadowNode
+    >(componentsPool->getNodeForType("__offsetComponent"));
     
     auto & cd = offseterTemplate->getComponentDescriptor();
     PropsParserContext propsParserContext{surfaceId, *cd.getContextContainer().get()};
