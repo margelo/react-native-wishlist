@@ -25,11 +25,12 @@ export default function App() {
       inflateItem={(index, pool) => {
         'worklet'
         const item = pool.getComponent(`type${(index % 2) + 1}`);
-        /*item.Text.addProps({
-          value: 'sdfwgwgrg4gth4h4h',
-          backgroundColor: 'yellow'
-        })
-        _log("aaa jestem2");*/
+        if (index % 2 == 0) {
+          item.Paragraph.RawText.addProps({
+            text: 'sdfwgwgrg4gth4h4herberberberbieoribjoeirjboierjboierjboiejrboierjnoiejrnoierjnoi',
+          })
+        }
+        _log("aaa jestem2");
         return item;
       }}
       style={{flex:1}}/>
