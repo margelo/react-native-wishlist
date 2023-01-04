@@ -1,1 +1,3 @@
-export { WishList, useTemplateValue, createTemplateComponent } from "./src/WishList";
+export {useTemplateValue} from './src/TemplateValue';
+export {createTemplateComponent} from './src/createTemplateComponent';
+export {WishList} from './src/WishList';

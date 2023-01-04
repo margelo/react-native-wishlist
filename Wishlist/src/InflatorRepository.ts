@@ -5,6 +5,7 @@ export type TemplateItem = {
   addProps: (props: any) => void;
   addCallback: (callback: () => void) => void;
   describe: () => string;
+  setChildren: (children: TemplateItem[]) => void;
 };
 
 export type ComponentPool = {
@@ -19,9 +20,10 @@ export type InflateMethod = (
 export type MappingInflateMethod = (
   value: any,
   templateItem: TemplateItem,
+  pool: ComponentPool,
 ) => void;
 
-export type InflatorRegistryUI = {
+export type UIInflatorRegistry = {
   inflateItem: (
     id: string,
     index: number,
@@ -32,8 +34,16 @@ export type InflatorRegistryUI = {
   registerMapping: (
     inflatorId: string,
     nativeId: string,
+    templateType: string,
     inflateMethod: MappingInflateMethod,
   ) => void;
+  useMappings: (
+    item: TemplateItem,
+    value: any,
+    templateType: string,
+    id: string,
+    pool: ComponentPool,
+  ) => TemplateItem;
 };
 
 const runOnUI = (...args: any[]) => {
@@ -49,9 +59,12 @@ const maybeInit = () => {
       'worklet';
 
       const registry = new Map<string, InflateMethod>();
-      const mappings = new Map<string, Map<string, MappingInflateMethod>>();
+      const mappings = new Map<
+        string,
+        Map<string, Map<string, MappingInflateMethod>>
+      >();
 
-      const InflatorRegistry: InflatorRegistryUI = {
+      const InflatorRegistry: UIInflatorRegistry = {
         inflateItem: (id, index, pool) => {
           const inflator = registry.get(id);
           if (inflator) {
@@ -60,14 +73,20 @@ const maybeInit = () => {
               return result;
             }
             const [item, value] = result;
-            
-            return global.InflatorRegistry.useMappings(item, value, value.type, id, pool);
+
+            return getUIInflatorRegistry().useMappings(
+              item,
+              value,
+              value.type,
+              id,
+              pool,
+            );
           } else {
             console.log('Inflator not found for id: ' + id);
             return undefined;
           }
         },
-        useMappings: (item, value, templateType,  id, pool) => {
+        useMappings: (item, value, templateType, id, pool) => {
           console.log('value mappings', value);
           const mapping = mappings.get(id)?.get(templateType);
           if (mapping) {
@@ -89,8 +108,19 @@ const maybeInit = () => {
           registry.delete(id);
           mappings.delete(id);
         },
-        registerMapping: (inflatorId: string, nativeId: string, templateType: string, inflateMethod) => {
-          console.log("InflatorRegistry::registerMapping", inflatorId, nativeId, templateType, inflateMethod);
+        registerMapping: (
+          inflatorId: string,
+          nativeId: string,
+          templateType: string,
+          inflateMethod: MappingInflateMethod,
+        ) => {
+          console.log(
+            'InflatorRegistry::registerMapping',
+            inflatorId,
+            nativeId,
+            templateType,
+            inflateMethod,
+          );
           const mapping = mappings.get(inflatorId) ?? new Map();
           const innerMapping = mapping.get(templateType) ?? new Map();
           innerMapping.set(nativeId, inflateMethod);
@@ -105,12 +135,18 @@ const maybeInit = () => {
   }
 };
 
+export function getUIInflatorRegistry(): UIInflatorRegistry {
+  'worklet';
+
+  return global.InflatorRegistry;
+}
+
 export default class InflatorRepository {
   static register(id: string, inflateMethod: InflateMethod) {
     maybeInit();
     runOnUI(() => {
       'worklet';
-      global.InflatorRegistry.registerInflator(id, inflateMethod);
+      getUIInflatorRegistry().registerInflator(id, inflateMethod);
     })();
   }
 
@@ -118,15 +154,25 @@ export default class InflatorRepository {
     maybeInit();
     runOnUI(() => {
       'worklet';
-      global.InflatorRegistry.unregisterInflator(id);
+      getUIInflatorRegistry().unregisterInflator(id);
     })();
   }
 
-  static registerMapping(inflatorId: string, nativeId: string, templateType: string, inflateMethod) {
+  static registerMapping(
+    inflatorId: string,
+    nativeId: string,
+    templateType: string,
+    inflateMethod: MappingInflateMethod,
+  ) {
     maybeInit();
     runOnUI(() => {
-      "worklet";
-      global.InflatorRegistry.registerMapping(inflatorId, nativeId, templateType, inflateMethod);
+      'worklet';
+      getUIInflatorRegistry().registerMapping(
+        inflatorId,
+        nativeId,
+        templateType,
+        inflateMethod,
+      );
     })();
   }
 }
