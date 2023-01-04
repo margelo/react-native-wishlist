@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 @interface MGScrollToItemAnimation : NSObject <MGScrollAnimation>
-- (instancetype)initWithIndex:(int)index offset:(CGFloat)offset viewportObserver:(ViewportObserver*)viewportObserver;
+- (instancetype)initWithIndex:(int)index offset:(CGFloat)offset viewportObserver:(std::shared_ptr<ViewportObserver>)viewportObserver;
 @end
 
 

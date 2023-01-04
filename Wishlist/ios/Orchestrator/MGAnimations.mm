@@ -7,6 +7,8 @@
 
 #import "MGAnimations.h"
 
+using namespace facebook::react;
+
 @implementation MGDecayAnimation {
     double _lastTimestamp;
     double _initialTimestamp;
@@ -71,33 +73,66 @@
 
 @end
 
+const float notFound = -12345;
+const float maxVelocity = 50; // TODO (it should be adjusted)
+
 @implementation MGScrollToItemAnimation {
-    __weak ViewportObserver * _viewportObserver;
+    std::shared_ptr<ViewportObserver> _viewportObserver;
     
     BOOL _needsSetup;
     BOOL _isFinished;
     CGFloat _lastOffset;
     CGFloat _targetOffset;
     int _targetIndex;
+    double _lastTimestamp;
+    double _velocity;
+    double _velCoef;
 }
 
-- (instancetype)initWithIndex:(int)index offset:(CGFloat)offset viewportObserver:(ViewportObserver *)viewportObserver {
+- (instancetype)initWithIndex:(int)index offset:(CGFloat)offset viewportObserver:(std::shared_ptr<ViewportObserver>)viewportObserver {
     if (self = [super init]) {
         _viewportObserver = viewportObserver;
         _lastOffset = offset;
         _targetIndex = index;
+        _targetOffset = notFound;
+        _velocity = 0;
+        
+        _velCoef = 1;
         
         _isFinished = NO;
         _needsSetup = YES;
+        
     }
     return self;
 }
 
+- (void)tryToFindTargetOffset {
+    for (auto & item : _viewportObserver->window) {
+        if (item.index == _targetIndex) {
+            _targetOffset = item.offset;
+            break;
+        }
+    }
+}
+
 - (CGFloat)getDiffWithTimestamp:(double)timestamp {
-    <#code#>
+    CGFloat diff = 0;
+    [self tryToFindTargetOffset];
+    
+    if (_easingAnimation) {
+        return [_easingAnimation getDiffWithTimestamp:timestamp];
+    }
+    
+    
+    
+    _lastTimestamp = timestamp;
+    return diff;
 }
 
 - (BOOL)isFinished {
+    if (_easingAnimation) {
+        return [_easingAnimation isFinished];
+    }
     return _isFinished;
 }
 
@@ -107,6 +142,16 @@
 
 - (void)setupWithTimestamp:(double)timestamp {
     _needsSetup = false;
+    _lastTimestamp = timestamp;
+    [self tryToFindTargetOffset];
+    
+    if (_targetOffset != notFound) {
+        // (TODO)
+    } else {
+        if (_viewportObserver->window[0].index > _targetIndex) {
+            _velCoef *= -1;
+        }
+    }
 }
 
 @end
