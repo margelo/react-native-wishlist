@@ -52,6 +52,9 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
+  "dependencies": {
+    "denque": "^2.1.0"
+  },
   "devDependencies": {
     "@arkweid/lefthook": "^0.7.7",
     "@commitlint/config-conventional": "^17.0.2",

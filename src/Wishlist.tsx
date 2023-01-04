@@ -109,7 +109,7 @@ const Component = forwardRef(
         update: (worklet: any /* TODO type properly */) => {
           runOnUI()(
             'worklet';
-            data().registerUpdate(worklet);
+            data().update(worklet);
           );
         }
       }),
