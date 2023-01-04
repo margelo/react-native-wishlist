@@ -136,7 +136,12 @@ using namespace facebook::react;
 -(void)setBridge:(RCTBridge *)bridge
 {
     // TODO here you can intercept uiManager by registering fake surface
-  //bridge.surfacePresentsr
+    //bridge.surfacePresentsr
 };
+
+- (void)scrollToItem:(NSInteger)index animated:(BOOL)animated {
+    NSLog(@"scrollToItem has been called :D ");
+}
+
 
 @end
