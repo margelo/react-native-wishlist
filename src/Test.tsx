@@ -2,6 +2,8 @@ import React from 'react';
 import { InteractionManager } from 'react-native';
 import { View, Text } from 'react-native';
 import createWishList from './WishList';
+import Animated from 'react-native-reanimated';
+import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 
 const WishList = createWishList();
 
@@ -30,17 +32,30 @@ WishList.registerComponent("type1", (
   </View>
 ));
 
+const Type: React.FC<{}> = () => {
+  const singleTap = Gesture.Tap()
+  .onStart(() => {
+    console.log("tap");
+  });
+
+  return (
+    <GestureDetector gesture={singleTap} >
+      <Animated.View>
+        <View style={{margin: 10, width: '70%', backgroundColor: '#6495ED'}} >
+          <View wishId="sth" style={{margin: 5}} > 
+            <Text style={{color: 'white'}} wishId='author'> author </Text>
+          </View>
+          <View style={{margin: 5}}>
+            <Text style={{color: 'white'}} wishId='content'> simple Message </Text>
+          </View>
+        </View>
+      </Animated.View>
+    </GestureDetector>
+  );
+};
+
 WishList.registerComponent("type2", (
-  <View>
-    <View style={{margin: 10, width: '70%', backgroundColor: '#6495ED'}} >
-      <View style={{margin: 5}} > 
-        <Text style={{color: 'white'}} wishId='author'> author </Text>
-      </View>
-      <View style={{margin: 5}}>
-        <Text style={{color: 'white'}} wishId='content'> simple Message </Text>
-      </View>
-    </View>
-  </View>
+  <Type/>
 ));
 
 export default function App() {

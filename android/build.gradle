@@ -1,0 +1,95 @@
+def getExtOrDefault(name, defaultValue) {
+    return rootProject.ext.has(name) ? rootProject.ext.get(name) : defaultValue
+}
+
+buildscript {
+    // The Android Gradle plugin is only required when opening the android folder stand-alone.
+    // This avoids unnecessary downloads and potential conflicts when the library is included as a
+    // module dependency in an application project.
+    if (project == rootProject) {
+        repositories {
+            google()
+            mavenCentral()
+        }
+        dependencies {
+            classpath 'com.android.tools.build:gradle:4.1.2'
+        }
+    }
+}
+
+apply plugin: 'com.android.library'
+
+apply plugin: "com.facebook.react"
+
+
+android {
+    compileSdkVersion getExtOrDefault('compileSdkVersion', 28)
+
+    defaultConfig {
+        minSdkVersion getExtOrDefault('minSdkVersion', 16)
+        targetSdkVersion getExtOrDefault('targetSdkVersion', 28)
+        versionCode 1
+        versionName "1.0"
+        buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", "true"
+
+         if (isNewArchitectureEnabled()) {
+            var appProject = rootProject.allprojects.find {it.plugins.hasPlugin('com.android.application')}
+            externalNativeBuild {
+                ndkBuild {
+                    arguments "APP_PLATFORM=android-21",
+                            "APP_STL=c++_shared",
+                            "NDK_TOOLCHAIN_VERSION=clang",
+                            "GENERATED_SRC_DIR=${appProject.buildDir}/generated/source",
+                            "PROJECT_BUILD_DIR=${appProject.buildDir}",
+                            "REACT_ANDROID_DIR=${appProject.rootDir}/../node_modules/react-native/ReactAndroid",
+                            "REACT_ANDROID_BUILD_DIR=${appProject.rootDir}/../node_modules/react-native/ReactAndroid/build"
+                    cFlags "-Wall", "-Werror", "-fexceptions", "-frtti", "-DWITH_INSPECTOR=1"
+                    cppFlags "-std=c++17"
+                    targets "safeareacontext_modules"
+                }
+            }
+        }
+    }
+
+    lintOptions{
+        abortOnError false
+    }
+
+    externalNativeBuild {
+        ndkBuild {
+            path "src/main/jni/Android.mk"
+        }
+    }
+    
+    packagingOptions {
+        // For some reason gradle only complains about the duplicated version of libreact_render libraries
+        // while there are more libraries copied in intermediates folder of the lib build directory, we exlude
+        // only the ones that make the build fail (ideally we should only include libwishlist_modules but we
+        // are only allowed to specify exlude patterns)
+        exclude "**/libreact_render*.so"
+    }
+    sourceSets.main {
+        java {
+          srcDirs += [
+              "src/fabric/java",
+          ]
+        }
+    }
+}
+
+repositories {
+    google()
+    maven {
+        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+        url "$rootDir/../node_modules/react-native/android"
+    }
+    mavenCentral()
+}
+
+dependencies {
+    if (isNewArchitectureEnabled()) {
+        implementation project(":ReactAndroid")
+    } else {
+        implementation 'com.facebook.react:react-native:+'
+    }
+}
