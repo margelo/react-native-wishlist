@@ -6,8 +6,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MGWishListComponent : RCTScrollViewComponentView
 
--(void)setTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates withNames:(std::vector<std::string>)names;
-
+-(void) setTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates withNames:(std::vector<std::string>)names;
+-(void) setInflatorId:(std::string)inflatorId;
 @end
 
 NS_ASSUME_NONNULL_END

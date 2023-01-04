@@ -12,8 +12,7 @@
 using namespace facebook::react;
 
 @implementation MGTemplateContainerComponent {
-    std::vector<std::shared_ptr<facebook::react::ShadowNode const>> _templates;
-    std::vector<std::string> _names;
+  MGWishListComponent* _wishList;
 }
 
 /*
@@ -23,6 +22,24 @@ using namespace facebook::react;
     // Drawing code
 }
 */
+
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+  if (self = [super initWithFrame:frame]) {
+    static const auto defaultProps = std::make_shared<const MGTemplateContainerComponentProps>();
+    _props = defaultProps;
+  }
+
+  return self;
+}
+
+
+-(void)setWishlist:(MGWishListComponent*)wishList {
+  _wishList = wishList;
+  auto props = *std::static_pointer_cast<const MGTemplateContainerComponentProps>(_props);
+  [_wishList setTemplates:props.templates withNames:props.names];
+}
 
 #pragma mark - RCTComponentViewProtocol
 
@@ -34,18 +51,11 @@ using namespace facebook::react;
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
   const auto &newProps = *std::static_pointer_cast<const MGTemplateContainerComponentProps>(props);
-    _names = newProps.names;
-    _templates = newProps.templates;
-}
-
--(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)getTemplates
-{
-    return _templates;
-}
-
--(std::vector<std::string>)getNames
-{
-    return _names;
+  if(_wishList != NULL) {
+    [_wishList setTemplates:newProps.templates withNames:newProps.names];
+  }
+  
+  [super updateProps:props oldProps:oldProps];
 }
 
 @end

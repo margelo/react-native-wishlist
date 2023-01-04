@@ -1,81 +1,167 @@
-import React, { useEffect, useMemo, useRef } from "react";
-import { View, Dimensions, Text } from "react-native";
+import React, { useEffect, useState, useMemo, useRef } from "react";
+import { View, ViewProps, useWindowDimensions } from "react-native";
 import NativeWishList from "./NativeViews/NativeWishlistComponent";
 import NativeTemplateContainer from "./NativeViews/NativeTemplateContainer";
 import NativeTemplateInterceptor from "./NativeViews/NativeTemplateInterceptor";
 import InflatorRepository from "./InflatorRepository";
 import { initEventHandler } from "./EventHandler";
 
-const TemplateContainer = React.memo(NativeTemplateContainer);
-const SCREEN_WIDTH = Dimensions.get("window").width;
+const OffsetComponent = "__offsetComponent";
+let InflatorId = 1000;
 
-function Component(props) {
-  const componentsRegistry = useMemo(() => {
-    const retVal = new Map<string, React.ReactElement>();
-    retVal.set(
-      "__offsetComponent",
-      <View style={{ height: 0, width: SCREEN_WIDTH }} />
-    );
-    return retVal;
-  }, []);
-  initEventHandler();
-  const { inflateItem, children } = props;
-  const inflatorId = useRef<string | null>(null);
+function getTemplatesFromChildren(children, width) {
+  const nextTemplates = {
+    [OffsetComponent]: <View style={{ height: 0, width }} />,
+  };
+  React.Children.forEach(children, (c) => {
+    if (c.type.displayName === "WishListTemplate") {
+      nextTemplates[c.props.type] = React.Children.only(c.props.children);
+    }
+  });
+  return nextTemplates;
+}
 
-  if (inflatorId.current == null) {
-    inflatorId.current = Math.random().toString();
-    InflatorRepository.register(inflatorId.current!, inflateItem);
+function getMappingsFromChildren(children) {
+  const nextMappings = {};
+  React.Children.forEach(children, (c) => {
+    if (c.type.displayName === "WishListMapping") {
+      nextMappings[c.props.nativeId] = {
+        onInflate: c.props.onInflate,
+        templateType: c.props.templateType,
+      };
+    }
+  });
+  return nextMappings;
+}
+
+type TemplateRegistry = {
+  getComponent: (type: string) => any;
+};
+
+type Props = ViewProps & {
+  inflateItem?: (index: number, pool: TemplateRegistry) => React.ReactElement;
+  onItemNeeded?: (index: number) => any;
+};
+
+const Component: React.FC<Props> = ({
+  inflateItem,
+  onItemNeeded,
+  children,
+  style,
+}) => {
+  const { width } = useWindowDimensions();
+  useMemo(() => initEventHandler(), []);
+
+  if (inflateItem === undefined && onItemNeeded === undefined) {
+    throw Error("Either inflateItem or onItemNeeded must be defined");
   }
 
-  const updateChildTemplates = () => {
-    // Children changed.
-    Array.from(componentsRegistry.keys()).forEach((k) => {
-      if (k !== "__offsetComponent") {
-        componentsRegistry.delete(k);
+  const templatesRef = useRef<{ [key: string]: React.ReactElement }>({});
+  const mappingRef = useRef<{
+    [key: string]: {
+      templateType: string;
+      onInflate: (value: any, item: any) => void;
+    };
+  }>({});
+
+  // Template registration and tracking
+  useMemo(() => {
+    templatesRef.current = getTemplatesFromChildren(children, width);
+  }, [children, width]);
+
+  // Mapping registration and tracking
+  useMemo(() => {
+    mappingRef.current = getMappingsFromChildren(children);
+  }, [children, width]);
+
+  // Resolve inflator - either use the provided callback or use the mapping
+  const resolvedInflater = useMemo(() => {
+    if (inflateItem) {
+      return inflateItem;
+    }
+
+    return (index: number, pool: any) => {
+      "worklet";
+      const value = onItemNeeded!(index);
+      if (!value) {
+        return undefined;
       }
-    });
-    React.Children.forEach(children, (c) => {
-      console.log('child', c.type.displayName);
-      if (c.type.displayName === "WishListTemplate") {
-        componentsRegistry.set(
-          c.props.type,
-          React.Children.only(c.props.children)
-        );
+
+      const item = pool.getComponent(value.type);
+      if (!item) {
+        return undefined;
       }
-    });
-  };
 
-  /*useEffect(
-    () => () => {
-      console.log('unregister');
-      inflatorId.current && InflatorRepository.unregister(inflatorId.current);
-    },
-    []
-  );*/
+      Object.keys(mappingRef.current!).forEach((key) => {
+        const templateItem = item.getByWishId(key);
+        if (
+          templateItem &&
+          (mappingRef.current![key].templateType !== undefined
+            ? mappingRef.current![key].templateType === value.type
+            : true)
+        ) {
+          try {
+            mappingRef.current![key].onInflate(value, templateItem);
+          } catch (err) {
+            console.error(
+              "Error calling mapper for key / template",
+              key,
+              value.type,
+              err
+            );
+          }
+        }
+      });
+      return item;
+    };
+  }, [inflateItem, onItemNeeded]);
 
-  
-  updateChildTemplates();
+  const inflatorIdRef = useRef<string | null>(null);
+  const prevInflatorRef = useRef<typeof resolvedInflater>();
 
-  const keys = Array.from(componentsRegistry.keys());
+  // Inflator registration and tracking
+  useMemo(() => {
+    if (prevInflatorRef.current !== resolvedInflater) {
+      // Unregister?
+      if (inflatorIdRef.current) {
+        InflatorRepository.unregister(inflatorIdRef.current);
+      }
+      // Register
+      inflatorIdRef.current = (InflatorId++).toString();
+      InflatorRepository.register(inflatorIdRef.current, resolvedInflater);
+    }
+  }, [resolvedInflater]);
 
-  console.log('keys', keys);
- 
+  const keys = Object.keys(templatesRef.current);
+  console.log("@@@ Render WishList", inflatorIdRef.current, keys.join(", "));
+
   return (
-    <NativeTemplateInterceptor inflatorId={inflatorId.current} style={{flex:1}} collapsable={false} removeClippedSubviews={false}>
+    <NativeTemplateInterceptor
+      inflatorId={inflatorIdRef.current}
+      style={style}
+      collapsable={false}
+      removeClippedSubviews={false}
+    >
       <NativeWishList
-        style={props.style}
+        style={{ flex: 1 }}
         removeClippedSubviews={false}
-        inflatorId={inflatorId.current}
+        inflatorId={inflatorIdRef.current}
       />
-        
-      <TemplateContainer names={keys} inflatorId={inflatorId.current} key={Math.random().toString()} collapsable={false} >
-        {Array.from(componentsRegistry.values()).map((c, i) => (
-            <View key={keys[i]}>{c}</View>
+
+      <NativeTemplateContainer
+        names={keys}
+        inflatorId={inflatorIdRef.current}
+        key={Math.random().toString()}
+        collapsable={false}
+      >
+        {Object.keys(templatesRef.current).map((c, i) => (
+          <View key={keys[i]}>{templatesRef.current[c]}</View>
         ))}
-      </TemplateContainer>
+      </NativeTemplateContainer>
     </NativeTemplateInterceptor>
   );
-}
+};
+
 type TemplateProps = {
   type: string;
   children: React.ReactElement;
@@ -85,9 +171,19 @@ const Template: React.FC<TemplateProps> = ({ children }) => {
   return children;
 };
 
+type MappingProps = {
+  nativeId: string;
+  templateType?: string;
+  onInflate: (value: any, item: any) => any;
+};
+
+const Mapping: React.FC<MappingProps> = () => null;
+
 Template.displayName = "WishListTemplate";
+Mapping.displayName = "WishListMapping";
 
 export const WishList = {
   Component,
   Template,
+  Mapping,
 };

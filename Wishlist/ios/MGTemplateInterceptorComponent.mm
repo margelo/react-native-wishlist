@@ -40,10 +40,8 @@ using namespace facebook::react;
 - (void)mountChildComponentView:(UIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index{
     if ([childComponentView isKindOfClass:[MGTemplateContainerComponent class]]) {
         MGTemplateContainerComponent * container = (MGTemplateContainerComponent *)childComponentView;
-        auto templates = [container getTemplates];
-        auto names = [container getNames];
         if (_wishlist != nil) {
-            [_wishlist setTemplates:templates withNames:names];
+            [container setWishlist: _wishlist];
         }
         return;
     }
@@ -70,7 +68,11 @@ using namespace facebook::react;
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
-    //inflatorId = std::dynamic_pointer_cast<const WishlistProps>(props)->inflatorId;
+    auto inflatorId = std::dynamic_pointer_cast<const MGTemplateInterceptorComponentProps>(props)->inflatorId;
+    if(_wishlist != nullptr) {
+      // Why isn't
+      [_wishlist setInflatorId:inflatorId];
+    }
     //[super updateProps:props oldProps:oldProps];
    // _eventEmitter = nil;
 }
