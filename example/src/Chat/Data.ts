@@ -1,6 +1,6 @@
 export type ReactionItem = {
   emoji: string;
-  id: string;
+  key: string;
 };
 
 export type ChatItem = {
@@ -64,7 +64,7 @@ const createChatItem = (index: number): ChatItem => {
     likes: Math.random() > 0.7 ? Math.floor(Math.random() * 8) : 0,
     reactions: getRandomReactions().map((ele, i) => ({
       emoji: ele,
-      id: String(i),
+      key: String(i),
     })),
   };
 };

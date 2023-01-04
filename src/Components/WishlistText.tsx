@@ -5,6 +5,7 @@ export const WishlistText = createTemplateComponent(Text, (item, props) => {
   'worklet';
 
   const { children, ...other } = props;
-  item.RawText?.addProps({ text: children });
+  const value = typeof children === 'string' ? children : children.toString();
+  item.RawText?.addProps({ text: value });
   item.addProps(other);
 });
