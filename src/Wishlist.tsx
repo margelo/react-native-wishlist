@@ -1,6 +1,6 @@
 import React, {
   createContext,
-  forwardRef,
+  Ref,
   useContext,
   useImperativeHandle,
   useMemo,
@@ -67,7 +67,7 @@ type Props<ItemT extends BaseItem> = ViewProps & {
   initialIndex?: number;
 };
 
-const Component = forwardRef(function ComponentBase<T extends BaseItem>(
+function ComponentBase<T extends BaseItem>(
   { children, style, initialData, ...rest }: Props<T>,
   ref: React.Ref<WishListInstance<T>>,
 ) {
@@ -222,7 +222,13 @@ const Component = forwardRef(function ComponentBase<T extends BaseItem>(
       </TemplatesRegistryContext.Provider>
     </WishlistContext.Provider>
   );
-});
+}
+
+const Component = React.forwardRef(
+  ComponentBase as <T extends BaseItem>(
+    props: Props<T> & { ref?: Ref<WishListInstance<T>> },
+  ) => ReturnType<typeof ComponentBase>,
+);
 
 type InnerComponentProps = ViewProps & {
   inflatorId: string;
