@@ -13,15 +13,15 @@ namespace react {
 
 int tag = 1e9+1;
 
-std::shared_ptr<ShadowNode> ShadowNodeCopyMachine::copyShadowSubtree(std::shared_ptr<const ShadowNode> sn) {
+std::shared_ptr<const ShadowNode> ShadowNodeCopyMachine::copyShadowSubtree(std::shared_ptr<const ShadowNode> sn) {
     const ComponentDescriptor &cd = sn->getComponentDescriptor();
     
     
     PropsParserContext propsParserContext{sn->getSurfaceId(), *cd.getContextContainer().get()};
    
     auto const fragment = ShadowNodeFamilyFragment{tag-=2, sn->getSurfaceId(), nullptr};
-    auto family =
-        cd.createFamily(fragment, sn->getFamily()._even); //TODO create handler on js side
+    auto family = std::make_shared<ShadowNodeFamily>(fragment, nullptr, cd);
+        //cd.createFamily(fragment, sn->getFamily()._even); //TODO create handler on js side
     auto const props =
         cd.cloneProps(propsParserContext, sn->getProps(), {});
     auto const state =
@@ -35,13 +35,14 @@ std::shared_ptr<ShadowNode> ShadowNodeCopyMachine::copyShadowSubtree(std::shared
             /* .state = */ state,
         },
         family);
+    auto clonedShadowNode = cd.cloneShadowNode(*shadowNode.get(), {});
     
     for (std::shared_ptr<const ShadowNode> child : sn->getChildren()) {
-        std::shared_ptr<ShadowNode> clonedChild = copyShadowSubtree(child);
-        shadowNode->appendChild(clonedChild);
+        std::shared_ptr<const ShadowNode> clonedChild = copyShadowSubtree(child);
+        clonedShadowNode->appendChild(clonedChild);
     }
 
-    return shadowNode;
+    return clonedShadowNode;
 }
 
 };

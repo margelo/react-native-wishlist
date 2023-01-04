@@ -22,7 +22,7 @@ namespace react {
 
 class ShadowNodeCopyMachine {
 public:
-    static std::shared_ptr<ShadowNode> copyShadowSubtree(std::shared_ptr<const ShadowNode> sn);
+    static std::shared_ptr<const ShadowNode> copyShadowSubtree(std::shared_ptr<const ShadowNode> sn);
 };
 
 };
