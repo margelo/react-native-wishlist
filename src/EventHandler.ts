@@ -14,7 +14,6 @@ const maybeInit = () => {
       global.handlers = {};
 
       global.handleEvent = (type: any, tag: any) => {
-        console.log('got event ', tag.toString() + type);
         const callback = global.handlers[tag.toString() + type];
         if (callback) {
           callback();
