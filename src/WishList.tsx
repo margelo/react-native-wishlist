@@ -27,7 +27,7 @@ import InflatorRepository, {
 import NativeTemplateContainer from './NativeViews/NativeTemplateContainer';
 import NativeTemplateInterceptor from './NativeViews/NativeTemplateInterceptor';
 import NativeWishList, {
-  WishlistCommands,
+  Commands as WishlistCommands,
 } from './NativeViews/WishlistNativeComponent';
 import { TemplateContext } from './TemplateContext';
 import { WishListContext } from './WishListContext';
@@ -86,7 +86,7 @@ type WishListInstance = {
   scrollToTop: () => void;
 };
 
-export type BaseItem = { type: string };
+export type BaseItem = { type: string; key: string };
 
 type Props<ItemT extends BaseItem> = ViewProps & {
   data: ItemT[];
@@ -192,7 +192,7 @@ const Component = forwardRef(
           return undefined;
         }
 
-        if (value.key == undefined) {
+        if (value.key == null) {
           throw new Error('Every data cell has to contain unique key prop!');
         }
         // We set the key of the item here so that
@@ -372,6 +372,7 @@ function Template({ children, type }: TemplateProps) {
 type MappingProps = {
   nativeId: string;
   templateType?: string;
+  onInflate: MappingInflateMethod;
 };
 
 const Mapping: React.FC<MappingProps> = () => null;
