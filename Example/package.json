@@ -2,6 +2,7 @@
   "name": "example",
   "version": "0.0.1",
   "private": true,
+  "main": "index.jsx",
   "scripts": {
     "postinstall": "patch-package",
     "android": "react-native run-android",
@@ -33,5 +34,9 @@
   },
   "jest": {
     "preset": "react-native"
+  },
+  "resolutions": {
+    "react": "18.0.0",
+    "react-native": "0.69.0"
   }
 }
