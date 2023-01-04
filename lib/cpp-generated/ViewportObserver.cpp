@@ -8,7 +8,6 @@
 #include "ViewportObserver.hpp"
 #include "WishlistShadowNodes.h"
 #include <folly/dynamic.h>
-#import "RCTFollyConvert.h"
 
 using namespace facebook::react;
 
