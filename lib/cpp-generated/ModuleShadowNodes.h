@@ -43,13 +43,19 @@ public:
         ShadowNode const &sourceShadowNode,
         ShadowNodeFragment const &fragment)
         : ConcreteViewShadowNode(sourceShadowNode, fragment) {
-      
+        try {
+            const ModuleShadowNode &msn = dynamic_cast<const ModuleShadowNode&>(sourceShadowNode);
+            registeredViews = msn.registeredViews;
+        }
+        catch (std::bad_cast) {
+              
+        }
     }
     
     void appendChild(
                      ShadowNode::Shared const &childNode) {
-        ConcreteViewShadowNode::appendChild(childNode);
-        std::shared_ptr<const LayoutableShadowNode> lsn = std::dynamic_pointer_cast<const LayoutableShadowNode>(childNode);
+        //ConcreteViewShadowNode::appendChild(childNode);
+        /*std::shared_ptr<const LayoutableShadowNode> lsn = std::dynamic_pointer_cast<const LayoutableShadowNode>(childNode);
         LayoutContext lc;
         LayoutConstraints lcc;
         //lsn->layoutTree(lc);
@@ -59,11 +65,13 @@ public:
             int x = 5;
         }
         
-        std::cout << "2 sdfwefwef" << std::endl;
-        
+        std::cout << "2 sdfwefwef" << std::endl;*/
+        registeredViews.push_back(childNode);
     }
     
     virtual ~ModuleShadowNode(){}
+    
+    std::vector<std::shared_ptr<const ShadowNode>> registeredViews;
 };
 
 } // namespace react
