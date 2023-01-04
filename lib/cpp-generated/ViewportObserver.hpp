@@ -30,7 +30,7 @@ struct ViewportObserver {
     void boot(int surfaceId, float offset, float windowHeight, float windowWidth, float originItemOffset, int originItem, std::weak_ptr<ShadowNode> weakWishListNode) {
         
         this->weakWishListNode = weakWishListNode;
-        itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<ItemProviderTestImpl>());
+        itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<ItemProviderTestImpl>(windowWidth));
         itemProvider->setComponentsPool(componentsPool);
         
         for (WishItem & item : window) {
@@ -51,7 +51,7 @@ struct ViewportObserver {
     void update(int surfaceId, float offset, float windowHeight, float originItemOffset, int originItem, std::weak_ptr<ShadowNode> weakWishListNode) {
         
         this->weakWishListNode = weakWishListNode;
-        itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<ItemProviderTestImpl>());
+        itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<ItemProviderTestImpl>(3453453));
         itemProvider->setComponentsPool(componentsPool);
         
         for (WishItem & item : window) {
@@ -148,5 +148,7 @@ struct ViewportObserver {
     
     void pushChildren(bool pushDirectly);
 };
+
+thread_local bool ViewportObserver::isPushingChildren = false;
 
 #endif /* ViewportObserver_hpp */

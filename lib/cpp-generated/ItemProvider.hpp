@@ -24,6 +24,12 @@ struct WishItem
 
 class ItemProvider {
 public:
+    float maxWidth = 0;
+    
+    ItemProvider(float maxWidth) {
+        this->maxWidth = maxWidth;
+    }
+    
     virtual void setComponentsPool(std::shared_ptr<ComponentsPool> pool) = 0;
     
     virtual WishItem provide(int index) = 0;
@@ -36,6 +42,8 @@ public:
 struct ItemProviderTestImpl : ItemProvider
 {
     std::shared_ptr<ComponentsPool> cp;
+    
+    ItemProviderTestImpl(float maxWidth): ItemProvider(maxWidth) {}
     
     void setComponentsPool(std::shared_ptr<ComponentsPool> pool) {
         cp = pool;
@@ -59,6 +67,7 @@ struct ItemProviderTestImpl : ItemProvider
         
         LayoutContext lc;
         LayoutConstraints lcc;
+        lcc.maximumSize.width = maxWidth;
         facebook::react::Size sz = sn->measure(lc, lcc);
         
         wishItem.sn = sn;

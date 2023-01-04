@@ -54,7 +54,7 @@ public:
             shadowNode = std::make_shared<ModuleShadowNode>(sourceShadowNode, ShadowNodeFragment{});
         }
         
-        shadowNode->registeredViews = SourceModuleSN.registeredViews;
+        std::static_pointer_cast<ModuleShadowNode>(shadowNode)->registeredViews = static_cast<const ModuleShadowNode&>(sourceShadowNode).registeredViews;
 
         adopt(shadowNode);
         return shadowNode;
