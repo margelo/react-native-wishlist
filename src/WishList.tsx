@@ -34,10 +34,9 @@ import { WishListContext } from './WishListContext';
 import { WishlistIDContext, useWishlistId } from './WishlistIdContext';
 import { IF } from './IF';
 import { Switch, Case } from './Switch';
+import { generateId } from './Utils';
 
 const OffsetComponent = '__offsetComponent';
-let InflatorId = 1000;
-let wishCtr = 0;
 
 type Mapping = {
   templateType?: string;
@@ -242,7 +241,7 @@ const Component = forwardRef(
           InflatorRepository.unregister(inflatorIdRef.current);
         }
         // Register
-        inflatorIdRef.current = (InflatorId++).toString();
+        inflatorIdRef.current = generateId();
         InflatorRepository.register(inflatorIdRef.current, resolvedInflater);
       }
       return inflatorIdRef.current!;
@@ -257,7 +256,7 @@ const Component = forwardRef(
 
     const wishlistId = useRef<{ id: string } | null>(null);
     if (!wishlistId.current) {
-      wishlistId.current = { id: `ID#${wishCtr++}` };
+      wishlistId.current = { id: generateId() };
     }
 
     return (
@@ -313,8 +312,6 @@ function InnerComponent({
   const combinedTemplates = { ...templates, ...nestedTemplates };
 
   const wishlistId = useWishlistId();
-
-  console.log('wishlistIDDD js', wishlistId);
 
   const keys = Object.keys(combinedTemplates);
   // console.log('@@@ Render WishList', inflatorId, keys.join(', '));
@@ -392,7 +389,7 @@ export const WishList = {
     'worklet';
 
     const { children, ...other } = props;
-    item.RawText?.addProps({ text: children });
+    item.RawText?.addProps({ text: String(children) });
     item.addProps(other);
   }),
 
