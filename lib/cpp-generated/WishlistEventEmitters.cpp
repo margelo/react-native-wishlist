@@ -105,7 +105,7 @@ object_optional_nested_1_layer.setProperty(runtime, "int32_optional_both", event
             }
     return payload;
   });
-}
+} yuyiyyui
 void WishlistEventEmitter::onBubblingEventDefinedInlineWithPaperName(OnBubblingEventDefinedInlineWithPaperName event) const {
   dispatchEvent("bubblingEventDefinedInlineWithPaperName", [event=std::move(event)](jsi::Runtime &runtime) {
     auto payload = jsi::Object(runtime);
