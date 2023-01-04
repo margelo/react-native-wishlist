@@ -104,4 +104,4 @@ export const Commands = codegenNativeCommands<NativeCommands>({
   supportedCommands: ['scrollTo']
 });
 
-export default (codegenNativeComponent<ModuleProps>('Module') as NativeType);
+export default (codegenNativeComponent<ModuleProps>('MGWishListComponent') as NativeType);
