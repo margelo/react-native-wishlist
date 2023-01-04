@@ -28,9 +28,9 @@ public:
         const ShadowNodeFragment &fragment,
         ShadowNodeFamily::Shared const &family) const override {
         
-            if (fragment.children != nullptr && fragment.children->size() != 0) {
-                std::cout << "sdfsdfs" << std::endl;
-            }
+        if (fragment.children != nullptr && fragment.children->size() != 0) {
+            std::cout << "sdfsdfs" << std::endl;
+        }
             
         /*PropsParserContext propsParserContext{getSurfaceId(), *this->getComponentDescriptor().getContextContainer().get()};
         auto rawProps = RawProps();

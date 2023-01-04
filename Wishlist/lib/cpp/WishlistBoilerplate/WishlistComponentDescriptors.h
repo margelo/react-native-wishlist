@@ -29,7 +29,6 @@ public:
         
         auto shadowNode =
             std::make_shared<WishlistShadowNode>(ShadowNodeFragment{fragment.props, nullptr, fragment.state}, family, getTraits());
-        ShadowNode::SharedListOfShared registeredComponents = fragment.children;
         shadowNode->sharedThis = shadowNode;
 
       adopt(shadowNode);

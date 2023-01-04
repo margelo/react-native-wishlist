@@ -44,5 +44,11 @@ void MGTemplateContainerComponentShadowNode::appendChild(ShadowNode::Shared cons
    }
 }
 
+void MGTemplateContainerComponentShadowNode::layout(LayoutContext layoutContext) {
+    
+    ConcreteViewShadowNode::layout(layoutContext);
+        
+}
+
 } // namespace react
 } // namespace facebook

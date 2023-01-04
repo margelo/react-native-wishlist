@@ -45,7 +45,7 @@ using namespace facebook::react;
 
 -(void)setTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates withNames:(std::vector<std::string>)names
 {
-    if (!alreadyRendered) {
+    if (!alreadyRendered && names.size() > 0 && names.size() == templates.size()) {
         alreadyRendered = true;
         CGRect frame = self.frame;
         self.scrollView.contentSize = CGSizeMake(frame.size.width, 1000000);
