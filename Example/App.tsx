@@ -1,8 +1,6 @@
 import React from 'react';
 import {View, Text, Image, Button} from 'react-native';
-import createWishlist from 'Wishlist';
-
-const WishList = createWishlist();
+import {WishList} from 'Wishlist';
 
 const SampleText = `Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
 Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, 
@@ -14,61 +12,34 @@ and more recently with desktop publishing software like Aldus PageMaker includin
 
 const authors = ['John', 'Bob', 'Szymon', 'Marc', 'Elon Musk'];
 
-WishList.registerComponent(
-  'type1',
-  <View style={{flexDirection: 'row-reverse'}}>
-    <View style={{margin: 10, width: '70%', backgroundColor: '#00008B'}}>
-      <Image
-        style={{width: 100, height: 100}}
-        source={{
-          uri: 'https://picsum.photos/100',
-        }}
-      />
-      <View style={{margin: 5}}>
-        <Text style={{color: 'white'}} wishId="author">
-          {' '}
-          me{' '}
-        </Text>
-      </View>
-      <View style={{margin: 5}}>
-        <Text style={{color: 'white'}} wishId="content">
-          {' '}
-          simple Message{' '}
-        </Text>
-      </View>
-    </View>
-  </View>,
-);
-
 const Type: React.FC<{}> = () => {
   return (
     <View>
       <View style={{margin: 10, width: '70%', backgroundColor: '#6495ED'}}>
         <Image
           style={{width: 100, height: 100}}
+          nativeID="image"
           source={{
             uri: 'https://picsum.photos/100',
           }}
         />
-        <View wishId="sth" style={{margin: 5}}>
-          <Text style={{color: 'white'}} wishId="author">
-            {' '}
-            author{' '}
+        <View style={{margin: 5}}>
+          <Text style={{color: 'white'}} nativeID="author">
+            author
           </Text>
         </View>
         <View style={{margin: 5}}>
-          <Text style={{color: 'white'}} wishId="content">
-            {' '}
-            simple Message{' '}
+          <Text style={{color: 'white'}} nativeID="content">
+            simple Message
           </Text>
         </View>
-        <Button title="click me" onPress={() => {}} />
+        <View>
+          <Button title="click me" onPress={() => {}} />
+        </View>
       </View>
     </View>
   );
 };
-
-WishList.registerComponent('type2', <Type />);
 
 export default function App() {
   return (
@@ -92,28 +63,63 @@ export default function App() {
           if (type === 2) {
             const randomIndex = Math.floor(Math.random() * authors.length);
             const randomAuthor = authors[randomIndex];
-            item.View.View.Paragraph.RawText.addProps({text: randomAuthor});
+            const authorView = item.getByWishId('author');
+            authorView.RawText.addProps({text: randomAuthor});
+            console.log(authorView.describe());
             imgSource = `https://picsum.photos/seed/picsum${authors[randomIndex]}/100`;
 
-            const button = item.View.View.at(2);
-            button.addProps({pointerEvents: 'box-only'});
-            button.setCallback('touchEnd', () => {
-              console.log('touched', index, newMessage);
-            });
+            const button = item.getByWishId('button');
+            if (button) {
+              button.addProps({pointerEvents: 'box-only'});
+              button.setCallback('touchEnd', () => {
+                console.log('touched', index, newMessage);
+              });
+            } else {
+              console.log('Button not found - TODO: nativeId for button');
+            }
           }
 
-          item.View.View.at(1).Paragraph.RawText.addProps({text: newMessage});
-          item.View.Image.addProps({source: {uri: imgSource}});
+          const contentView = item.getByWishId('content');
+          contentView.RawText.addProps({text: newMessage});
 
-          item.View.Image.setCallback('loadEnd', () => {
+          const imageView = item.getByWishId('image');
+          imageView.addProps({source: {uri: imgSource}});
+          imageView.setCallback('loadEnd', () => {
             // modify data
-            console.log('loadEvent' + index);
+            // console.log('loadEvent' + index);
           });
 
           return item;
         }}
-        style={{flex: 1}}
-      />
+        style={{flex: 1}}>
+        <WishList.Template type="type1">
+          <View style={{flexDirection: 'row-reverse'}}>
+            <View
+              style={{margin: 10, width: '70%', backgroundColor: '#00008B'}}>
+              <Image
+                style={{width: 100, height: 100}}
+                nativeID="image"
+                source={{
+                  uri: 'https://picsum.photos/100',
+                }}
+              />
+              <View style={{margin: 5}}>
+                <Text style={{color: 'white'}} nativeID="author">
+                  me
+                </Text>
+              </View>
+              <View style={{margin: 5}}>
+                <Text style={{color: 'white'}} nativeID="content">
+                  simple Message
+                </Text>
+              </View>
+            </View>
+          </View>
+        </WishList.Template>
+        <WishList.Template type="type2">
+          <Type />
+        </WishList.Template>
+      </WishList.Component>
     </View>
   );
 }
