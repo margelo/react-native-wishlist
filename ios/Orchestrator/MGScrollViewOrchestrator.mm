@@ -1,5 +1,8 @@
 #import "MGScrollViewOrchestrator.h"
 #include <set>
+#include "WishlistJsRuntime.h"
+
+using namespace Wishlist;
 
 @implementation MGScrollViewOrchestrator {
   UIScrollView *_scrollView;
@@ -247,7 +250,7 @@
 
 - (void)syncUpWithJS:(jsi::Value)observerBinding
 {
-  jsi::Runtime &rt = *ReanimatedRuntimeHandler::rtPtr;
+  auto &rt = WishlistJsRuntime::getInstance().getRuntime();
   jsi::Object global = rt.global().getPropertyAsObject(rt, "global");
   if (!global.hasProperty(rt, "wishlists")) {
     global.setProperty(rt, "wishlists", jsi::Object(rt));
@@ -264,7 +267,7 @@
 
 - (void)registerWishlistBinding
 {
-  jsi::Runtime &rt = *ReanimatedRuntimeHandler::rtPtr;
+  auto &rt = WishlistJsRuntime::getInstance().getRuntime();
   jsi::Object global = rt.global().getPropertyAsObject(rt, "global");
   if (!global.hasProperty(rt, "wishlists")) {
     global.setProperty(rt, "wishlists", jsi::Object(rt));
@@ -295,7 +298,7 @@
 
 - (void)unregisterWishlistBinding
 {
-  jsi::Runtime &rt = *ReanimatedRuntimeHandler::rtPtr;
+  auto &rt = WishlistJsRuntime::getInstance().getRuntime();
   jsi::Object global = rt.global().getPropertyAsObject(rt, "global");
   jsi::Object wishlists = global.getPropertyAsObject(rt, "wishlists");
   wishlists.setProperty(rt, _wishlistId.c_str(), jsi::Value::undefined());

@@ -1,0 +1,73 @@
+diff --git a/node_modules/metro-react-native-babel-preset/src/configs/hmr.js b/node_modules/metro-react-native-babel-preset/src/configs/hmr.js
+index 5eda723..a5a7c77 100644
+--- a/node_modules/metro-react-native-babel-preset/src/configs/hmr.js
++++ b/node_modules/metro-react-native-babel-preset/src/configs/hmr.js
+@@ -10,6 +10,6 @@
+ 
+ module.exports = function () {
+   return {
+-    plugins: [require("react-refresh/babel")],
++    plugins: [],
+   };
+ };
+diff --git a/node_modules/metro-react-native-babel-preset/src/configs/main.js b/node_modules/metro-react-native-babel-preset/src/configs/main.js
+index 7ffbc92..226e06b 100644
+--- a/node_modules/metro-react-native-babel-preset/src/configs/main.js
++++ b/node_modules/metro-react-native-babel-preset/src/configs/main.js
+@@ -99,34 +99,34 @@ const getPreset = (src, options) => {
+   }
+ 
+   if (!isHermesCanary) {
+-    extraPlugins.push([
+-      require("@babel/plugin-transform-destructuring"),
+-      {
+-        useBuiltIns: true,
+-      },
+-    ]);
++    // extraPlugins.push([
++    //   require("@babel/plugin-transform-destructuring"),
++    //   {
++    //     useBuiltIns: true,
++    //   },
++    // ]);
+   }
+ 
+   if (!isHermes && (isNull || hasClass || src.indexOf("...") !== -1)) {
+-    extraPlugins.push(
+-      [require("@babel/plugin-transform-spread")],
+-      [
+-        require("@babel/plugin-proposal-object-rest-spread"), // Assume no dependence on getters or evaluation order. See https://github.com/babel/babel/pull/11520
+-        {
+-          loose: true,
+-          useBuiltIns: true,
+-        },
+-      ]
+-    );
++    // extraPlugins.push(
++    //   [require("@babel/plugin-transform-spread")],
++    //   [
++    //     require("@babel/plugin-proposal-object-rest-spread"), // Assume no dependence on getters or evaluation order. See https://github.com/babel/babel/pull/11520
++    //     {
++    //       loose: true,
++    //       useBuiltIns: true,
++    //     },
++    //   ]
++    // );
+   }
+ 
+   if (!isHermes && (isNull || src.indexOf("`") !== -1)) {
+-    extraPlugins.push([
+-      require("@babel/plugin-transform-template-literals"),
+-      {
+-        loose: true,
+-      }, // dont 'a'.concat('b'), just use 'a'+'b'
+-    ]);
++    // extraPlugins.push([
++    //   require("@babel/plugin-transform-template-literals"),
++    //   {
++    //     loose: true,
++    //   }, // dont 'a'.concat('b'), just use 'a'+'b'
++    // ]);
+   }
+ 
+   if (isNull || src.indexOf("async") !== -1) {

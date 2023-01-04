@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { runOnUI } from './Utils';
+import { createRunInWishlistFn } from './WishlistJsRuntime';
 
 interface VisibleItem {
   index: number;
@@ -27,7 +27,7 @@ export function useOnFlushCallback(
   wishlistId: string,
 ) {
   useEffect(() => {
-    runOnUI(() => {
+    createRunInWishlistFn(() => {
       'worklet';
       if (!global.wishlists) {
         global.wishlists = {};
@@ -38,7 +38,7 @@ export function useOnFlushCallback(
       global.wishlists[wishlistId].listener = listener;
     })();
     return () => {
-      runOnUI(() => {
+      createRunInWishlistFn(() => {
         'worklet';
         global.wishlists[wishlistId].listener = undefined;
       })();

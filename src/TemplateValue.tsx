@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { getUIInflatorRegistry } from './InflatorRepository';
-import { generateId, runOnUI } from './Utils';
+import { generateId } from './Utils';
+import { createRunInWishlistFn } from './WishlistJsRuntime';
 
 export type TemplateValueMapper<ItemT, ValueT> = (
   item: ItemT,
@@ -69,7 +70,9 @@ export function createTemplateValue<ValueT>(
   }
 
   function remove() {
-    runOnUI(() => {
+    createRunInWishlistFn(() => {
+      'worklet';
+
       getUIInflatorRegistry().deleteTemplateValueState(id);
     });
   }

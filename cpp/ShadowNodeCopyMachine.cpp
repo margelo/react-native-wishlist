@@ -1,8 +1,8 @@
 #include "ShadowNodeCopyMachine.h"
 #include "MGWishlistComponentDescriptor.h"
+#include "WishlistJsRuntime.h"
 
-namespace facebook {
-namespace react {
+namespace Wishlist {
 
 int tag = -2;
 
@@ -19,10 +19,8 @@ std::shared_ptr<const ShadowNode> ShadowNodeCopyMachine::copyShadowSubtree(
 
   auto const fragment =
       ShadowNodeFamilyFragment{tag -= 2, sn->getSurfaceId(), nullptr};
-  auto eventTarget = std::make_shared<EventTarget>(
-      *ReanimatedRuntimeHandler::rtPtr,
-      jsi::Object(*ReanimatedRuntimeHandler::rtPtr),
-      tag);
+  auto &rt = WishlistJsRuntime::getInstance().getRuntime();
+  auto eventTarget = std::make_shared<EventTarget>(rt, jsi::Object(rt), tag);
 
   auto family = // std::make_shared<ShadowNodeFamily>(fragment, nullptr, cd);
       cd.createFamily(
@@ -53,5 +51,4 @@ std::shared_ptr<const ShadowNode> ShadowNodeCopyMachine::copyShadowSubtree(
   return clonedShadowNode;
 }
 
-}; // namespace react
-}; // namespace facebook
+}; // namespace Wishlist
