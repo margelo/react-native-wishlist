@@ -11,6 +11,7 @@
 
 #include <react/renderer/components/view/ViewProps.h>
 #include <react/renderer/core/PropsParserContext.h>
+#include "MGContainerProps.h"
 
 namespace facebook {
 namespace react {

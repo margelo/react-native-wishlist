@@ -6,6 +6,7 @@
 //
 
 #import "MGTemplateContainerComponent.h"
+#import "MGContainerComponentDescriptors.h"
 
 @implementation MGTemplateContainerComponent
 
@@ -19,9 +20,9 @@
 
 #pragma mark - RCTComponentViewProtocol
 
-+ (ComponentDescriptorProvider)componentDescriptorProvider
++ (facebook::react::ComponentDescriptorProvider)componentDescriptorProvider
 {
-  return concreteComponentDescriptorProvider<WishlistComponentDescriptor>(); // CHANGE !!!!!
+    return facebook::react::concreteComponentDescriptorProvider<facebook::react::MGTemplateContainerComponentComponentDescriptor>();
 }
 
 @end
