@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <react/renderer/components/Wishlist/Props.h>
+#include <react/renderer/components/view/Props.h>
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
 
 namespace facebook {
