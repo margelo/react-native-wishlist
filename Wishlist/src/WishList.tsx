@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useMemo, useRef } from "react";
-import { View, ViewProps, useWindowDimensions } from "react-native";
-import NativeWishList from "./NativeViews/NativeWishlistComponent";
+import React, { useEffect, useMemo, useRef, forwardRef, useImperativeHandle } from "react";
+import { View, ViewProps, useWindowDimensions, Text } from "react-native";
+import NativeWishList, { WishlistCommands } from "./NativeViews/WishlistNativeComponent";
 import NativeTemplateContainer from "./NativeViews/NativeTemplateContainer";
 import NativeTemplateInterceptor from "./NativeViews/NativeTemplateInterceptor";
 import InflatorRepository from "./InflatorRepository";
@@ -43,12 +43,23 @@ type Props = ViewProps & {
   onItemNeeded?: (index: number) => any;
 };
 
-const Component: React.FC<Props> = ({
+const Component = forwardRef((({
   inflateItem,
   onItemNeeded,
   children,
   style,
-}) => {
+  ...rest
+}, ref) => { 
+  const nativeWishlist = useRef(null); // TODO type it properly
+  useImperativeHandle(ref, () => ({
+    scrollToItem: (index: number, animated?: boolean) => {
+      WishlistCommands.scrollToItem(nativeWishlist.current, index, animated ?? true);
+    },
+    scrollToTop: () => {
+      WishlistCommands.scrollToItem(nativeWishlist.current, 0, true);
+    },
+  }));
+
   const { width } = useWindowDimensions();
   useMemo(() => initEventHandler(), []);
 
@@ -144,8 +155,12 @@ const Component: React.FC<Props> = ({
     >
       <NativeWishList
         style={{ flex: 1 }}
+        ref={nativeWishlist}
         removeClippedSubviews={false}
         inflatorId={inflatorIdRef.current}
+        onEndReached={rest?.onEndReached}
+        onStartReached={rest?.onStartReached}
+        initialIndex={rest.initialIndex ?? 0}
       />
 
       <NativeTemplateContainer
@@ -160,7 +175,7 @@ const Component: React.FC<Props> = ({
       </NativeTemplateContainer>
     </NativeTemplateInterceptor>
   );
-};
+}) as React.FC<Props> );
 
 type TemplateProps = {
   type: string;

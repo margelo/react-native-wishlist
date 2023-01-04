@@ -11,6 +11,7 @@
 #import "WishlistShadowNodes.h"
 #import <React/RCTBridgeModule.h>
 #import <React/RCTComponentViewFactory.h>
+#import "MGScrollViewOrchestrator.h"
 
 using namespace facebook::react;
 
@@ -24,6 +25,9 @@ using namespace facebook::react;
     WishlistShadowNode::ConcreteState::Shared _sharedState;
     bool alreadyRendered;
     std::string inflatorId;
+    MGScrollViewOrchestrator * _orchestrator;
+    std::shared_ptr<const WishlistEventEmitter> _emitter;
+    int _initialIndex;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -32,12 +36,35 @@ using namespace facebook::react;
       self.scrollView.delaysContentTouches = NO;
       self.scrollView.canCancelContentTouches = true;
       alreadyRendered = false;
+      
+      [self.scrollView removeGestureRecognizer: self.scrollView.panGestureRecognizer];
+      
+      UIPanGestureRecognizer * customR = [UIPanGestureRecognizer new];
+      [customR setMinimumNumberOfTouches:1];
+      [self.scrollView addGestureRecognizer:customR];
+      [customR addTarget:self action:@selector(handlePan:)];
   }
   return self;
 }
 
 -(void) setInflatorId:(std::string)nextInflatorId {
-  inflatorId = nextInflatorId;
+    inflatorId = nextInflatorId;
+}
+
+- (void)handlePan:(UIPanGestureRecognizer *)gesture
+{
+    if (_orchestrator != nil) {
+        PanEvent * panEvent = [PanEvent new];
+        panEvent.state = gesture.state;
+        panEvent.velocity = [gesture velocityInView:self].y;
+        panEvent.translation = [gesture translationInView:self.scrollView].y;
+        [_orchestrator notifyAboutEvent:panEvent];
+    }
+}
+
+- (BOOL)scrollViewShouldScrollToTop:(UIScrollView *)scrollView {
+    [self scrollToItem:0 animated:YES]; // Maybe it would be better to scroll to initial (which is not always 0)
+    return NO;
 }
 
 -(void) setTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates withNames:(std::vector<std::string>)names
@@ -45,15 +72,16 @@ using namespace facebook::react;
     if (!alreadyRendered && names.size() > 0 && names.size() == templates.size()) {
         alreadyRendered = true;
         CGRect frame = self.frame;
-        self.scrollView.contentSize = CGSizeMake(frame.size.width, 1000000);
-        _sharedState->getData().viewportObserver->boot(
-                                          5000,
-                                          frame.size.height, frame.size.width, 5000, 10, templates, names, inflatorId);
+        
+        self.scrollView.contentSize = CGSizeMake(frame.size.width, 10000000);
+        self.scrollView.frame = CGRectMake(self.scrollView.frame.origin.x,self.scrollView.frame.origin.y, frame.size.width, frame.size.height);
+        
+        _orchestrator = [[MGScrollViewOrchestrator alloc] initWith:self.scrollView templates:templates names:names viewportObserver: _sharedState->getData().viewportObserver inflatorId:inflatorId initialIndex:_initialIndex];
+        
+        _orchestrator.delegate = self;
+        
     } else {
-        CGRect frame = self.frame;
-        self.scrollView.contentSize = CGSizeMake(frame.size.width, 1000000);
-        _sharedState->getData().viewportObserver->update(
-                                          frame.size.height, frame.size.width, templates, names, inflatorId);
+        [_orchestrator notifyAboutNewTemplates:templates withNames:names inflatorId:inflatorId];
     }
 }
 
@@ -61,39 +89,44 @@ using namespace facebook::react;
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
 {
-  return concreteComponentDescriptorProvider<WishlistComponentDescriptor>();
+    return concreteComponentDescriptorProvider<WishlistComponentDescriptor>();
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-missing-super-calls"
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
-    inflatorId = std::dynamic_pointer_cast<const WishlistProps>(props)->inflatorId;
-    //[super updateProps:props oldProps:oldProps];
-    _eventEmitter = nil;
+  std::shared_ptr<const WishlistProps> wProps = std::static_pointer_cast<const WishlistProps>(props);
+    inflatorId = wProps->inflatorId;
+    _initialIndex = wProps->initialIndex;
 }
+#pragma clang diagnostic pop
 
 - (void)updateState:(State::Shared const &)state oldState:(State::Shared const &)oldState
 {
-    _eventEmitter = nil; // temporary TODO fix this
     if (state == nullptr) return;
     auto newState = std::static_pointer_cast<WishlistShadowNode::ConcreteState const>(state);
     auto &data = newState->getData();
     _sharedState = newState;
-    self.scrollView.contentOffset = CGPointMake(0, data.viewportObserver->offset);
 
   CGSize contentSize = RCTCGSizeFromSize(data.contentBoundingRect.size);
 
   self.containerView.frame = CGRect{RCTCGPointFromPoint(data.contentBoundingRect.origin), contentSize};
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-missing-super-calls"
+- (void)updateEventEmitter:(EventEmitter::Shared const &)eventEmitter
+{
+    _emitter = std::static_pointer_cast<WishlistEventEmitter const>(eventEmitter);
+}
+#pragma clang diagnostic pop
+
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
     if (_sharedState == nullptr) {
         return;
     }
-    //[super scrollViewDidScroll: scrollView];
-   // NSLog(@"offset: %f", scrollView.contentOffset.y);
-    _sharedState->getData().viewportObserver->reactToOffsetChange(scrollView.contentOffset.y);
-    //TODO update list
 }
 
 - (void)prepareForRecycle
@@ -105,7 +138,33 @@ using namespace facebook::react;
 -(void)setBridge:(RCTBridge *)bridge
 {
     // TODO here you can intercept uiManager by registering fake surface
-  //bridge.surfacePresentsr
-};
+    //bridge.surfacePresentsr
+}
+
+- (void)handleCommand:(const NSString *)commandName args:(const NSArray *)args {
+    MGWishlistHandleCommand(self, commandName, args);
+}
+
+- (void)scrollToItem:(NSInteger)index animated:(BOOL)animated {
+    if (animated && _orchestrator != nil) {
+        [_orchestrator scrollToItem:index];
+    }
+    
+    if (!animated) {
+        // TODO (restart Wishlist with different initial index)
+    }
+}
+
+- (void)onEndReached {
+    if (_emitter) {
+        _emitter->onEndReached({});
+    }
+}
+
+- (void)onStartReached {
+    if (_emitter) {
+        _emitter->onStartReached({});
+    }
+}
 
 @end

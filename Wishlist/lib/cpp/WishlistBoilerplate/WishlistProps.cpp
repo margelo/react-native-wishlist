@@ -19,6 +19,7 @@ WishlistProps::WishlistProps(
     const PropsParserContext &context,
     const WishlistProps &sourceProps,
     const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
+    initialIndex(convertRawProp(context, rawProps, "initialIndex", sourceProps.initialIndex, 0)),
     inflatorId(convertRawProp(context, rawProps, "inflatorId", sourceProps.inflatorId, "__defaultId__")),
     names(convertRawProp(context, rawProps, "names", sourceProps.names, {}))
       {

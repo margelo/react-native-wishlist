@@ -9,11 +9,10 @@ import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNati
 
 import {NativeModules} from 'react-native';
 NativeModules.Workaround.registerContainer();
-
-export type NativeTemplateContainerProps = Readonly<ViewProps & {
+export interface NativeTemplateContainerProps extends ViewProps {
   inflatorId: string;
   names: ReadonlyArray<string>;
-}>;
+}
 
 
 export default (codegenNativeComponent<NativeTemplateContainerProps>('MGTemplateContainerComponent'));
