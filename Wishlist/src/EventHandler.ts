@@ -11,7 +11,7 @@ const maybeInit = () => {
       'worklet';
       global.handlers = {};
 
-      global.handleEvent = (type, tag) => {
+      global.handleEvent = (type: any, tag: any) => {
         const callback = global.handlers[tag.toString() + type];
         if (callback) {
           callback();
