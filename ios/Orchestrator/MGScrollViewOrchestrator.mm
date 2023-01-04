@@ -162,7 +162,7 @@
   // update teamplates if needed
   if (_doWeHavePendingTemplates or rerenderAllItems) {
     _viewportObserver->update(
-        _scrollView.frame.size.height, _scrollView.frame.size.width, _pendingTemplates, _pendingNames, _inflatorId, rerenderAllItems);
+        _scrollView.frame.size.height, _scrollView.frame.size.width, _pendingTemplates, _pendingNames, _inflatorId, rerenderAllItems && !_doWeHaveOngoingEvent);
     _doWeHavePendingTemplates = NO;
     rerenderAllItems = NO;
   }

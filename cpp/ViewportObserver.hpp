@@ -78,9 +78,9 @@ struct ViewportObserver {
                 std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
                 std::vector<std::string> names,
                 std::string inflatorId,
-                bool rerenderAll) {
+                bool justRerender) {
         
-        if (!rerenderAll) {
+        if (!justRerender) {
             itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<WorkletItemProvider>(windowWidth, lc, inflatorId));
             itemProvider->setComponentsPool(componentsPool);
         }
@@ -100,7 +100,7 @@ struct ViewportObserver {
             componentsPool->returnToPool(item.sn);
         }
         
-        if (!rerenderAll) {
+        if (!justRerender) {
             componentsPool->registeredViews = registeredViews;
             componentsPool->setNames(names);
             componentsPool->templatesUpdated();
