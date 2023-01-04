@@ -21,6 +21,11 @@
 
 using namespace facebook::react;
 
+@interface RCTScrollViewComponentView (MGWishList)
+   
+- (void)scrollViewDidScroll:(UIScrollView*)sv;
+
+@end
 
 @implementation MGWishListComponent
 
@@ -44,6 +49,41 @@ using namespace facebook::react;
   const auto &oldSliderProps = *std::static_pointer_cast<const ModuleProps>(_props);
   const auto &newSliderProps = *std::static_pointer_cast<const ModuleProps>(props);
     int z = 3;
+    self.scrollView.contentSize = CGSizeMake(1000, 10000);
+    _eventEmitter = nil; // temporary TODO fix this
+    //self.contentSize = 10000;
+    //self.con
+}
+
+- (void)updateState:(State::Shared const &)state oldState:(State::Shared const &)oldState
+{
+    _eventEmitter = nil; // temporary TODO fix this
+ /* _state = std::static_pointer_cast<ScrollViewShadowNode::ConcreteState const>(state);
+  auto &data = _state->getData();
+
+  auto contentOffset = RCTCGPointFromPoint(data.contentOffset);
+  if (!oldState && !CGPointEqualToPoint(contentOffset, CGPointZero)) {
+    _scrollView.contentOffset = contentOffset;
+  } */
+
+ // CGSize contentSize = RCTCGSizeFromSize(data.getContentSize());
+
+ /* if (CGSizeEqualToSize(_contentSize, contentSize)) {
+    return;
+  }*/
+
+  /*_contentSize = contentSize;
+  _containerView.frame = CGRect{RCTCGPointFromPoint(data.contentBoundingRect.origin), contentSize};
+
+  [self _preserveContentOffsetIfNeededWithBlock:^{
+    self->_scrollView.contentSize = contentSize;
+  }];*/
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    [super scrollViewDidScroll: scrollView];
+    NSLog(@"offset: %f", scrollView.contentOffset.y);
 }
 
 
