@@ -56,9 +56,9 @@ public:
             shadowNode = std::make_shared<WishlistShadowNode>(sourceShadowNode, ShadowNodeFragment{});
         }
         
-        auto WishlistShadowNode = std::static_pointer_cast<WishlistShadowNode>(shadowNode);
-        WishlistShadowNode->registeredViews = static_cast<const WishlistShadowNode&>(sourceShadowNode).registeredViews;
-            WishlistShadowNode->sharedThis = WishlistShadowNode;
+        std::shared_ptr<WishlistShadowNode> wishlistShadowNode = std::static_pointer_cast<WishlistShadowNode>(shadowNode);
+        wishlistShadowNode->registeredViews = static_cast<const WishlistShadowNode&>(sourceShadowNode).registeredViews;
+            wishlistShadowNode->sharedThis = wishlistShadowNode;
 
         adopt(shadowNode);
         return shadowNode;

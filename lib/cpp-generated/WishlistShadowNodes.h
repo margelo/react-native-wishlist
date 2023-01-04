@@ -41,7 +41,7 @@ public:
         ShadowNodeFamily::Shared const &family,
         ShadowNodeTraits traits)
         : ConcreteViewShadowNode(fragment, family, traits) {
-            int x = 0;
+
     }
 
     WishlistShadowNode(

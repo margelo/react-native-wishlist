@@ -31,27 +31,16 @@ class WishlistState final {
  public:
     double originContentOffset = 50000;
     int originItemIndex = 10; // Hardcode for now
-    std::shared_ptr<ViewportObserver> viewportObserver = std::make_shared<ViewportObserver>();
+    std::shared_ptr<ViewportObserver> viewportObserver;
     bool initialised = false;
+    virtual ~WishlistState();
 
 #ifdef ANDROID
-  WishlistState() = default;
-  WishlistState(Mod const &previousState, folly::dynamic data)
-      : contentOffset(
-            {(Float)data["contentOffsetLeft"].getDouble(),
-             (Float)data["contentOffsetTop"].getDouble()}),
-        contentBoundingRect({}),
-        scrollAwayPaddingTop((Float)data["scrollAwayPaddingTop"].getDouble()){};
-
-  folly::dynamic getDynamic() const {
-    return folly::dynamic::object("contentOffsetLeft", contentOffset.x)(
-        "contentOffsetTop", contentOffset.y)(
-        "scrollAwayPaddingTop", scrollAwayPaddingTop);
-  };
-  MapBuffer getMapBuffer() const {
-    return MapBufferBuilder::EMPTY();
-  };
-  virtual ~WishlistState(){}
+  WishlistState();
+  WishlistState(WishlistState const &previousState, folly::dynamic data);
+  folly::dynamic getDynamic() const;
+  MapBuffer getMapBuffer() const;
+  
 #endif
 };
 

@@ -16,8 +16,8 @@ import {codegenNativeComponent} from 'react-native-tscodegen-types';
 import {codegenNativeCommands} from 'react-native-tscodegen-types';
 'use strict';
 
-import {NativeModules} from 'react-native';
-NativeModules.Workaround.registerList();
+//import {NativeModules} from 'react-native';
+//NativeModules.Workaround.registerList();
 
 export type EventInFile = Readonly<{
   boolean_required: boolean;
@@ -85,8 +85,8 @@ export type Int = Int32;
 
 export type Void = void;
 
-export type ModuleProps = Readonly<ViewProps & {
-  kkk: number;
+export type WishlistProps = Readonly<ViewProps & {
+  kkk: Int;
   inflatorId: string;
   names: ReadonlyArray<string>;
   onBubblingEventDefinedInline: BubblingEventHandler<EventInFile>;
@@ -95,7 +95,7 @@ export type ModuleProps = Readonly<ViewProps & {
   onDirectEventDefinedInlineWithPaperName: DirectEventHandler<EventInFile, 'paperDirectEventDefinedInlineWithPaperName'>;
 }>;
 
-type NativeType = HostComponent<ModuleProps>;
+type NativeType = HostComponent<WishlistProps>;
 
 export type ScrollTo = (viewRef: React.ElementRef<NativeType>, y: Int, animated: Boolean) => Void;
 
@@ -107,4 +107,4 @@ export const Commands = codegenNativeCommands<NativeCommands>({
   supportedCommands: ['scrollTo']
 });
 
-export default (codegenNativeComponent<ModuleProps>('MGWishListComponent') as NativeType);
+export default (codegenNativeComponent<WishlistProps>('MGWishListComponent') as NativeType);
