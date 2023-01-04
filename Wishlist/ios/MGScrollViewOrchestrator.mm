@@ -62,6 +62,7 @@
 
 - (void)handleVSync:(CADisplayLink *)displayLink
 {
+    CGFloat yDiff = 0;
     // Check Touch Events
     if (_touchEvents.count > 0) {
      /* _currentAnimation = nil */
@@ -71,8 +72,9 @@
                 _doWeHaveOngoingEvent = YES;
             }
             if (event.state == UIGestureRecognizerStateChanged) {
-                CGFloat yDiff = event.translation - _lastTranslation;
+                yDiff = event.translation - _lastTranslation;
                 _lastTranslation = event.translation;
+                
             }
             if (event.state == UIGestureRecognizerStateEnded) {
                 _doWeHaveOngoingEvent = NO;
@@ -86,15 +88,51 @@
     // Run Animations
     /* if (_currentAnimation != nil) [_currentAnimation timeFrame: ...]*/
     
+    // Update content Offset
+    if (yDiff != 0) {
+        CGPoint oldOffset = _scrollView.contentOffset;
+        _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + yDiff);
+    }
+    
     // update teamplates if needed
     if (_doWeHavePendingTemplates) {
         _viewportObserver->update(_scrollView.frame.size.height, _scrollView.frame.size.width, _pendingTemplates, _pendingNames, _inflatorId);
         _doWeHavePendingTemplates = NO;
     }
     
-    // update viewport
+    // cover Viewport if possible
+    _viewportObserver->reactToOffsetChange(_scrollView.contentOffset.y);
     
     // update offset if new elements require it
+    CGFloat topElementY = _viewportObserver->window[0].offset;
+    CGFloat bottomElementY = _viewportObserver->window.back().offset;
+    
+    CGFloat topViewportEdge = _scrollView.contentOffset.y;
+    CGFloat bottomViewPortEdge = topViewportEdge + _scrollView.frame.size.height;
+    
+    // ugly casework
+    // topElementY < topViewportEdge (possibly new elementsOnTheTop)
+        /* stop overscrollAnimation */
+    
+    // bottomElementY < bottomViewportEdge (bottom overscroll)
+    if (bottomElementY < bottomViewPortEdge) {
+        CGFloat diff = bottomElementY - bottomViewPortEdge;
+        CGPoint oldOffset = _scrollView.contentOffset;
+        
+        _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + diff);
+        bottomViewPortEdge += diff;
+        topViewportEdge += diff;
+    }
+    
+    // topElementY > topViewPortEdge (top overscroll)
+    if (topElementY > topViewportEdge) {
+        CGFloat diff = topElementY - topViewportEdge;
+        CGPoint oldOffset = _scrollView.contentOffset;
+        
+        _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + diff);
+        bottomViewPortEdge += diff;
+        topViewportEdge += diff;
+    }
     
     // pause Vsync listener if there is nothing to do
     if ([_touchEvents count] == 0 /*&& _currentAnimation == nil */ && !_doWeHavePendingTemplates) {
@@ -122,5 +160,9 @@
     _scrollView = nil;
     [_displayLink invalidate];
 }
+
+@end
+
+@implementation PanEvent
 
 @end
