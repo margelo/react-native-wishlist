@@ -24,18 +24,42 @@ struct WishItem
 
 class ItemProvider {
 public:
-    void setComponentsPool(std::shared_ptr<ComponentsPool> pool) = 0;
+    virtual void setComponentsPool(std::shared_ptr<ComponentsPool> pool) = 0;
     
-    WishItem provide(int index) = 0;
+    virtual WishItem provide(int index) = 0;
+    
+    virtual ~ItemProvider() {}
 };
+
+//TODO create provider based on worklet and inflateItem method
 
 struct ItemProviderTestImpl : ItemProvider
 {
-    std::shared_ptr<ComponentProvider> cp;
+    std::shared_ptr<ComponentsPool> cp;
     
-    void setComponentsPool(ComponentsPool & pool) = 0;
+    void setComponentsPool(std::shared_ptr<ComponentsPool> pool) {
+        cp = pool;
+    }
     
-    WishItem provide(int index) = 0;
+    WishItem provide(int index) {
+        WishItem wishItem;
+        if (index < 0 or index > 1000) {
+            return wishItem;
+        }
+        std::shared_ptr<LayoutableShadowNode> sn;
+        if (index & 1) {
+            std::shared_ptr<const ShadowNode> item = cp->getNodeForType("type1");
+        } else {
+            std::shared_ptr<const ShadowNode> item = cp->getNodeForType("type2");
+        }
+        
+        LayoutContext lc;
+        LayoutConstraints lcc;
+        Size sz = sn->measure(lc, lcc);
+        
+        wishItem.sn = sn;
+        wishItem.height = sz
+    }
 };
 
 #endif /* ItemProvider_hpp */
