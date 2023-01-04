@@ -17,6 +17,11 @@ export const ChatItemView: React.FC<Props> = ({type, item}) => {
 
     return item.likes > 0 ? '♥️' : '🖤';
   });
+  const likeOpacity = useTemplateValue((item: ChatItem) => {
+    'worklet';
+
+    return item.likes > 0 ? 1 : 0.4;
+  });
 
   return (
     <View style={[styles.container, type === 'me' ? styles.me : styles.other]}>
@@ -29,7 +34,9 @@ export const ChatItemView: React.FC<Props> = ({type, item}) => {
           <Template.Text style={styles.authorText}>{item.author}</Template.Text>
           {type === 'other' ? (
             <View nativeID="likeButton">
-              <Template.Text>{likeText}</Template.Text>
+              <Template.Text style={{opacity: likeOpacity}}>
+                {likeText}
+              </Template.Text>
             </View>
           ) : null}
         </View>

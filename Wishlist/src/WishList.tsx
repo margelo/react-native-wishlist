@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, forwardRef, useImperativeHandle, useContext, createContext } from "react";
-import { View, ViewProps, useWindowDimensions, Text, Image } from "react-native";
+import { View, ViewProps, useWindowDimensions, Text, Image, StyleSheet } from "react-native";
 import NativeWishList, { WishlistCommands } from "./NativeViews/WishlistNativeComponent";
 import NativeTemplateContainer from "./NativeViews/NativeTemplateContainer";
 import NativeTemplateInterceptor from "./NativeViews/NativeTemplateInterceptor";
@@ -288,13 +288,13 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
   Component: T,
   addProps?: (templateItem, props: any) => void,
 ): T {
-  return forwardRef<any, any>((props, ref) => {
+  return forwardRef<any, any>(({style, ...props}, ref) => {
     const {inflatorId} = useMappingContext();
-
+    const resolvedStyle = StyleSheet.flatten(style);
     const proxyValues: {valuePath: string[], targetPath: string[]}[] = [];
     const templateValues: {mapper: any, targetPath: string[]}[] = [];
     const otherProps = {};
-    traverseObject(props, (path, value) => {
+    traverseObject({...props, style: resolvedStyle}, (path, value) => {
       const applyHacks = () => {
         // Text component needs to receive a string child to work properly.
         // @ts-ignore
@@ -321,17 +321,20 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
     useMemo(() => {
       InflatorRepository.registerMapping(inflatorId, nativeId, (value, templateItem) => {
         'worklet';
-        const propsToSet = {};
+        const propsToSet: any = {};
         for (const {valuePath, targetPath} of proxyValues) {
           setInObject(propsToSet, targetPath, getInObject(value, valuePath));
         }
         for (const {mapper, targetPath} of templateValues) {
           setInObject(propsToSet, targetPath, mapper(value));
         }
+        // Styles need to be passed as props.
+        const {style, ...otherPropsToSet} = propsToSet;
+        const finalPropsToSet = {...otherPropsToSet, ...style};
         if (addProps) {
-          addProps(templateItem, propsToSet);
+          addProps(templateItem, finalPropsToSet);
         } else {
-          templateItem.addProps(propsToSet);
+          templateItem.addProps(finalPropsToSet);
         }
       })
     }, [inflatorId, nativeId]);
