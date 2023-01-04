@@ -31,7 +31,6 @@
     "typescript": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "prettier": "prettier \"src/**/*.{js,ts,tsx}\" \"example/**/*.{js,ts,tsx}\" --check",
-    "clang-format": "clang-format -i --glob='{ios,android,cpp}/**/*.{h,cpp,m,mm}'",
     "prepare": "bob build",
     "release": "release-it",
     "example": "yarn --cwd example",
@@ -61,7 +60,6 @@
     "@types/jest": "^28.1.2",
     "@types/react": "^18.0.21",
     "@types/react-native": "^0.70.6",
-    "clang-format": "^1.8.0",
     "commitlint": "^17.0.2",
     "eslint": "^8.4.1",
     "eslint-config-prettier": "^8.5.0",
@@ -133,10 +131,5 @@
         }
       ]
     ]
-  },
-  "codegenConfig": {
-    "name": "wishlist",
-    "type": "components",
-    "jsSrcsDir": "./src/NativeViews"
   }
 }
