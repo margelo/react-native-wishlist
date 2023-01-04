@@ -1,38 +1,41 @@
 import React from 'react';
-import {Image, StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
+import {useTemplateValue, WishList} from 'wishlist';
+import {ChatItem} from './Data';
 
 interface Props {
   type: 'me' | 'other';
 }
 
 export const ChatItemView: React.FC<Props> = ({type}) => {
+  const author = useTemplateValue((item: ChatItem) => item.author);
+  const avatarUrl = useTemplateValue((item: ChatItem) => item.avatarUrl);
+  const message = useTemplateValue((item: ChatItem) => item.message);
+  const likeText = useTemplateValue((item: ChatItem) =>
+    item.likes > 0 ? '♥️' : '🖤',
+  );
+  const likeOpacity = useTemplateValue((item: ChatItem) =>
+    item.likes > 0 ? 1 : 0.4,
+  );
+
   return (
     <View style={[styles.container, type === 'me' ? styles.me : styles.other]}>
       <View style={styles.imageAndAuthor}>
-        <Image
-          style={styles.avatarImage}
-          nativeID="avatar"
-          source={{
-            uri: 'https://picsum.photos/100',
-          }}
-        />
+        <WishList.Image style={styles.avatarImage} source={{uri: avatarUrl}} />
         <View style={styles.authorContainer}>
-          <Text style={styles.authorText} nativeID="author">
-            {/*  FIXME: We shouldnt need placeholders - but currently we need'em */}
-            Author
-          </Text>
+          <WishList.Text style={styles.authorText}>{author}</WishList.Text>
           {type === 'other' ? (
             <View nativeID="likeButton">
-              <Text nativeID="likes">❤️</Text>
+              <WishList.Text style={{opacity: likeOpacity}}>
+                {likeText}
+              </WishList.Text>
             </View>
           ) : null}
         </View>
       </View>
 
       <View style={styles.messageContainer}>
-        <Text style={styles.messageText} nativeID="content">
-          Simple Message
-        </Text>
+        <WishList.Text style={styles.messageText}>{message}</WishList.Text>
       </View>
     </View>
   );
