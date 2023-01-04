@@ -1,11 +1,28 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
-import {useTemplateValue, WishList} from 'wishlist';
-import type {ChatItem} from './Data';
+import {useTemplateValue, WishList as Wishlist} from 'wishlist';
+import {ChatItem, ReactionItem} from './Data';
 
 interface Props {
   type: 'me' | 'other';
 }
+
+export const Reaction = () => {
+  const emoji = useTemplateValue((item: ReactionItem) => {
+    if (!item.emoji) {
+      console.log('lol', item);
+    } else {
+      console.log('non lol', item.emoji);
+    }
+    return item.emoji || 'b';
+  });
+
+  return (
+    <View>
+      <Wishlist.Text >{emoji}</Wishlist.Text>
+    </View>
+  );
+};
 
 export const ChatItemView: React.FC<Props> = ({type}) => {
   const author = useTemplateValue((item: ChatItem) => item.author);
@@ -18,25 +35,29 @@ export const ChatItemView: React.FC<Props> = ({type}) => {
     item.likes > 0 ? 1 : 0.4,
   );
 
+  const reactions = useTemplateValue((item: ChatItem) => item.reactions);
+
   return (
     <View style={[styles.container, type === 'me' ? styles.me : styles.other]}>
       <View style={styles.imageAndAuthor}>
-        <WishList.Image style={styles.avatarImage} source={{uri: avatarUrl}} />
+        <Wishlist.Image style={styles.avatarImage} source={{uri: avatarUrl}} />
         <View style={styles.authorContainer}>
-          <WishList.Text style={styles.authorText}>{author}</WishList.Text>
+          <Wishlist.Text style={styles.authorText}>{author}</Wishlist.Text>
           {type === 'other' ? (
             <View nativeID="likeButton">
-              <WishList.Text style={{opacity: likeOpacity}}>
+              <Wishlist.Text style={{opacity: likeOpacity}}>
                 {likeText}
-              </WishList.Text>
+              </Wishlist.Text>
             </View>
           ) : null}
         </View>
       </View>
 
       <View style={styles.messageContainer}>
-        <WishList.Text style={styles.messageText}>{message}</WishList.Text>
+        <Wishlist.Text style={styles.messageText}>{message}</Wishlist.Text>
       </View>
+
+      <Wishlist.ForEach style={{flexDirection: 'row'}} items={reactions} template="reaction" />
     </View>
   );
 };

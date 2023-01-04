@@ -12,16 +12,21 @@
 using namespace facebook::react;
 using namespace jsi;
 
+struct ComponentsPool;
+
 struct ShadowNodeBinding : public jsi::HostObject,
                            std::enable_shared_from_this<ShadowNodeBinding> {
   std::shared_ptr<ShadowNodeBinding> parent;
   std::shared_ptr<const ShadowNode> sn;
+  std::weak_ptr<ComponentsPool> wcp;
 
   ShadowNodeBinding(
       std::shared_ptr<const ShadowNode> sn,
+      std::weak_ptr<ComponentsPool> wcp,
       std::shared_ptr<ShadowNodeBinding> parent = nullptr) {
     this->sn = sn;
     this->parent = parent;
+    this->wcp = wcp;
   }
 
   void describe(
@@ -47,7 +52,7 @@ struct ShadowNodeBinding : public jsi::HostObject,
       std::shared_ptr<ShadowNodeBinding> p) {
     for (auto child : p->sn->getChildren()) {
       // Create binding
-      auto bc = std::make_shared<ShadowNodeBinding>(child, p);
+      auto bc = std::make_shared<ShadowNodeBinding>(child, wcp, p);
 
       // Test against native id
       if (child->getProps()->nativeId == nativeId) {
@@ -63,177 +68,37 @@ struct ShadowNodeBinding : public jsi::HostObject,
     return nullptr;
   }
 
-  virtual Value get(Runtime &rt, const PropNameID &nameProp) {
-    std::string name = nameProp.utf8(rt);
-
-    if (name == "setCallback") {
-      return jsi::Function::createFromHostFunction(
-          rt,
-          nameProp,
-          1,
-          [=](jsi::Runtime &rt,
-              jsi::Value const &thisValue,
-              jsi::Value const *args,
-              size_t count) -> jsi::Value {
-            std::string callbackName = args[0].asString(rt).utf8(rt);
-            int tag = this->sn->getTag();
-            std::string eventName = std::to_string(tag) + callbackName;
-            jsi::Function callback = args[1].asObject(rt).asFunction(rt);
-
-            auto handlerRegistry = rt.global()
-                                       .getPropertyAsObject(rt, "global")
-                                       .getPropertyAsObject(rt, "handlers");
-            handlerRegistry.setProperty(rt, eventName.c_str(), callback);
-
-            return jsi::Value::undefined();
-          });
-    }
-
-    if (name == "addProps") {
-      return jsi::Function::createFromHostFunction(
-          rt,
-          nameProp,
-          1,
-          [=](jsi::Runtime &rt,
-              jsi::Value const &thisValue,
-              jsi::Value const *args,
-              size_t count) -> jsi::Value {
-            RawProps rawProps(rt, args[0]);
-
-            auto &cd = sn->getComponentDescriptor();
-
-            PropsParserContext propsParserContext{
-                sn->getFamily().getSurfaceId(),
-                *cd.getContextContainer().get()};
-
-            auto nextProps =
-                cd.cloneProps(propsParserContext, sn->getProps(), rawProps);
-            std::cout << nextProps->getDebugValue() << std::endl;
-
-            auto clonedShadowNode = cd.cloneShadowNode(
-                *sn,
-                {
-                    nextProps,
-                    nullptr,
-                });
-
-            sn = clonedShadowNode;
-
-            std::shared_ptr<ShadowNodeBinding> currentParent = parent;
-            std::shared_ptr<ShadowNode> currentSN = clonedShadowNode;
-            while (currentParent != nullptr) {
-              auto &cd = currentParent->sn->getComponentDescriptor();
-              auto children = currentParent->sn->getChildren();
-              for (int i = 0; i < children.size(); ++i) {
-                if (children[i]->getTag() == currentSN->getTag()) {
-                  children[i] = currentSN;
-                  break;
-                }
-              }
-              currentSN = cd.cloneShadowNode(
-                  *(currentParent->sn),
-                  {nullptr,
-                   std::make_shared<ShadowNode::ListOfShared>(children)});
-              currentParent->sn = currentSN;
-              currentParent = currentParent->parent;
-              std::cout << "is currentParent null "
-                        << (currentParent == nullptr) << std::endl;
-            }
-
-            return jsi::Value::undefined();
-          });
-    }
-
-    if (name == "getName") {
-      return jsi::Function::createFromHostFunction(
-          rt,
-          nameProp,
-          1,
-          [=](jsi::Runtime &rt,
-              jsi::Value const &thisValue,
-              jsi::Value const *args,
-              size_t count) -> jsi::Value {
-            return jsi::String::createFromUtf8(rt, sn->getComponentName());
-          });
-    }
-
-    if (name == "describe") {
-      return jsi::Function::createFromHostFunction(
-          rt,
-          nameProp,
-          1,
-          [=](jsi::Runtime &rt,
-              jsi::Value const &thisValue,
-              jsi::Value const *args,
-              size_t count) -> jsi::Value {
-            std::stringstream ss;
-            describe(ss, sn, 0);
-            return jsi::String::createFromUtf8(rt, ss.str());
-          });
-    }
-
-    if (name == "getByWishId") { // That can be optimised to O(depth) when
-                                 // template preprocessing
-      return jsi::Function::createFromHostFunction(
-          rt,
-          nameProp,
-          1,
-          [=](jsi::Runtime &rt,
-              jsi::Value const &thisValue,
-              jsi::Value const *args,
-              size_t count) -> jsi::Value {
-            auto binding = findNodeByWishId(
-                args[0].asString(rt).utf8(rt), shared_from_this());
-            if (binding != nullptr) {
-              return jsi::Object::createFromHostObject(rt, binding);
-            }
-
-            return jsi::Value::undefined();
-          });
-    }
-
-    if (name == "at") {
-      return jsi::Function::createFromHostFunction(
-          rt,
-          nameProp,
-          1,
-          [=](jsi::Runtime &rt,
-              jsi::Value const &thisValue,
-              jsi::Value const *args,
-              size_t count) -> jsi::Value {
-            int index = (int)(args[0].getNumber());
-            std::string type = sn->getComponentName();
-
-            int i = 0;
-
-            for (auto sibiling : parent->sn->getChildren()) {
-              if (sibiling->getComponentName() == type) {
-                if (i == index) {
-                  return jsi::Object::createFromHostObject(
-                      rt,
-                      std::make_shared<ShadowNodeBinding>(sibiling, parent));
-                }
-                i++;
-              }
-            }
-
-            return jsi::Value::undefined();
-          });
-    }
-
-    for (auto child : sn->getChildren()) {
-      if (child->getComponentName() == name) {
-        return jsi::Object::createFromHostObject(
-            rt, std::make_shared<ShadowNodeBinding>(child, shared_from_this()));
-      }
-    }
-
-    return jsi::Value::undefined();
-  }
+  virtual Value get(Runtime &rt, const PropNameID &nameProp);
 
   virtual void set(Runtime &rt, const PropNameID &name, const Value &value) {
     throw jsi::JSError(rt, "set hasn't been implemented yet");
   }
+};
+
+// dirty hack don't do it at home
+class ShadowNodeFamilyHack final {
+ public:
+  using Shared = std::shared_ptr<ShadowNodeFamily const>;
+  using Weak = std::weak_ptr<ShadowNodeFamily const>;
+
+  using AncestorList = butter::small_vector<
+      std::pair<
+          std::reference_wrapper<ShadowNode const> /* parentNode */,
+          int /* childIndex */>,
+      64>;
+
+  EventDispatcher::Weak eventDispatcher_;
+  mutable std::shared_ptr<State const> mostRecentState_;
+  mutable butter::shared_mutex mutex_;
+
+  Tag const tag_;
+  SurfaceId const surfaceId_;
+  SharedEventEmitter const eventEmitter_;
+  ComponentDescriptor const &componentDescriptor_;
+  ComponentHandle componentHandle_;
+  ComponentName componentName_;
+  mutable ShadowNodeFamily::Weak parent_{};
+  mutable bool hasParent_{false};
 };
 
 struct ComponentsPool : std::enable_shared_from_this<ComponentsPool> {
@@ -255,6 +120,10 @@ struct ComponentsPool : std::enable_shared_from_this<ComponentsPool> {
     if (sn == nullptr) {
       return;
     }
+    auto *family =
+        reinterpret_cast<const ShadowNodeFamilyHack *>(&sn->getFamily());
+    family->hasParent_ = false;
+    family->parent_.reset();
     std::string type = tagToType[sn->getTag()];
     reusable[type].push_back(sn);
   }
@@ -313,7 +182,7 @@ struct ComponentsPool : std::enable_shared_from_this<ComponentsPool> {
               auto sn = blockWcp.lock()->getNodeForType(componentName);
 
               return jsi::Object::createFromHostObject(
-                  rt, std::make_shared<ShadowNodeBinding>(sn));
+                  rt, std::make_shared<ShadowNodeBinding>(sn, blockWcp));
             });
       }
 
