@@ -8,13 +8,13 @@
   "private": true,
   "scripts": {},
   "devDependencies": {
-    "@types/react-native": "^0.69.0"
-  },
-  "peerDependencies": {
-    "react-native": "^0.69.0"
-  },
-  "dependencies": {
+    "@types/react-native": "^0.70.0",
     "react-native-tscodegen": "^0.68.4",
     "react-native-tscodegen-types": "^0.69.1"
+  },
+  "peerDependencies": {
+    "react-native": "^0.70.0"
+  },
+  "dependencies": {
   }
 }

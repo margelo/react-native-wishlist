@@ -34,7 +34,7 @@ const Type: React.FC<{}> = () => {
           </Text>
         </View>
         <View>
-          <Button title="click me" onPress={() => {}} />
+          <Button title="click me" nativeID="button" onPress={() => {}} />
         </View>
       </View>
     </View>
@@ -88,7 +88,7 @@ export default function App() {
             imageView.addProps({source: {uri: imgSource}});
             imageView.setCallback('loadEnd', () => {
               // modify data
-              // console.log('loadEvent' + index);
+               console.log('loadEvent' + index);
             });
 
             return item;
