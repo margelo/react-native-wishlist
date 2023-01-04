@@ -62,8 +62,6 @@ struct ViewportObserver {
     void rerenderDirtyItems(std::set<std::string> && items) {
         float offset = window.front().offset;
         
-        std::vector<WishItem> itemsToRemove;
-        
         for (auto & item : window) {
             item.offset = offset;
             if (items.find(item.key) != items.end()) {
