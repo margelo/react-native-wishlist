@@ -6,7 +6,7 @@
 //
 
 #include "ShadowNodeCopyMachine.h"
-#include "ModuleComponentDescriptors.h"
+#include "WishlistComponentDescriptors.h"
 
 namespace facebook {
 namespace react {

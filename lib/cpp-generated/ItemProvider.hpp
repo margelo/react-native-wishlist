@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <memory>
 #include "ComponentsPool.h"
-#include "decorator.h"
 #include <react/renderer/uimanager/primitives.h>
 #include "ReanimatedRuntimeHandler.hpp"
 
