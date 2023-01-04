@@ -63,6 +63,8 @@ struct ViewportObserver {
                 }
                 wishItem.offset = item.offset - wishItem.height;
                 window.push_front(wishItem);
+            } else {
+                break;
             }
         }
         
@@ -78,6 +80,8 @@ struct ViewportObserver {
                 }
                 wishItem.offset = bottom;
                 window.push_back(wishItem);
+            } else {
+                break;
             }
         }
         
@@ -89,6 +93,8 @@ struct ViewportObserver {
                 window.pop_front();
                 componentsPool.returnToPool(item.sn);
                 continue;
+            } else {
+                break;
             }
         }
         
@@ -100,10 +106,11 @@ struct ViewportObserver {
                 window.pop_back();
                 componentsPool.returnToPool(item.sn);
                 continue;
+            } else {
+                break;
             }
         }
     }
-    
 };
 
 #endif /* ViewportObserver_hpp */
