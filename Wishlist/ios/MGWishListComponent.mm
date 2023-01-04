@@ -139,6 +139,10 @@ using namespace facebook::react;
     //bridge.surfacePresentsr
 };
 
+- (void)handleCommand:(const NSString *)commandName args:(const NSArray *)args {
+    MGWishlistHandleCommand(self, commandName, args);
+}
+
 - (void)scrollToItem:(NSInteger)index animated:(BOOL)animated {
     NSLog(@"scrollToItem has been called :D ");
 }

@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)scrollToItem:(NSInteger)index animated:(BOOL)animated;
 @end
 
-RCT_EXTERN inline void RCTWishlistHandleCommand(
+RCT_EXTERN inline void MGWishlistHandleCommand(
   id<MGWishlistViewProtocol> componentView,
   NSString const *commandName,
   NSArray const *args)
