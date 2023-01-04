@@ -18,23 +18,18 @@ export default function App() {
 
   const listRef = useRef<WishListInstance<ChatItem>>();
 
-  const added = useRef(0);
-
-  const handleSend = useCallback(
-    async (text: string) => {
-      const newItem = getSendedMessage(text);
-      await listRef.current?.update((dataCopy) => {
-        'worklet';
-        // get rid of frozen object that Reanimated creates
-        const val = JSON.parse(JSON.stringify(newItem));
-        val.message += ` ind:${dataCopy.length()}`;
-        dataCopy.push(val);
-      });
-      added.current++;
-      listRef.current?.scrollToItem(data.length + added.current - 1);
-    },
-    [data],
-  );
+  const handleSend = useCallback(async (text: string) => {
+    const newItem = getSendedMessage(text);
+    const index = (await listRef.current?.update((dataCopy) => {
+      'worklet';
+      // get rid of frozen object that Reanimated creates
+      const val = JSON.parse(JSON.stringify(newItem));
+      val.message += ` ind:${dataCopy.length()}`;
+      dataCopy.push(val);
+      return dataCopy.length() - 1;
+    })) as number;
+    listRef.current?.scrollToItem(index);
+  }, []);
 
   // Load data
   useEffect(() => {

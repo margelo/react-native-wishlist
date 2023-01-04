@@ -56,7 +56,7 @@ function getTemplatesFromChildren(children: React.ReactNode, width: number) {
 export type WishListInstance<T extends BaseItem> = {
   scrollToItem: (index: number, animated?: boolean) => void;
   scrollToTop: () => void;
-  update: (updateJob: UpdateJob<T>) => void;
+  update: (updateJob: UpdateJob<T>) => Promise<unknown>;
 };
 
 export type BaseItem = { type: string; key: string };

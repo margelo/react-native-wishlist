@@ -7,7 +7,7 @@ export type Item = {
   key: string;
 };
 
-export type UpdateJob<T extends Item> = (datacopy: DataCopy<T>) => void;
+export type UpdateJob<T extends Item> = (datacopy: DataCopy<T>) => unknown;
 export interface DataCopy<T extends Item> {
   getIndex: (key: string) => number | undefined;
   deque: Array<T>;
@@ -26,7 +26,7 @@ export interface DataCopy<T extends Item> {
 }
 
 export interface Data<T extends Item> {
-  update: (job: UpdateJob<T>, callback?: () => void) => void;
+  update: (job: UpdateJob<T>, callback?: (results: unknown) => void) => void;
   at: (index: number) => T | undefined;
   length: () => number;
   forKey: (key: string) => T | undefined;
@@ -122,12 +122,15 @@ export function useInternalWishlistData<T extends Item>(
         const __currentlyRenderedCopy = createItemsDataStructure(initialData);
 
         const pendingUpdates: Array<UpdateJob<T>> = [];
-        function update(updateJob: UpdateJob<T>, callback?: () => void) {
+        function update(
+          updateJob: UpdateJob<T>,
+          callback?: (result: any) => void,
+        ) {
           updateJob(__nextCopy);
           pendingUpdates.push((dataCopy: DataCopy<T>) => {
-            updateJob(dataCopy);
+            const result = updateJob(dataCopy);
             if (callback) {
-              runOnJS(callback)();
+              runOnJS(callback)(result);
             }
           });
           scheduleSyncUp();
