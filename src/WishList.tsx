@@ -7,8 +7,9 @@ export default function createWishList() {
   const componentsRegistry = new Map<string, React.ReactElement>();
 
   function WishList(props) {
+    console.log(componentsRegistry.keys())
     return (
-      <NativeWishList>
+      <NativeWishList names={Array.from(componentsRegistry.keys())} >
         { Array.from(componentsRegistry.values())}
       </NativeWishList>
     );
