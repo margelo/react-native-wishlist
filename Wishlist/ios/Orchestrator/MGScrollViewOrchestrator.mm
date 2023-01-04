@@ -59,7 +59,9 @@
 - (void)maybeRegisterForNextVSync
 {
     if (_paused) {
-        _paused = NO;
+    if ([_displayLink isPaused]) {
+        [_displayLink setPaused:NO];
+    }
         [_displayLink setPaused:NO];
     }
 }
