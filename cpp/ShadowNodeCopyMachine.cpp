@@ -19,15 +19,22 @@ std::shared_ptr<const ShadowNode> ShadowNodeCopyMachine::copyShadowSubtree(
 
   auto const fragment =
       ShadowNodeFamilyFragment{tag -= 2, sn->getSurfaceId(), nullptr};
+  auto eventTarget = std::make_shared<EventTarget>(
+                                                   *ReanimatedRuntimeHandler::rtPtr,
+                                                   jsi::Object(*ReanimatedRuntimeHandler::rtPtr),
+                                                   tag);
+ 
   auto family = // std::make_shared<ShadowNodeFamily>(fragment, nullptr, cd);
       cd.createFamily(
           fragment,
-          std::make_shared<EventTarget>(
-              *ReanimatedRuntimeHandler::rtPtr,
-              jsi::Object(*ReanimatedRuntimeHandler::rtPtr),
-              tag)); // TODO create handler on js side
+        eventTarget); // TODO create handler on js side
   auto const props = cd.cloneProps(propsParserContext, sn->getProps(), {});
   auto const state = cd.createInitialState(ShadowNodeFragment{props}, family);
+   
+  // prevent fabric from clearing EventTarget
+    auto *familyH =
+        reinterpret_cast<const ShadowNodeFamilyHack *>(family.get());
+    familyH->eventEmitter_->setEnabled(true);
 
   auto shadowNode = cd.createShadowNode(
       ShadowNodeFragment{
