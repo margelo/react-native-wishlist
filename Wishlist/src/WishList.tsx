@@ -25,6 +25,10 @@ import NativeWishList, {
 const OffsetComponent = '__offsetComponent';
 let InflatorId = 1000;
 
+const ForEachBase = forwardRef<any, any> ((props, ref) => {
+  return (<View {...props} ref={ref} />)
+});
+
 type Mapping = {
   [key: string]: {
     templateType?: string;
@@ -299,6 +303,16 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
 
         applyHacks();
       } else {
+        if (Component === ForEachBase && path[0] === 'template') {
+          const templateType = value;
+          templateValues.push({
+            mapper: () => {
+              'worklet';
+              return templateType;
+            },
+            targetPath: path
+          });
+        }
         setInObject(otherProps, path, value);
       }
     });
@@ -378,15 +392,20 @@ export const WishList = {
    * TODO(Szymon) It's just a prototype we have to think about matching new and old children
    * TODO(Szymon) implement setChildren
    */
-  ForEach: createTemplateComponent(View, (item, props, inflatorId, pool) => {
+  ForEach: createTemplateComponent(ForEachBase, (item, props, inflatorId, pool) => {
     'worklet';
 
     const subItems = props.items;
+    console.log('subItems', subItems);
     const items = subItems.map((subItem) => { 
-      const [item, value] = [pool.getComponent(props.template), subItem];
-      const child = global.InflatorRegistry.useMappings(item, value, inflatorId, pool);
+      const childItem = pool.getComponent(props.template);
+      const childValue = subItem;
+      console.log('value', childValue);
+      const child = global.InflatorRegistry.useMappings(childItem, childValue, inflatorId, pool);
       return child;
     });
+
+    console.log('len', items.length);
 
     item.setChildren(items);
   })
