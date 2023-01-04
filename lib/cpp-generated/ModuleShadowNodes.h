@@ -76,16 +76,20 @@ public:
         }
         
         std::cout << "2 sdfwefwef" << std::endl;*/
+        auto state = getStateData();
+        if (state.initialised) {
+            return;
+        }
+        
         registeredViews.push_back(childNode);
         auto props = std::dynamic_pointer_cast<const ModuleProps>(this->getProps());
         if (props->names.size() == registeredViews.size()) { // last Child
             auto state = getStateData();
-            state.viewportObserver
-            //state.weakSn = this->clone(ShadowNodeFragment{});
+            state.initialised = true;
+            ViewportObserver::isPushingChildren = false;
             setStateData(std::move(state));
-            /*for (int i = 0; i < 20; ++i) {
-                realAppendChild(ShadowNodeCopyMachine::copyShadowSubtree(registeredViews[i & 1]));
-            }*/
+            
+            state.viewportObserver.initOrUpdate(this->getSurfaceId(), 5000, float windowHeight, 5000, float originItem, this->clone(ShadowNodeFragment{}));
         }
     }
                                     

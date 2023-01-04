@@ -21,14 +21,14 @@ struct ViewportObserver {
     float offset;
     float windowHeight;
     int surfaceId;
+    static thread_local bool isPushingChildren;
     
     std::shared_ptr<ComponentsPool> componentsPool = std::make_shared<ComponentsPool>();
     std::shared_ptr<ItemProvider> itemProvider;
     std::deque<WishItem> window;
-    
     std::weak_ptr<ShadowNode> weakWishListNode;
     
-    void initOrUpdate(int surfaceId, float offset, float windowHeight, float originItemOffset, float originItem, std::weak_ptr<ShadowNode> weakWishListNode) {
+    void initOrUpdate(int surfaceId, float offset, float windowHeight, float originItemOffset, int originItem, std::weak_ptr<ShadowNode> weakWishListNode) {
         
         this->weakWishListNode = weakWishListNode;
         itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<ItemProviderTestImpl>());
@@ -127,6 +127,8 @@ struct ViewportObserver {
     std::shared_ptr<ShadowNode> getOffseter(float offset);
     
     void pushChildren() {
+        isPushingChildren = true;
+        
         std::shared_ptr<ShadowNode> sWishList = weakWishListNode.lock();
         if (sWishList.get() == nullptr) {
             return;
@@ -147,6 +149,7 @@ struct ViewportObserver {
             };
             st.commit(transaction);
         });
+        isPushingChildren = false;
     }
 };
 

@@ -49,16 +49,22 @@ struct ItemProviderTestImpl : ItemProvider
         std::shared_ptr<LayoutableShadowNode> sn;
         if (index & 1) {
             std::shared_ptr<const ShadowNode> item = cp->getNodeForType("type1");
+            sn = std::static_pointer_cast<LayoutableShadowNode>(item);
+            // TODO change some things
         } else {
             std::shared_ptr<const ShadowNode> item = cp->getNodeForType("type2");
+            sn = std::static_pointer_cast<LayoutableShadowNode>(item);
+            // TODO change some things
         }
         
         LayoutContext lc;
         LayoutConstraints lcc;
-        Size sz = sn->measure(lc, lcc);
+        facebook::react::Size sz = sn->measure(lc, lcc);
         
         wishItem.sn = sn;
-        wishItem.height = sz
+        wishItem.height = sz.height;
+        wishItem.index = index;
+        return wishItem;
     }
 };
 

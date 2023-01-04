@@ -17,7 +17,7 @@
 #endif
 
 #include "ComponentsPool.h"
-#include "ViewportObserver.h"
+#include "ViewportObserver.hpp"
 
 namespace facebook {
 namespace react {
@@ -32,6 +32,7 @@ class ModuleState final {
     double originContentOffset = 50000;
     int originItemIndex = 10; // Hardcode for now
     ViewportObserver viewportObserver;
+    bool initialised = false;
 
 #ifdef ANDROID
   ModuleState() = default;
