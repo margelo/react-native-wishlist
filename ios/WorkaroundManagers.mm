@@ -10,8 +10,6 @@
 #include <jsi/jsi.h>
 #include <react/renderer/components/view/ViewEventEmitter.h>
 #include <react/renderer/core/EventListener.h>
-#import "MGTemplateContainerComponent.h"
-#import "MGTemplateInterceptorComponent.h"
 #import "MGWishListComponent.h"
 #include "ReanimatedRuntimeHandler.hpp"
 
@@ -74,31 +72,17 @@ RCT_EXPORT_MODULE(Workaround);
   [_surfacePresenter.scheduler removeEventListener:_eventListener];
 }
 
-RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(registerList)
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 {
-  [[RCTComponentViewFactory currentComponentViewFactory] registerComponentViewClass:[MGWishListComponent class]];
-  return @true;
-}
-
-RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(registerContainer)
-{
-  [[RCTComponentViewFactory currentComponentViewFactory]
-      registerComponentViewClass:[MGTemplateContainerComponent class]];
-  return @true;
-}
-
-RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(registerInterceptor)
-{
-  [[RCTComponentViewFactory currentComponentViewFactory]
-      registerComponentViewClass:[MGTemplateInterceptorComponent class]];
+  // This is only used to force the native module to load and setBridge to be called.
   return @true;
 }
 
 @end
 
-@implementation MGWishListComponentManager
+@implementation MGWishlistComponentManager
 
-RCT_EXPORT_MODULE(MGWishListComponentManager)
+RCT_EXPORT_MODULE(MGWishlist)
 
 RCT_CUSTOM_VIEW_PROPERTY(inflatorId, NSString *, UIView) {}
 RCT_CUSTOM_VIEW_PROPERTY(initialIndex, double, UIView) {}
@@ -115,7 +99,7 @@ RCT_EXPORT_VIEW_PROPERTY(onEndReached, RCTDirectEventBlock)
 
 @implementation MGTemplateContainerManager
 
-RCT_EXPORT_MODULE(MGTemplateContainerComponentManager)
+RCT_EXPORT_MODULE(MGTemplateContainer)
 
 RCT_CUSTOM_VIEW_PROPERTY(inflatorId, NSString *, UIView) {}
 
@@ -130,7 +114,7 @@ RCT_CUSTOM_VIEW_PROPERTY(names, NSArray<NSString *> *, UIView) {}
 
 @implementation MGTemplateInterceptorManager
 
-RCT_EXPORT_MODULE(MGTemplateInterceptorComponentManager)
+RCT_EXPORT_MODULE(MGTemplateInterceptor)
 
 RCT_CUSTOM_VIEW_PROPERTY(inflatorId, NSString *, UIView) {}
 

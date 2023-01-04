@@ -40,7 +40,7 @@ Pod::Spec.new do |s|
 
   s.source_files = [
     "ios/**/*.{mm,h,m,cpp}",
-    "cpp/*.{cpp,h,m,mm,hpp}",
+    "cpp/**/*.{cpp,h,m,mm,hpp}",
   ]
 
   s.compiler_flags = folly_compiler_flags + ' ' + boost_compiler_flags
@@ -80,18 +80,7 @@ Pod::Spec.new do |s|
   s.dependency 'glog'
   s.dependency 'React-Fabric'
   s.dependency 'React-callinvoker'
-
-  s.subspec 'Container' do |sp|
-    sp.source_files = 'cpp/ContainerBoilerplate/*.{cpp,h,m,mm,hpp}'
-  end
-
-  s.subspec 'Interceptor' do |sp|
-    sp.source_files = 'cpp/InterceptorBoilerplate/*.{cpp,h,m,mm,hpp}'
-  end
-
-  s.subspec 'Wishlist' do |sp|
-    sp.source_files = 'cpp/WishlistBoilerplate/*.{cpp,h,m,mm,hpp}'
-  end
+  s.dependency 'React-Codegen'
 
 end
 
