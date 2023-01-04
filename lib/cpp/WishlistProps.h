@@ -24,8 +24,6 @@ class WishlistProps final : public ViewProps {
 #pragma mark - Props
 
   int kkk;
-  //ShadowTreeRegistry & ShadowTreeRegistry;
-  jsi::Runtime * reanimatedRuntime;
   std::string inflatorId;
   std::vector<std::string> names{};
 };

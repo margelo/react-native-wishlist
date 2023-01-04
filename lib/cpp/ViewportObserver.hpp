@@ -1,3 +1,10 @@
+//
+//  ViewportObserver.hpp
+//  MGWishList
+//
+//  Created by Szymon on 27/11/2021.
+//
+
 #ifndef ViewportObserver_hpp
 #define ViewportObserver_hpp
 
@@ -33,7 +40,7 @@ struct ViewportObserver {
         componentsPool->registeredViews = registeredViews;
         componentsPool->setNames(names);
         
-        std::string inflatorId = std::static_pointer_cast<const WishlistProps>(weakWishListNode.lock()->getProps())->inflatorId;
+        std::string inflatorId = std::static_pointer_cast<const ModuleProps>(weakWishListNode.lock()->getProps())->inflatorId;
         itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<WorkletItemProvider>(windowWidth, lc, inflatorId));
         itemProvider->setComponentsPool(componentsPool);
         
@@ -74,6 +81,7 @@ struct ViewportObserver {
         // Add above
         while (1) {
             WishItem item = window.front();
+            float bottom = item.offset + item.height;
             
             if (item.offset > topEdge) {
                 WishItem wishItem = itemProvider->provide(item.index-1);

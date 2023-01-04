@@ -64,42 +64,50 @@ public:
     
     void appendChild(ShadowNode::Shared const &childNode) {
         auto state = getStateData();
+       if (state.initialised) {
+           return;
+       }
        
-        //state.nextRegisteredViews.push_back(childNode);
-        auto props = std::dynamic_pointer_cast<const WishlistProps>(this->getProps());
+       registeredViews.push_back(childNode);
+       auto props = std::dynamic_pointer_cast<const ModuleProps>(this->getProps());
+       if (props->names.size() == registeredViews.size()) { // last Child
+           
+           /*state.viewportObserver.initOrUpdate(this->getSurfaceId(), 5000, 20, 5000, 10, this->clone(ShadowNodeFragment{}));*/
+       }
     }
                                     
     void layout(LayoutContext layoutContext) {
-      // TODO probably the best place to initialize children in the future
         auto state = getStateData();
-        if (false/*!state.initialised*/) {
-           // state.initialised = true;
-            
-            // remove that flushing in the future
-            // I know it's not always on UI (In our case it's fine)
-            ReanimatedRuntimeHandler::scheduler->triggerUI();
-            
-            LayoutMetrics lm = getLayoutMetrics();
-        
-            
-            state.viewportObserver->boot(getSurfaceId(),
-                                              5000,
-                                              lm.frame.size.height, lm.frame.size.width, 5000, 10, sharedThis, registeredViews, layoutContext,
-                                                  std::static_pointer_cast<const WishlistProps>(getProps())->names);
-            
-            setStateData(std::move(state));
-            
-            auto layoutM = this->getLayoutMetrics();
-            LayoutConstraints lcc = LayoutConstraints();
-            lcc.minimumSize = lcc.maximumSize = layoutM.frame.size;
-            lcc.layoutDirection = layoutM.layoutDirection;
-            layoutTree(layoutContext, lcc);
-            return;
-        }
-        
-        ConcreteViewShadowNode::layout(layoutContext);
-        
-        updateStateIfNeeded();
+                if (!state.initialised) {
+                    state.initialised = true;
+                    
+                    // remove that flushing in the future
+                    // I know it's not always on UI (In our case it's fine)
+                    ReanimatedRuntimeHandler::scheduler->triggerUI();
+                    
+                    LayoutMetrics lm = getLayoutMetrics();
+                
+                    
+                    state.viewportObserver->boot(getSurfaceId(),
+                                                      5000,
+                                                      lm.frame.size.height, lm.frame.size.width, 5000, 10, sharedThis, registeredViews, layoutContext,
+                                                          std::static_pointer_cast<const WishlistProps>(getProps())->names);
+                    
+                    setStateData(std::move(state));
+                    
+                    auto layoutM = this->getLayoutMetrics();
+                    LayoutConstraints lcc = LayoutConstraints();
+                    lcc.minimumSize = lcc.maximumSize = layoutM.frame.size;
+                    lcc.layoutDirection = layoutM.layoutDirection;
+                    layoutTree(layoutContext, lcc);
+                    return;
+                }
+                // TODO update viewportObserver if needed
+                
+                ConcreteViewShadowNode::layout(layoutContext);
+                
+              //updateScrollContentOffsetIfNeeded();
+             updateStateIfNeeded();
     }
                                     
     void updateStateIfNeeded() {
@@ -109,7 +117,6 @@ public:
     
     virtual ~WishlistShadowNode(){}
     
-    std::vector<std::shared_ptr<ShadowNode const>> nextRegisteredViews;
     std::vector<std::shared_ptr<ShadowNode const>> registeredViews;
     std::weak_ptr<WishlistShadowNode> sharedThis;
 };
