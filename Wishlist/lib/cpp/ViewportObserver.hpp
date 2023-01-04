@@ -75,6 +75,7 @@ struct ViewportObserver {
         itemProvider->setComponentsPool(componentsPool);
     
         float oldOffset = window[0].offset; // TODO (maybe update if frame has changed)
+        // TODO (sometimes we have to modify the index by the number of new elements above)
         float oldIndex = window[0].index;
         
         std::vector<WishItem> itemsToRemove;
