@@ -9,50 +9,49 @@ interface Props extends ViewProps {
   onLikeItem: (item: ChatItem) => void;
 }
 
-export const ChatListView: React.FC<Props> = ({data, onLikeItem, style}) => {
-  const handleLikeItem = useCallback(
-    (item: ChatItem) => {
-      onLikeItem(item);
-    },
-    [onLikeItem],
-  );
+export const ChatListView: React.FC<Props> = React.memo(
+  ({data, onLikeItem, style}) => {
+    const handleLikeItem = useCallback(
+      (item: ChatItem) => {
+        onLikeItem(item);
+      },
+      [onLikeItem],
+    );
 
-  const runOnJS = useMemo(() => {
-    const f = require('react-native-reanimated').runOnJS; //delay reanimated init
-    return (...args) => {
-      'worklet';
-      return f(...args);
-    };
-  }, []);
-
-  return (
-    <WishList.Component
-      style={style}
-      initialIndex={0}
-      onItemNeeded={index => {
+    const runOnJS = useMemo(() => {
+      const f = require('react-native-reanimated').runOnJS; //delay reanimated init
+      return (...args) => {
         'worklet';
-        return data[index];
-      }}>
-      <WishList.Mapping
-        templateType="other"
-        nativeId="likeButton"
-        onInflate={(value: any, item: any) => {
+        return f(...args);
+      };
+    }, []);
+
+    return (
+      <WishList.Component
+        style={style}
+        initialIndex={0}
+        onItemNeeded={index => {
           'worklet';
-          item.addProps({pointerEvents: 'box-only'});
-          item.setCallback('topTouchEnd', () => {
-            runOnJS(handleLikeItem)(value);
-          });
-        }}
-      />
-      <WishList.Template type="me">
-        <ChatItemView type="me" />
-      </WishList.Template>
-      <WishList.Template type="other">
-        <ChatItemView type="other" />
-      </WishList.Template>
-     <WishList.Template type="reaction">
-        <Reaction />
-      </WishList.Template>
-    </WishList.Component>
-  );
-};
+          return data[index];
+        }}>
+        <WishList.Mapping
+          templateType="other"
+          nativeId="likeButton"
+          onInflate={(value: any, item: any) => {
+            'worklet';
+            item.addProps({pointerEvents: 'box-only'});
+            item.setCallback('topTouchEnd', () => {
+              runOnJS(handleLikeItem)(value);
+            });
+          }}
+        />
+        <WishList.Template type="me">
+          <ChatItemView type="me" />
+        </WishList.Template>
+        <WishList.Template type="other">
+          <ChatItemView type="other" />
+        </WishList.Template>
+      </WishList.Component>
+    );
+  },
+);

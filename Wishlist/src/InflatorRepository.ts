@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 
 const runOnUI = (...args) => {
-  const f = require("react-native-reanimated").runOnUI; //delay reanimated init
+  const f = require('react-native-reanimated').runOnUI; //delay reanimated init
   return f(...args);
 };
 
@@ -10,7 +10,7 @@ const maybeInit = () => {
   if (!done) {
     done = true;
     runOnUI(() => {
-      "worklet";
+      'worklet';
 
       const registry = new Map();
       const mappings = new Map<string, Map<string, any>>();
@@ -24,15 +24,21 @@ const maybeInit = () => {
               return result;
             }
             const [item, value] = result;
-            
-            return global.InflatorRegistry.useMappings(item, value, value.type, id, pool);
+
+            return global.InflatorRegistry.useMappings(
+              item,
+              value,
+              value.type,
+              id,
+              pool,
+            );
           } else {
-            console.log("Inflator not found for id: " + id);
+            console.log('Inflator not found for id: ' + id);
             return undefined;
           }
         },
-        useMappings: (item, value, templateType,  id, pool) => {
-          console.log('value mappings', value);
+        useMappings: (item, value, templateType, id, pool) => {
+          // console.log('value mappings', value);
           const mapping = mappings.get(id)?.get(templateType);
           if (mapping) {
             for (const [nativeId, inflate] of mapping.entries()) {
@@ -45,16 +51,27 @@ const maybeInit = () => {
           return item;
         },
         registerInflator: (id, inflateMethod) => {
-          console.log("InflatorRegistry::register", id);
+          // console.log('InflatorRegistry::register', id);
           registry.set(id, inflateMethod);
         },
-        unregisterInflator: (id) => {
-          console.log("InflatorRegistry::unregister", id); // TODO(Szymon) It should be done on UI Thread as it may be still in use
+        unregisterInflator: id => {
+          // console.log('InflatorRegistry::unregister', id); // TODO(Szymon) It should be done on UI Thread as it may be still in use
           registry.delete(id);
           mappings.delete(id);
         },
-        registerMapping: (inflatorId: string, nativeId: string, templateType: string, inflateMethod) => {
-          console.log("InflatorRegistry::registerMapping", inflatorId, nativeId, templateType, inflateMethod);
+        registerMapping: (
+          inflatorId: string,
+          nativeId: string,
+          templateType: string,
+          inflateMethod,
+        ) => {
+          // console.log(
+          //   'InflatorRegistry::registerMapping',
+          //   inflatorId,
+          //   nativeId,
+          //   templateType,
+          //   inflateMethod,
+          // );
           const mapping = mappings.get(inflatorId) ?? new Map();
           const innerMapping = mapping.get(templateType) ?? new Map();
           innerMapping.set(nativeId, inflateMethod);
@@ -63,7 +80,7 @@ const maybeInit = () => {
         },
       };
 
-      console.log("InflatorRegister initialized");
+      console.log('InflatorRegister initialized');
     })();
   }
 };
@@ -72,7 +89,7 @@ export default class InflatorRepository {
   static register(id: string, inflateMethod) {
     maybeInit();
     runOnUI(() => {
-      "worklet";
+      'worklet';
       global.InflatorRegistry.registerInflator(id, inflateMethod);
     })();
   }
@@ -80,16 +97,26 @@ export default class InflatorRepository {
   static unregister(id: string) {
     maybeInit();
     runOnUI(() => {
-      "worklet";
+      'worklet';
       global.InflatorRegistry.unregisterInflator(id);
     })();
   }
 
-  static registerMapping(inflatorId: string, nativeId: string, templateType: string, inflateMethod) {
+  static registerMapping(
+    inflatorId: string,
+    nativeId: string,
+    templateType: string,
+    inflateMethod,
+  ) {
     maybeInit();
     runOnUI(() => {
-      "worklet";
-      global.InflatorRegistry.registerMapping(inflatorId, nativeId, templateType, inflateMethod);
+      'worklet';
+      global.InflatorRegistry.registerMapping(
+        inflatorId,
+        nativeId,
+        templateType,
+        inflateMethod,
+      );
     })();
   }
 }
