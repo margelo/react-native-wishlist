@@ -48,6 +48,7 @@ const Component= forwordRef((({
   onItemNeeded,
   children,
   style,
+  ...rest
 }, ref) => { 
   const nativeWishlist = useRef(null); // TODO type it properly
   useImperativeHandle(ref, () => ({
@@ -157,6 +158,8 @@ const Component= forwordRef((({
         ref={nativeWishlist}
         removeClippedSubviews={false}
         inflatorId={inflatorIdRef.current}
+        onEndReached={rest?.onEndReached}
+        onStartReached={rest?.onStartReached}
       />
 
       <NativeTemplateContainer
