@@ -88,6 +88,61 @@ struct ShadowNodeBinding : public jsi::HostObject,
             return jsi::Value::undefined();
           });
     }
+      
+    if (name == "setChildren") { // TODO implement that
+        return jsi::Function::createFromHostFunction(
+            rt,
+            nameProp,
+            1,
+            [=](jsi::Runtime &rt,
+                jsi::Value const &thisValue,
+                jsi::Value const *args,
+                size_t count) -> jsi::Value {
+              RawProps rawProps(rt, args[0]);
+
+              auto &cd = sn->getComponentDescriptor();
+
+              PropsParserContext propsParserContext{
+                  sn->getFamily().getSurfaceId(),
+                  *cd.getContextContainer().get()};
+
+              auto nextProps =
+                  cd.cloneProps(propsParserContext, sn->getProps(), rawProps);
+              std::cout << nextProps->getDebugValue() << std::endl;
+
+              auto clonedShadowNode = cd.cloneShadowNode(
+                  *sn,
+                  {
+                      nextProps,
+                      nullptr,
+                  });
+
+              sn = clonedShadowNode;
+
+              std::shared_ptr<ShadowNodeBinding> currentParent = parent;
+              std::shared_ptr<ShadowNode> currentSN = clonedShadowNode;
+              while (currentParent != nullptr) {
+                auto &cd = currentParent->sn->getComponentDescriptor();
+                auto children = currentParent->sn->getChildren();
+                for (int i = 0; i < children.size(); ++i) {
+                  if (children[i]->getTag() == currentSN->getTag()) {
+                    children[i] = currentSN;
+                    break;
+                  }
+                }
+                currentSN = cd.cloneShadowNode(
+                    *(currentParent->sn),
+                    {nullptr,
+                     std::make_shared<ShadowNode::ListOfShared>(children)});
+                currentParent->sn = currentSN;
+                currentParent = currentParent->parent;
+                std::cout << "is currentParent null "
+                          << (currentParent == nullptr) << std::endl;
+              }
+
+              return jsi::Value::undefined();
+            });
+    }
 
     if (name == "addProps") {
       return jsi::Function::createFromHostFunction(

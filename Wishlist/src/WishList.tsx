@@ -278,7 +278,7 @@ function traverseObject(
 
 export function createTemplateComponent<T extends React.ComponentType<any>>(
   Component: T,
-  addProps?: (templateItem, props: any, inflatorId: string, componentRegistry: any) => void
+  addProps?: (templateItem, props: any, inflatorId: string, pool: any) => void
 ): T {
   const WishListComponent = forwardRef<any, any>(({style, ...props}, ref) => {
     const {inflatorId} = useMappingContext();
@@ -372,14 +372,19 @@ export const WishList = {
       item.addProps({display: 'none'});
     }
   }),
+  
 
-  ForEach: createTemplateComponent(View, (item, props, inflatorId, componentRegistry) => {
+  /**
+   * TODO(Szymon) It's just a prototype we have to think about matching new and old children
+   * TODO(Szymon) implement setChildren
+   */
+  ForEach: createTemplateComponent(View, (item, props, inflatorId, pool) => {
     'worklet';
 
     const subItems = props.subItems;
-    const items = subItems.map((subItem) => {
-      const [item, value] = [componentRegistry.getComponent(props.template), subItem];
-      const child = global.InflatorRegistry.useMappings(item, value, inflatorId, componentRegistry);
+    const items = subItems.map((subItem) => { 
+      const [item, value] = [pool.getComponent(props.template), subItem];
+      const child = global.InflatorRegistry.useMappings(item, value, inflatorId, pool);
       return child;
     });
 
