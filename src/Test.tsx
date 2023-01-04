@@ -1,4 +1,5 @@
 import React from 'react';
+import { InteractionManager } from 'react-native';
 import { View, Text } from 'react-native';
 import createWishList from './WishList';
 
@@ -48,6 +49,9 @@ export default function App() {
       <WishList.Component 
       inflateItem={(index, pool) => {
         'worklet'
+        
+        if (index < 0 || index > 1000) return undefined;
+
         const type = (index % 2) + 1;
         const item = pool.getComponent(`type${type}`);
 
@@ -56,7 +60,11 @@ export default function App() {
         const messageLen = Math.floor(Math.random() * (len - start - 1)) + 1; 
         const newMessage = SampleText.slice(start, start + messageLen);
 
-        _log(`aaa newMessage ${newMessage}`);
+        if (type === 2) {
+          const randomIndex = Math.floor(Math.random() * authors.length);
+          const randomAuthor = authors[randomIndex];
+          item.View.View.Paragraph.RawText.addProps({text: randomAuthor});
+        }
         
         item.View.View.at(1).Paragraph.RawText.addProps({text: newMessage});
 

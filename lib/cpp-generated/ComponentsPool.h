@@ -89,7 +89,7 @@ struct ShadowNodeBinding : public jsi::HostObject, std::enable_shared_from_this<
                     for (auto sibiling : parent.lock()->sn->getChildren()) {
                         if (sibiling->getComponentName() == type) {
                             if (i == index) {
-                                return jsi::Object::createFromHostObject(rt, std::make_shared<ShadowNodeBinding>(sibiling, shared_from_this()));
+                                return jsi::Object::createFromHostObject(rt, std::make_shared<ShadowNodeBinding>(sibiling, parent.lock()));
                             }
                             i++;
                         }
