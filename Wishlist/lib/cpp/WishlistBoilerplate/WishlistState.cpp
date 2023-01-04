@@ -8,10 +8,12 @@ WishlistState::~WishlistState() {}
 #ifdef ANDROID
 
 WishlistState::WishlistState() {
-      this->viewportObserver = std::make_shared<ViewportObserver>();
-  };
+  this->viewportObserver = std::make_shared<ViewportObserver>();
+};
 
-WishlistState::WishlistState(WishlistState const &previousState, folly::dynamic data) {};
+WishlistState::WishlistState(
+    WishlistState const &previousState,
+    folly::dynamic data){};
 
 folly::dynamic WishlistState::getDynamic() const {
   return folly::dynamic::object("contentOffsetLeft", 5);
@@ -20,7 +22,7 @@ folly::dynamic WishlistState::getDynamic() const {
 MapBuffer WishlistState::getMapBuffer() const {
   return MapBufferBuilder::EMPTY();
 };
-  
+
 #endif
 
 } // namespace react

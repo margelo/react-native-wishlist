@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <react/renderer/graphics/Geometry.h>
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
+#include <react/renderer/graphics/Geometry.h>
 
 #ifdef ANDROID
 #include <folly/dynamic.h>
@@ -22,30 +22,31 @@
 namespace facebook {
 namespace react {
 
-//class WishlistShadowNode;
+// class WishlistShadowNode;
 
 /*
  * State for <ScrollView> component.
  */
 class WishlistState final {
  public:
-    //
-    int revision;
-    //
-    double originContentOffset = 50000;
-    int originItemIndex = 10; // Hardcode for now
-    std::shared_ptr<ViewportObserver> viewportObserver = std::make_shared<ViewportObserver>();
-    bool initialised = false;
-    Rect contentBoundingRect;
-    
-    virtual ~WishlistState();
+  //
+  int revision;
+  //
+  double originContentOffset = 50000;
+  int originItemIndex = 10; // Hardcode for now
+  std::shared_ptr<ViewportObserver> viewportObserver =
+      std::make_shared<ViewportObserver>();
+  bool initialised = false;
+  Rect contentBoundingRect;
+
+  virtual ~WishlistState();
 
 #ifdef ANDROID
   WishlistState();
   WishlistState(WishlistState const &previousState, folly::dynamic data);
   folly::dynamic getDynamic() const;
   MapBuffer getMapBuffer() const;
-  
+
 #endif
 };
 

@@ -14,18 +14,20 @@ namespace facebook {
 namespace react {
 
 void WishlistEventEmitter::onStartReached(OnStartReached event) const {
-  dispatchEvent("startReached", [event=std::move(event)](jsi::Runtime &runtime) {
-    auto payload = jsi::Object(runtime);
-    
-    return payload;
-  });
+  dispatchEvent(
+      "startReached", [event = std::move(event)](jsi::Runtime &runtime) {
+        auto payload = jsi::Object(runtime);
+
+        return payload;
+      });
 }
 void WishlistEventEmitter::onEndReached(OnEndReached event) const {
-  dispatchEvent("endReached", [event=std::move(event)](jsi::Runtime &runtime) {
-    auto payload = jsi::Object(runtime);
-    
-    return payload;
-  });
+  dispatchEvent(
+      "endReached", [event = std::move(event)](jsi::Runtime &runtime) {
+        auto payload = jsi::Object(runtime);
+
+        return payload;
+      });
 }
 
 } // namespace react

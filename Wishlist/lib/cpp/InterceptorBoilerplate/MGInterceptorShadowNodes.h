@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "MGInterceptorProps.h"
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
+#include "MGInterceptorProps.h"
 
 namespace facebook {
 namespace react {
