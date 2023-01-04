@@ -13,23 +13,19 @@ export default function createWishList() {
 
   function WishList(props) {
     const { inflateItem } = props;
-    const ref = useRef(null);
-   
-    const handleRef = useCallback((compRef) => {
-      if (compRef != null) {
-        ref.current = compRef;
-        InflatorRepository.register(compRef, inflateItem);
-      }
-    }, [inflateItem]);
+    const inflatorId = useRef(null);
+
+    if (inflatorId.current == null) {
+      inflatorId.current = Math.random().toString();
+      InflatorRepository.register(inflatorId.current, inflateItem);
+    }
 
     useEffect(() => (() => {
-      if (ref.current != null) {
-        InflatorRepository.unregister(ref.current);
-      }
+      InflatorRepository.unregister(inflatorId.current);
     }), []);
     
     return (
-      <NativeWishList ref={handleRef} {...props}  removeClippedSubviews={false} names={Array.from(componentsRegistry.keys())} >
+      <NativeWishList  {...props} removeClippedSubviews={false} inflatorId={inflatorId.current} kkk={6} names={Array.from(componentsRegistry.keys())} >
         { Array.from(componentsRegistry.values())}
       </NativeWishList>
     );

@@ -19,9 +19,12 @@ ModuleProps::ModuleProps(
     const PropsParserContext &context,
     const ModuleProps &sourceProps,
     const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
-
+    kkk(convertRawProp(context, rawProps, "kkk", sourceProps.kkk, 1)),
+    inflatorId(convertRawProp(context, rawProps, "inflatorId", sourceProps.inflatorId, "__defaultId__")),
     names(convertRawProp(context, rawProps, "names", sourceProps.names, {}))
-      {}
+      {
+          int x = 4;
+      }
 
 } // namespace react
 } // namespace facebook
