@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, forwardRef, useImperativeHandle } from "react";
-import { View, ViewProps, useWindowDimensions, Text } from "react-native";
+import React, { useMemo, useRef, forwardRef, useImperativeHandle, useContext, createContext } from "react";
+import { View, ViewProps, useWindowDimensions, Text, Image } from "react-native";
 import NativeWishList, { WishlistCommands } from "./NativeViews/WishlistNativeComponent";
 import NativeTemplateContainer from "./NativeViews/NativeTemplateContainer";
 import NativeTemplateInterceptor from "./NativeViews/NativeTemplateInterceptor";
@@ -9,13 +9,22 @@ import { initEventHandler } from "./EventHandler";
 const OffsetComponent = "__offsetComponent";
 let InflatorId = 1000;
 
+type Mapping = {
+  [key: string]: {
+    templateType?: string;
+    onInflate: (value: any, item: any) => void;
+  };
+};
+
+const MappingContext = createContext<{inflatorId: string} | null>(null);
+
 function getTemplatesFromChildren(children, width) {
   const nextTemplates = {
     [OffsetComponent]: <View style={{ height: 0, width }} />,
   };
   React.Children.forEach(children, (c) => {
     if (c.type.displayName === "WishListTemplate") {
-      nextTemplates[c.props.type] = React.Children.only(c.props.children);
+      nextTemplates[c.props.type] = c;
     }
   });
   return nextTemplates;
@@ -43,13 +52,13 @@ type Props = ViewProps & {
   onItemNeeded?: (index: number) => any;
 };
 
-const Component = forwardRef((({
+const Component = forwardRef<any, Props>(({
   inflateItem,
   onItemNeeded,
   children,
   style,
   ...rest
-}, ref) => { 
+}, ref) => {
   const nativeWishlist = useRef(null); // TODO type it properly
   useImperativeHandle(ref, () => ({
     scrollToItem: (index: number, animated?: boolean) => {
@@ -68,12 +77,7 @@ const Component = forwardRef((({
   }
 
   const templatesRef = useRef<{ [key: string]: React.ReactElement }>({});
-  const mappingRef = useRef<{
-    [key: string]: {
-      templateType: string;
-      onInflate: (value: any, item: any) => void;
-    };
-  }>({});
+  const mappingRef = useRef<Mapping>({});
 
   // Template registration and tracking
   useMemo(() => {
@@ -123,7 +127,8 @@ const Component = forwardRef((({
           }
         }
       });
-      return item;
+
+      return [item, value];
     };
   }, [inflateItem, onItemNeeded]);
 
@@ -146,45 +151,164 @@ const Component = forwardRef((({
   const keys = Object.keys(templatesRef.current);
   console.log("@@@ Render WishList", inflatorIdRef.current, keys.join(", "));
 
+  const mappingContext = useMemo(() => ({
+    inflatorId: inflatorIdRef.current!,
+  }), [inflatorIdRef.current]);
+
   return (
-    <NativeTemplateInterceptor
-      inflatorId={inflatorIdRef.current}
-      style={style}
-      collapsable={false}
-      removeClippedSubviews={false}
-    >
-      <NativeWishList
-        style={{ flex: 1 }}
-        ref={nativeWishlist}
-        removeClippedSubviews={false}
-        inflatorId={inflatorIdRef.current}
-        onEndReached={rest?.onEndReached}
-        onStartReached={rest?.onStartReached}
-        initialIndex={rest.initialIndex ?? 0}
-      />
-
-      <NativeTemplateContainer
-        names={keys}
-        inflatorId={inflatorIdRef.current}
-        key={Math.random().toString()}
+    <MappingContext.Provider value={mappingContext}>
+      <NativeTemplateInterceptor
+        inflatorId={inflatorIdRef.current!}
+        style={style}
         collapsable={false}
+        removeClippedSubviews={false}
       >
-        {Object.keys(templatesRef.current).map((c, i) => (
-          <View key={keys[i]}>{templatesRef.current[c]}</View>
-        ))}
-      </NativeTemplateContainer>
-    </NativeTemplateInterceptor>
+        <NativeWishList
+          style={{ flex: 1 }}
+          ref={nativeWishlist}
+          removeClippedSubviews={false}
+          inflatorId={inflatorIdRef.current!}
+          onEndReached={rest?.onEndReached}
+          onStartReached={rest?.onStartReached}
+          initialIndex={rest.initialIndex ?? 0}
+        />
+
+        <NativeTemplateContainer
+          names={keys}
+          inflatorId={inflatorIdRef.current!}
+          key={Math.random().toString()}
+          collapsable={false}
+        >
+          {Object.keys(templatesRef.current).map((c, i) => (
+            <View key={keys[i]}>{templatesRef.current[c]}</View>
+          ))}
+        </NativeTemplateContainer>
+      </NativeTemplateInterceptor>
+    </MappingContext.Provider>
   );
-}) as React.FC<Props> );
+});
 
-type TemplateProps = {
+type TemplateProps<T> = {
   type: string;
-  children: React.ReactElement;
+  children: (item: T) => React.ReactElement;
 };
 
-const Template: React.FC<TemplateProps> = ({ children }) => {
-  return children;
+type TemplateProxyTarget = {
+  path: string[];
+}
+
+type TemplateProxy = {
+  __isTemplateProxy: boolean;
+  __templatePath: string[];
+}
+
+function Template<T>({ children,  }: TemplateProps<T>) {
+  const templateProxy = useMemo(() => {
+    const handler: ProxyHandler<TemplateProxyTarget> = {
+      get(target, prop) {
+        if (prop === '__isTemplateProxy') {
+          return true;
+        }
+        if (prop === '__templatePath') {
+          return target.path;
+        }
+        // TODO: This could be a Symbol.
+        return new Proxy({path: [...target.path, prop]}, handler);
+      }
+    };
+    return new Proxy({path: []}, handler);
+  }, []);
+  return children(templateProxy as unknown as T);
 };
+
+let nativeIdGenerator = 0;
+
+function useMappingContext() {
+  const context = useContext(MappingContext);
+  if (!context) {
+    throw Error("MappingContext is not defined");
+  }
+  return context;
+}
+
+function getInObject(obj: any, path: string[]) {
+  'worklet';
+
+  let current = obj;
+  for (let i = 0; i < path.length; i++) {
+    current = current[path[i]];
+  }
+  return current;
+}
+
+function setInObject(obj: any, path: string[], value: any) {
+  'worklet';
+
+  let current = obj;
+  for (let i = 0; i < path.length - 1; i++) {
+    current[path[i]] = current[path[i]] ?? {};
+    current = current[path[i]];
+  }
+  current[path[path.length - 1]] = value;
+}
+
+function traverseObject(obj: any, callback: (path: string[], value: any) => void) {
+  const stack: {path: string[], value: any}[] = [{path: [], value: obj}];
+  while (stack.length > 0) {
+    const {path, value} = stack.pop()!;
+    if (value && typeof value === 'object' && !value.__isTemplateProxy) {
+      Object.keys(value).forEach((key) => {
+        stack.push({path: [...path, key], value: value[key]});
+      });
+    } else {
+      callback(path, value);
+    }
+  }
+}
+
+export function createTemplateComponent<T extends React.ComponentType<any>>(
+  Component: T,
+  addProps?: (templateItem, props: any) => void,
+): T {
+  return forwardRef<any, any>((props, ref) => {
+    const {inflatorId} = useMappingContext();
+
+    const proxyValues: {valuePath: string[], targetPath: string[]}[] = [];
+    const otherProps = {};
+    traverseObject(props, (path, value) => {
+      if ((value as TemplateProxy).__isTemplateProxy) {
+        proxyValues.push({targetPath: path, valuePath: (value as TemplateProxy).__templatePath});
+
+        // Text component needs to receive a string child to work properly.
+        // @ts-ignore
+        if (path[0] === 'children' && Component === Text) {
+          setInObject(otherProps, path, ' ');
+        }
+      } else {
+        setInObject(otherProps, path, value);
+      }
+    });
+
+    const nativeId = useMemo(() => `template_id_${nativeIdGenerator++}`, []);
+
+    useMemo(() => {
+      InflatorRepository.registerMapping(inflatorId, nativeId, (value, templateItem) => {
+        'worklet';
+        const propsToSet = {};
+        for (const {valuePath, targetPath} of proxyValues) {
+          setInObject(propsToSet, targetPath, getInObject(value, valuePath));
+        }
+        if (addProps) {
+          addProps(templateItem, propsToSet);
+        } else {
+          templateItem.addProps(propsToSet);
+        }
+      })
+    }, [inflatorId, nativeId]);
+
+    return <Component ref={ref} {...otherProps} nativeID={nativeId} />;
+  }) as unknown as T;
+}
 
 type MappingProps = {
   nativeId: string;
@@ -195,6 +319,15 @@ type MappingProps = {
 const Mapping: React.FC<MappingProps> = () => null;
 
 Template.displayName = "WishListTemplate";
+Template.Text = createTemplateComponent(Text, (item, props) => {
+  'worklet';
+
+  const {children, ...other} = props;
+  item.RawText.addProps({text: children});
+  item.addProps(other);
+});
+Template.Image = createTemplateComponent(Image);
+
 Mapping.displayName = "WishListMapping";
 
 export const WishList = {

@@ -34,27 +34,6 @@ export const ChatListView: React.FC<Props> = ({data, onLikeItem, style}) => {
         return data[index];
       }}>
       <WishList.Mapping
-        nativeId="content"
-        onInflate={(value: any, item: any) => {
-          'worklet';
-          item.RawText.addProps({text: value.message});
-        }}
-      />
-      <WishList.Mapping
-        nativeId="author"
-        onInflate={(value: any, item: any) => {
-          'worklet';
-          item.RawText.addProps({text: value.author});
-        }}
-      />
-      <WishList.Mapping
-        nativeId="avatar"
-        onInflate={(value: any, item: any) => {
-          'worklet';
-          item.addProps({source: {uri: value.avatarUrl}});
-        }}
-      />
-      <WishList.Mapping
         templateType="other"
         nativeId="likes"
         onInflate={(value: any, item: any) => {
@@ -77,10 +56,10 @@ export const ChatListView: React.FC<Props> = ({data, onLikeItem, style}) => {
         }}
       />
       <WishList.Template type="me">
-        <ChatItemView type="me" />
+        {(item: ChatItem) => <ChatItemView type="me" item={item} />}
       </WishList.Template>
       <WishList.Template type="other">
-        <ChatItemView type="other" />
+        {(item: ChatItem) => <ChatItemView type="other" item={item} />}
       </WishList.Template>
     </WishList.Component>
   );
