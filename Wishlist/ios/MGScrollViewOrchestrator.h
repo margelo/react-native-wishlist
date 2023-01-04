@@ -22,6 +22,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@protocol MGScrollAnimation <NSObject>
+
+- (void)setupWithTimestamp:(double)timestamp;
+- (CGFloat)getDiffWithTimestamp:(double)timestamp;
+- (BOOL)isFinished;
+
+@end
+
 
 @interface MGScrollViewOrchestrator : NSObject
 
