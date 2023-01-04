@@ -213,6 +213,7 @@ struct ComponentsPool : std::enable_shared_from_this<ComponentsPool>
     std::shared_ptr<jsi::HostObject> proxy;
     
     void setNames(std::vector<std::string> names) {
+        nameToIndex.clear();
         for (int i = 0; i < names.size(); ++i) {
             nameToIndex[names[i]] = i;
         }
@@ -221,6 +222,11 @@ struct ComponentsPool : std::enable_shared_from_this<ComponentsPool>
     void returnToPool(std::shared_ptr<const ShadowNode> sn) {
         std::string type = tagToType[sn->getTag()];
         reusable[type].push_back(sn);
+    }
+    
+    void templatesUpdated() { // optimise by reusing some of elements if they are the same
+        tagToType.clear();
+        reusable.clear();
     }
     
     std::shared_ptr<const ShadowNode> getNodeForType(std::string type) {

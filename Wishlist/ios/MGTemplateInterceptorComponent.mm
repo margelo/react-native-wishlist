@@ -62,6 +62,9 @@ using namespace facebook::react;
     if ([childComponentView isKindOfClass:[MGWishListComponent class]]) {
         _wishlist = nil;
     }
+    if ([childComponentView isKindOfClass:[MGTemplateContainerComponent class]]) {
+        return;
+    }
     [super unmountChildComponentView:childComponentView index:index];
 }
 

@@ -21,7 +21,6 @@ function Component(props) {
   initEventHandler();
   const { inflateItem, children } = props;
   const inflatorId = useRef<string | null>(null);
-  const mounted = useRef(false);
 
   if (inflatorId.current == null) {
     inflatorId.current = Math.random().toString();
@@ -36,6 +35,7 @@ function Component(props) {
       }
     });
     React.Children.forEach(children, (c) => {
+      console.log('child', c.type.displayName);
       if (c.type.displayName === "WishListTemplate") {
         componentsRegistry.set(
           c.props.type,
@@ -45,25 +45,20 @@ function Component(props) {
     });
   };
 
-  useEffect(
+  /*useEffect(
     () => () => {
+      console.log('unregister');
       inflatorId.current && InflatorRepository.unregister(inflatorId.current);
     },
     []
-  );
+  );*/
 
-  if (!mounted.current) {
-    updateChildTemplates();
-  }
-
-  useEffect(() => {
-    if (mounted.current) {
-      updateChildTemplates();
-    }
-    mounted.current = true;
-  }, [children]);
+  
+  updateChildTemplates();
 
   const keys = Array.from(componentsRegistry.keys());
+
+  console.log('keys', keys);
  
   return (
     <NativeTemplateInterceptor inflatorId={inflatorId.current} style={{flex:1}} collapsable={false} removeClippedSubviews={false}>
