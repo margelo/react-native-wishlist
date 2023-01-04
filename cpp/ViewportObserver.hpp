@@ -77,11 +77,13 @@ struct ViewportObserver {
     void update(float windowHeight, float windowWidth,
                 std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
                 std::vector<std::string> names,
-                std::string inflatorId) {
+                std::string inflatorId,
+                bool justRerender) {
         
-        
-        itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<WorkletItemProvider>(windowWidth, lc, inflatorId));
-        itemProvider->setComponentsPool(componentsPool);
+        if (!justRerender) {
+            itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<WorkletItemProvider>(windowWidth, lc, inflatorId));
+            itemProvider->setComponentsPool(componentsPool);
+        }
     
         float oldOffset = window[0].offset; // TODO (maybe update if frame has changed)
         // TODO (sometimes we have to modify the index by the number of new elements above)
@@ -98,9 +100,11 @@ struct ViewportObserver {
             componentsPool->returnToPool(item.sn);
         }
         
-        componentsPool->registeredViews = registeredViews;
-        componentsPool->setNames(names);
-        componentsPool->templatesUpdated();
+        if (!justRerender) {
+            componentsPool->registeredViews = registeredViews;
+            componentsPool->setNames(names);
+            componentsPool->templatesUpdated();
+        }
         
         window.push_back(itemProvider->provide(oldIndex));
         window.back().offset = oldOffset;
