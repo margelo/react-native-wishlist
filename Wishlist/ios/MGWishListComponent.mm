@@ -32,12 +32,50 @@ using namespace facebook::react;
       self.scrollView.delaysContentTouches = NO;
       self.scrollView.canCancelContentTouches = true;
       alreadyRendered = false;
+      
+      [self.scrollView removeGestureRecognizer: self.scrollView.panGestureRecognizer];
+      
+      UIPanGestureRecognizer * customR = [UIPanGestureRecognizer new];
+      [self.scrollView addGestureRecognizer:customR];
+      [customR addTarget:self action:@selector(handlePan:)];
+      
   }
   return self;
 }
 
 -(void) setInflatorId:(std::string)nextInflatorId {
   inflatorId = nextInflatorId;
+- (void)handlePan:(UIPanGestureRecognizer *)gesture
+{
+    NSLog(@"jest");
+    if (gesture.state == UIGestureRecognizerStateBegan) {
+        
+    }
+    
+    if (gesture.state == UIGestureRecognizerStateCancelled) {
+        
+    }
+    
+    if (gesture.state == UIGestureRecognizerStateChanged) {
+        CGPoint tr = [gesture translationInView:self.scrollView];
+        CGPoint offset = self.scrollView.contentOffset;
+        if (offset.y - tr.y)
+        float overscroll = offset.y
+        self.scrollView.contentOffset = CGPointMake(offset.x, offset.y - tr.y);
+        
+        [gesture setTranslation:CGPointMake(0, 0) inView:self.scrollView];
+    }
+    
+    if (gesture.state == UIGestureRecognizerStateEnded) {
+        
+    }
+}
+
+#pragma mark - RCTComponentViewProtocol
+
++ (ComponentDescriptorProvider)componentDescriptorProvider
+{
+  return concreteComponentDescriptorProvider<WishlistComponentDescriptor>();
 }
 
 -(void) setTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates withNames:(std::vector<std::string>)names
@@ -67,7 +105,6 @@ using namespace facebook::react;
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
     inflatorId = std::dynamic_pointer_cast<const WishlistProps>(props)->inflatorId;
-    //[super updateProps:props oldProps:oldProps];
     _eventEmitter = nil;
 }
 
