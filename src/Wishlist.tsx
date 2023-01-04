@@ -27,7 +27,7 @@ import NativeWishList, {
 } from './NativeViews/WishlistNativeComponent';
 import { TemplateContext } from './TemplateContext';
 import { useWishlistContext, WishlistContext } from './WishlistContext';
-import { generateId } from './Utils';
+import { generateId, runOnUI } from './Utils';
 
 const OffsetComponent = '__offsetComponent';
 
@@ -60,7 +60,7 @@ type WishListInstance = {
 export type BaseItem = { type: string; key: string };
 
 type Props<ItemT extends BaseItem> = ViewProps & {
-  data: ItemT[];
+  initialData: ItemT[];
   inflateItem?: InflateMethod;
   onItemNeeded?: (index: number) => ItemT;
   onStartReached?: () => void;
@@ -70,10 +70,19 @@ type Props<ItemT extends BaseItem> = ViewProps & {
 
 const Component = forwardRef(
   <T extends BaseItem>(
-    { inflateItem, onItemNeeded, children, style, data, ...rest }: Props<T>,
+    {
+      inflateItem,
+      onItemNeeded,
+      children,
+      style,
+      initialData,
+      ...rest
+    }: Props<T>,
     ref: React.Ref<WishListInstance>,
   ) => {
     const nativeWishlist = useRef(null); // TODO type it properly
+    const data = useInternalWishlistData(wishlistId, initialData);
+
     useImperativeHandle(
       ref,
       (): WishListInstance => ({
@@ -91,35 +100,17 @@ const Component = forwardRef(
             WishlistCommands.scrollToItem(nativeWishlist.current, 0, true);
           }
         },
-        update: () => {
-          
+        update: (worklet: any /* TODO type properly */) => {
+          runOnUI()(
+            'worklet';
+            data.registerUpdate(worklet);
+          );
         }
       }),
     );
 
     const { width } = useWindowDimensions();
     useMemo(() => initEventHandler(), []);
-
-    if (
-      inflateItem === undefined &&
-      onItemNeeded === undefined &&
-      data === undefined
-    ) {
-      throw Error('Either inflateItem, onItemNeeded or data must be defined');
-    }
-
-    const onItemNeededInternal = useCallback(
-      (index: number) => {
-        'worklet';
-
-        if (onItemNeeded) {
-          return onItemNeeded(index);
-        } else {
-          return data[index];
-        }
-      },
-      [onItemNeeded, data],
-    );
 
     // Template registration and tracking
     const childrenTemplates = useMemo(
@@ -143,13 +134,9 @@ const Component = forwardRef(
 
     // Resolve inflator - either use the provided callback or use the mapping
     const resolvedInflater: InflateMethod = useMemo(() => {
-      if (inflateItem) {
-        return inflateItem;
-      }
-
       return (index: number, pool: ComponentPool) => {
         'worklet';
-        const value = onItemNeededInternal(index);
+        const value = data.at(index);
         if (!value) {
           return undefined;
         }
@@ -168,7 +155,7 @@ const Component = forwardRef(
 
         return [item, value];
       };
-    }, [inflateItem, onItemNeededInternal]);
+    }, [data]);
 
     const inflatorIdRef = useRef<string | null>(null);
     const prevInflatorRef = useRef<typeof resolvedInflater>();
@@ -192,13 +179,12 @@ const Component = forwardRef(
       wishlistId.current = generateId();
     }
 
-    const data = useInternalWishlistData();
-
+    
     const wishlistContext = useMemo(
       () => ({
         id: wishlistId.current!,
         inflatorId,
-        data, 
+        data,
       }),
       [inflatorId],
     );

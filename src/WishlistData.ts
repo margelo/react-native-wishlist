@@ -1,21 +1,17 @@
 import { useMemo } from 'react';
-import { runOnUI } from 'react-native-reanimated';
-export function useData<T>(initialArray: Array<T>) {
-  return useMemo(() => {
+import { runOnUI } from './Utils';
+import { makeRemote } from 'react-native-reanimated/src/reanimated2/core';
+import { useWishlistContext } from './WishlistContext';
 
-    
-    return function data() {
-      'worklet';
+export function useInternalWishlistData() {
+  const data = useMemo(() => {
+    return makeRemote({
+      
+    });
+  }, [])
+}
 
-      if (_WORKLET) { // UI
-
-      } else { // JS
-        return {
-          update: function updateData(worklet) {
-            runOnUI()
-          },
-        }
-      }
-    };
-  }, []);
+export function useData() {
+  const { data } = useWishlistContext();
+  return data;
 }
