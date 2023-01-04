@@ -100,15 +100,6 @@ using namespace facebook::react;
     return concreteComponentDescriptorProvider<WishlistComponentDescriptor>();
 }
 
-- (void)drawRect:(CGRect)rect
-{
-    [super drawRect:rect];
-}
-
-- (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
-{
-    std::shared_ptr<const WishlistProps> wProps = std::static_pointer_cast<const WishlistProps>(props);
-    inflatorId = wProps->inflatorId;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wobjc-missing-super-calls"
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
@@ -118,7 +109,6 @@ using namespace facebook::react;
     _initialIndex = wProps->initialIndex;
 }
 #pragma clang diagnostic pop
-}
 
 - (void)updateState:(State::Shared const &)state oldState:(State::Shared const &)oldState
 {
@@ -132,10 +122,13 @@ using namespace facebook::react;
   self.containerView.frame = CGRect{RCTCGPointFromPoint(data.contentBoundingRect.origin), contentSize};
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-missing-super-calls"
 - (void)updateEventEmitter:(EventEmitter::Shared const &)eventEmitter
 {
     _emitter = std::static_pointer_cast<WishlistEventEmitter const>(eventEmitter);
 }
+#pragma clang diagnostic pop
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
