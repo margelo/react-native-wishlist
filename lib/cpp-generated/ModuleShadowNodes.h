@@ -36,7 +36,7 @@ public:
         ShadowNodeFamily::Shared const &family,
         ShadowNodeTraits traits)
         : ConcreteViewShadowNode(fragment, family, traits) {
-     
+            int x = 0;
     }
 
     ModuleShadowNode(
@@ -46,6 +46,7 @@ public:
         try {
             const ModuleShadowNode &msn = dynamic_cast<const ModuleShadowNode&>(sourceShadowNode);
             registeredViews = msn.registeredViews;
+            
         }
         catch (std::bad_cast) {
               

@@ -20,8 +20,8 @@ std::shared_ptr<const ShadowNode> ShadowNodeCopyMachine::copyShadowSubtree(std::
     PropsParserContext propsParserContext{sn->getSurfaceId(), *cd.getContextContainer().get()};
    
     auto const fragment = ShadowNodeFamilyFragment{tag-=2, sn->getSurfaceId(), nullptr};
-    auto family = std::make_shared<ShadowNodeFamily>(fragment, nullptr, cd);
-        //cd.createFamily(fragment, sn->getFamily()._even); //TODO create handler on js side
+    auto family = //std::make_shared<ShadowNodeFamily>(fragment, nullptr, cd);
+        cd.createFamily(fragment, nullptr); //TODO create handler on js side
     auto const props =
         cd.cloneProps(propsParserContext, sn->getProps(), {});
     auto const state =
