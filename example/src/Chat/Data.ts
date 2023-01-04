@@ -69,19 +69,18 @@ const createChatItem = (index: number): ChatItem => {
   };
 };
 
-export const addSendedMessage = (data: ChatItem[], text: string) => {
-  const myMessage = data.find((item) => item.type === 'me');
+export const getSendedMessage = (text: string) => {
   const message: ChatItem = {
-    key: `key#${data.length}`,
+    key: `key#${Math.random()}`,
     type: 'me',
-    author: myMessage?.author!,
+    author: 'Me',
     message: text,
-    avatarUrl: myMessage?.avatarUrl!,
+    avatarUrl: `https://i.pravatar.cc/100?u=Me`,
     liked: false,
     reactions: [],
   };
 
-  return data.concat(message);
+  return message;
 };
 
 export const fetchData = (limit: number = 100) => {
