@@ -10,7 +10,6 @@
 @implementation MGScrollViewOrchestrator {
     UIScrollView * _scrollView;
     CADisplayLink * _displayLink;
-    BOOL _paused;
     
     // Events
     NSMutableArray<PanEvent *> *_touchEvents;
@@ -35,7 +34,6 @@
     if (self = [super init]) {
         _scrollView = scrollView;
         
-        _paused = YES;
         _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(handleVSync:)];
         [_displayLink addToRunLoop:NSRunLoop.currentRunLoop forMode:NSDefaultRunLoopMode];
         [_displayLink setPaused:YES];
@@ -58,10 +56,7 @@
 
 - (void)maybeRegisterForNextVSync
 {
-    if (_paused) {
     if ([_displayLink isPaused]) {
-        [_displayLink setPaused:NO];
-    }
         [_displayLink setPaused:NO];
     }
 }
@@ -171,7 +166,6 @@
     
     // pause Vsync listener if there is nothing to do
     if ([_touchEvents count] == 0 && _currentAnimation == nil && !_doWeHavePendingTemplates) {
-        _paused = YES;
         [_displayLink setPaused:YES];
     }
 }
