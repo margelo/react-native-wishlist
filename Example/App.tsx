@@ -33,8 +33,8 @@ const Type: React.FC<{}> = () => {
             simple Message
           </Text>
         </View>
-        <View>
-          <Button title="click me" nativeID="button" onPress={() => {}} />
+        <View nativeID='button'>
+          <Button title="click me" onPress={() => {}} />
         </View>
       </View>
     </View>
@@ -72,8 +72,9 @@ export default function App() {
 
               const button = item.getByWishId('button');
               if (button) {
-                button.addProps({pointerEvents: 'box-only'});
-                button.setCallback('touchEnd', () => {
+                console.log('button found!')
+                button.addProps({pointerEvents: 'box-only', borderWidth: 1});
+                button.setCallback('topTouchEnd', () => {
                   console.log('touched', index, newMessage);
                 });
               } else {
@@ -86,7 +87,7 @@ export default function App() {
 
             const imageView = item.getByWishId('image');
             imageView.addProps({source: {uri: imgSource}});
-            imageView.setCallback('loadEnd', () => {
+            imageView.setCallback('topLoadEnd', () => {
               // modify data
                console.log('loadEvent' + index);
             });

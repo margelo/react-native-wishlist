@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.cpp b/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.cpp
-index 894ddf8..562a0e8 100644
+index 894ddf8..1f8e9f7 100644
 --- a/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.cpp
 +++ b/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.cpp
 @@ -11,6 +11,7 @@
@@ -10,52 +10,16 @@ index 894ddf8..562a0e8 100644
  
  #include "RawEvent.h"
  
-@@ -46,7 +47,8 @@ EventEmitter::EventEmitter(
-     SharedEventTarget eventTarget,
-     Tag tag,
-     EventDispatcher::Weak eventDispatcher)
--    : eventTarget_(std::move(eventTarget)),
-+    : tag_(tag),
-+      eventTarget_(std::move(eventTarget)),
-       eventDispatcher_(std::move(eventDispatcher)) {}
- 
- void EventEmitter::dispatchEvent(
-@@ -54,6 +56,23 @@ void EventEmitter::dispatchEvent(
+@@ -54,6 +55,9 @@ void EventEmitter::dispatchEvent(
      const folly::dynamic &payload,
      EventPriority priority,
      RawEvent::Category category) const {
 +        
 +    std::string eventType = type;
-+    int tag = tag_;
-+    
-+      // TODO use eventListerens from EventDispatcher class in the future
-+  std::shared_ptr<jsi::Runtime> rt = ReanimatedRuntimeHandler::rtPtr;
-+    if (rt != nullptr) {
-+        ReanimatedRuntimeHandler::scheduler->scheduleOnUI([=](){
-+            try {
-+                jsi::Function f = rt->global().getPropertyAsObject(*rt, "global").getPropertyAsFunction(*rt, "handleEvent");
-+                f.call(*rt, jsi::String::createFromUtf8(*rt, eventType), tag, valueFromDynamic(*rt, payload));
-+            } catch (std::exception e) {
-+                // do Nothing most likly the handler funciton is not registered yet
-+            }
-+        });
-+    }
 +        
    dispatchEvent(
        std::move(type),
        [payload](jsi::Runtime &runtime) {
-diff --git a/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.h b/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.h
-index 1f5afce..c6735bb 100644
---- a/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.h
-+++ b/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.h
-@@ -97,6 +97,7 @@ class EventEmitter {
- 
-   EventDispatcher::Weak eventDispatcher_;
-   mutable int enableCounter_{0};
-+  mutable int tag_{0};
-   mutable bool isEnabled_{false};
- };
- 
 diff --git a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.cpp b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.cpp
 index cd2d326..c927ad3 100644
 --- a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.cpp
@@ -89,3 +53,10 @@ index a30a594..6246aa6 100644
  class UIManager final : public ShadowTreeDelegate {
   public:
    UIManager(
+diff --git a/node_modules/react-native/scripts/.packager.env b/node_modules/react-native/scripts/.packager.env
+new file mode 100644
+index 0000000..361f5fb
+--- /dev/null
++++ b/node_modules/react-native/scripts/.packager.env
+@@ -0,0 +1 @@
++export RCT_METRO_PORT=8081
