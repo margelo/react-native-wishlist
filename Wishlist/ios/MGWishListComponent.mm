@@ -23,6 +23,7 @@ using namespace facebook::react;
 @implementation MGWishListComponent{
     WishlistShadowNode::ConcreteState::Shared _sharedState;
     bool alreadyRendered;
+    std::string inflatorId;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -50,13 +51,14 @@ using namespace facebook::react;
         self.scrollView.contentSize = CGSizeMake(frame.size.width, 1000000);
         _sharedState->getData().viewportObserver->boot(
                                           5000,
-                                          frame.size.height, frame.size.width, 5000, 10, templates, names, std::static_pointer_cast<const WishlistProps>(self.props)->inflatorId);
+                                          frame.size.height, frame.size.width, 5000, 10, templates, names, inflatorId);
     }
 }
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
-    [super updateProps:props oldProps:oldProps];
+    inflatorId = std::dynamic_pointer_cast<const WishlistProps>(props)->inflatorId;
+    //[super updateProps:props oldProps:oldProps];
     _eventEmitter = nil;
 }
 
