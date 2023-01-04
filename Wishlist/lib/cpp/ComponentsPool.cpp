@@ -122,6 +122,7 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
                   newChildren,
               });
 
+          // TODO(Szymon) fix this
           /*auto oldChildren = sn->getChildren();
           auto cp = this->wcp.lock();
           for (int i = 0; i < oldChildren.size(); ++i) {
