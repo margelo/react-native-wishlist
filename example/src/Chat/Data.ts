@@ -54,7 +54,7 @@ const createChatItem = (index: number): ChatItem => {
   const author = authors[index % authors.length];
 
   return {
-    id: index,
+    key: `id#${index}`,
     type: author === 'Me' ? 'me' : 'other',
     author,
     message,

@@ -13,6 +13,7 @@ struct WishItem
 {
     float offset;
     int index;
+    std::string key;
     float height;
     std::shared_ptr<ShadowNode> sn;
 };
