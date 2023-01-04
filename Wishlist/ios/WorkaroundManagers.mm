@@ -95,6 +95,7 @@ RCT_EXPORT_METHOD(registerInterceptor)
 RCT_EXPORT_MODULE(MGWishListComponentManager)
 
 RCT_CUSTOM_VIEW_PROPERTY(inflatorId, NSString* , UIView){}
+RCT_CUSTOM_VIEW_PROPERTY(initialIndex, double, UIView){}
 
 RCT_EXPORT_VIEW_PROPERTY(onStartReached, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onEndReached, RCTDirectEventBlock)

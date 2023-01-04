@@ -160,6 +160,7 @@ const Component = forwardRef((({
         inflatorId={inflatorIdRef.current}
         onEndReached={rest?.onEndReached}
         onStartReached={rest?.onStartReached}
+        initialIndex={rest.initialIndex ?? 0}
       />
 
       <NativeTemplateContainer

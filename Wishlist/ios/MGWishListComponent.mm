@@ -27,6 +27,7 @@ using namespace facebook::react;
     std::string inflatorId;
     MGScrollViewOrchestrator * _orchestrator;
     std::shared_ptr<const WishlistEventEmitter> _emitter;
+    int _initialIndex;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -83,7 +84,7 @@ using namespace facebook::react;
         self.scrollView.contentSize = CGSizeMake(frame.size.width, 10000000);
         self.scrollView.frame = CGRectMake(self.scrollView.frame.origin.x,self.scrollView.frame.origin.y, frame.size.width, frame.size.height);
         
-        _orchestrator = [[MGScrollViewOrchestrator alloc] initWith:self.scrollView templates:templates names:names viewportObserver: _sharedState->getData().viewportObserver inflatorId:inflatorId];
+        _orchestrator = [[MGScrollViewOrchestrator alloc] initWith:self.scrollView templates:templates names:names viewportObserver: _sharedState->getData().viewportObserver inflatorId:inflatorId initialIndex:_initialIndex];
         
         _orchestrator.delegate = self;
         
@@ -106,7 +107,9 @@ using namespace facebook::react;
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
-    inflatorId = std::dynamic_pointer_cast<const WishlistProps>(props)->inflatorId;
+    std::shared_ptr<const WishlistProps> wProps = std::dynamic_pointer_cast<const WishlistProps>(props);
+    inflatorId = wProps->inflatorId;
+    _initialIndex = wProps->initialIndex;
 }
 
 - (void)updateState:(State::Shared const &)state oldState:(State::Shared const &)oldState

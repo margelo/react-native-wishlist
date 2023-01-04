@@ -38,6 +38,7 @@ WishItem WorkletItemProvider::provide(int index) {
     wishItem.sn = std::static_pointer_cast<ShadowNode>(ysn);
     wishItem.height = sz.height;
     wishItem.index = index;
+    NSLog(@"BBB index %d", index);
     return wishItem;
 }
 

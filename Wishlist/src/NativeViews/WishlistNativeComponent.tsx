@@ -25,6 +25,7 @@ export type EventInFile = Readonly<{
 export interface WishlistProps extends ViewProps {
   reanimatedRuntime: Double,
   inflatorId: string;
+  initialIndex: number;
   onStartReached: DirectEventHandler<Readonly<{}>>;
   onEndReached: DirectEventHandler<Readonly<{}>>;
 }

@@ -30,7 +30,7 @@
 }
 
 - (instancetype)initWith:(UIScrollView*)scrollView templates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates names:(std::vector<std::string>)names viewportObserver:(std::shared_ptr<ViewportObserver>)vo
-  inflatorId:(std::string)inflatorId
+  inflatorId:(std::string)inflatorId initialIndex:(int)initialIndex
 {
     if (self = [super init]) {
         _scrollView = scrollView;
@@ -45,7 +45,7 @@
         _scrollView.contentOffset = CGPointMake(0, 500000);
         _viewportObserver->boot( //TODO Mostlikly needs to adujst offset?
                               500000,
-                              _scrollView.frame.size.height, _scrollView.frame.size.width, 500000, 0, templates, names, inflatorId);
+                              _scrollView.frame.size.height, _scrollView.frame.size.width, 500000, initialIndex, templates, names, inflatorId);
         
     
         _doWeHavePendingTemplates = NO;
