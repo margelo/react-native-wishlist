@@ -57,7 +57,7 @@ const createChatItem = (index: number): ChatItem => {
     key: `id#${index}`,
     type: author === 'Me' ? 'me' : 'other',
     author,
-    message,
+    message: `message ind:${index}`,
     avatarUrl: `https://i.pravatar.cc/100?u=${
       authors[Math.round(index % authors.length)]
     }`,
