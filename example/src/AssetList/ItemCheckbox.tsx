@@ -1,6 +1,6 @@
 import React from 'react';
 import { processColor, StyleSheet, View } from 'react-native';
-import { useTemplateValue, WishList } from 'wishlist';
+import { useTemplateValue, Wishlist } from 'wishlist';
 import type { AssetListItemWithState } from './AssetListExample';
 
 const blue = processColor('#1F87FF');
@@ -18,11 +18,11 @@ export function ItemCheckbox() {
 
   return (
     <View style={styles.container}>
-      <WishList.View style={[styles.outerCircle, { borderColor }]}>
-        <WishList.IF condition={checked}>
+      <Wishlist.View style={[styles.outerCircle, { borderColor }]}>
+        <Wishlist.IF condition={checked}>
           <View style={styles.innerCircle} />
-        </WishList.IF>
-      </WishList.View>
+        </Wishlist.IF>
+      </Wishlist.View>
     </View>
   );
 }

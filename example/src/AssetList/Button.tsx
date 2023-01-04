@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { TemplateValue, WishList } from 'wishlist';
+import { TemplateValue, Wishlist } from 'wishlist';
 
 type HeaderProps = {
   active: boolean;
@@ -11,7 +11,7 @@ type HeaderProps = {
 
 export function Button({ onPress, text, active, disabled }: HeaderProps) {
   return (
-    <WishList.Pressable onPress={onPress}>
+    <Wishlist.Pressable onPress={onPress}>
       <View
         style={[
           styles.button,
@@ -19,13 +19,13 @@ export function Button({ onPress, text, active, disabled }: HeaderProps) {
           disabled && styles.disabled,
         ]}
       >
-        <WishList.Text
+        <Wishlist.Text
           style={[styles.buttonText, active && styles.buttonTextActive]}
         >
           {text}
-        </WishList.Text>
+        </Wishlist.Text>
       </View>
-    </WishList.Pressable>
+    </Wishlist.Pressable>
   );
 }
 
