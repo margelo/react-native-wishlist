@@ -25,6 +25,7 @@ export default function App() {
     setData(fetchData(200));
   }, []);
 
+
   return (
     <View style={styles.container}>
       <ChatListView

@@ -18,8 +18,8 @@ if rnVersion.to_i >= 64
 end
 
 folly_flags = '-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1'
-folly_compiler_flags = folly_flags + ' ' + '-Wno-comma -Wno-shorten-64-to-32'
-folly_version = '2021.06.28.00-v2'
+folly_compiler_flags = folly_flags + ' ' + '-Wno-comma -Wno-shorten-64-to-32' + " -DRCT_NEW_ARCH_ENABLED=1"
+folly_version = '2021.07.22.00'
 boost_compiler_flags = '-Wno-documentation'
 
 

@@ -1,0 +1,62 @@
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.cpp b/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.cpp
+index 894ddf8..1f8e9f7 100644
+--- a/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.cpp
++++ b/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.cpp
+@@ -11,6 +11,7 @@
+ #include <jsi/JSIDynamic.h>
+ #include <jsi/jsi.h>
+ #include <react/renderer/debug/SystraceSection.h>
++#include <MGWishList/ReanimatedRuntimeHandler.hpp>
+ 
+ #include "RawEvent.h"
+ 
+@@ -54,6 +55,9 @@ void EventEmitter::dispatchEvent(
+     const folly::dynamic &payload,
+     EventPriority priority,
+     RawEvent::Category category) const {
++        
++    std::string eventType = type;
++        
+   dispatchEvent(
+       std::move(type),
+       [payload](jsi::Runtime &runtime) {
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.cpp b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.cpp
+index cd2d326..c927ad3 100644
+--- a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.cpp
++++ b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.cpp
+@@ -45,7 +45,11 @@ UIManager::UIManager(
+     : runtimeExecutor_(runtimeExecutor),
+       backgroundExecutor_(std::move(backgroundExecutor)),
+       contextContainer_(std::move(contextContainer)),
+-      leakChecker_(constructLeakCheckerIfNeeded(runtimeExecutor)) {}
++      leakChecker_(constructLeakCheckerIfNeeded(runtimeExecutor)) {
++          KeyClassHolder::shadowTreeRegistry = &shadowTreeRegistry_;
++      }
++
++ShadowTreeRegistry * KeyClassHolder::shadowTreeRegistry = nullptr;
+ 
+ UIManager::~UIManager() {
+   LOG(WARNING) << "UIManager::~UIManager() was called (address: " << this
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.h b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.h
+index a30a594..6246aa6 100644
+--- a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.h
++++ b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.h
+@@ -30,6 +30,11 @@ namespace facebook::react {
+ class UIManagerBinding;
+ class UIManagerCommitHook;
+ 
++class KeyClassHolder {
++public:
++    static ShadowTreeRegistry * shadowTreeRegistry;
++};
++
+ class UIManager final : public ShadowTreeDelegate {
+  public:
+   UIManager(
+diff --git a/node_modules/react-native/scripts/.packager.env b/node_modules/react-native/scripts/.packager.env
+new file mode 100644
+index 0000000..361f5fb
+--- /dev/null
++++ b/node_modules/react-native/scripts/.packager.env
+@@ -0,0 +1 @@
++export RCT_METRO_PORT=8081
