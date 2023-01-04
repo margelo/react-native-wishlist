@@ -13,6 +13,7 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.uimanager.FabricViewStateManager;
 import com.facebook.react.uimanager.UIManagerModule;
+import com.facebook.react.views.scroll.ReactScrollView;
 import com.facebook.react.views.view.ReactViewGroup;
 
 import java.util.EnumSet;
