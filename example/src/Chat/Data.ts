@@ -9,7 +9,8 @@ export type ChatItem = {
   type: 'me' | 'other';
   message: string;
   avatarUrl: string;
-  likes: number;
+  showBiggerAvatar: boolean;
+  liked: boolean;
   reactions: ReactionItem[];
 };
 
@@ -61,7 +62,8 @@ const createChatItem = (index: number): ChatItem => {
     avatarUrl: `https://i.pravatar.cc/100?u=${
       authors[Math.round(index % authors.length)]
     }`,
-    likes: Math.random() > 0.7 ? Math.floor(Math.random() * 8) : 0,
+    liked: false,
+    showBiggerAvatar: false,
     reactions: getRandomReactions().map((ele, i) => ({
       emoji: ele,
       key: String(i),
@@ -69,19 +71,19 @@ const createChatItem = (index: number): ChatItem => {
   };
 };
 
-export const addSendedMessage = (data: ChatItem[], text: string) => {
-  const myMessage = data.find((item) => item.type === 'me');
+export const getSendedMessage = (text: string) => {
   const message: ChatItem = {
-    key: `key#${data.length}`,
+    key: `key#${Math.random()}`,
     type: 'me',
-    author: myMessage?.author!,
+    author: 'Me',
     message: text,
-    avatarUrl: myMessage?.avatarUrl!,
-    likes: 0,
+    avatarUrl: `https://i.pravatar.cc/100?u=Me`,
+    liked: false,
+    showBiggerAvatar: false,
     reactions: [],
   };
 
-  return data.concat(message);
+  return message;
 };
 
 export const fetchData = (limit: number = 100) => {

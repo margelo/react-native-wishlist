@@ -1,30 +1,31 @@
-import { useWishlistContext } from './WishlistContext';
 import { useEffect } from 'react';
 import { runOnUI } from './Utils';
 
-export function useMarkItemsDirty() {
-  const { id } = useWishlistContext();
-  return (items: Array<string>) => {
-    'worklet';
-    const markItemsDirty = global.wishlists[id].markItemsDirty as any as (
-      items: Array<string>,
-    ) => void;
-    return markItemsDirty(items);
-  };
+interface VisibleItem {
+  index: number;
+  key: string;
+}
+export interface ViewportObserver {
+  markItemsDirty: (indices: Array<number>) => void;
+  markAllItemsDirty: () => void;
+  getAllVisibleItems: () => Array<VisibleItem>;
+  updateIndices: (newIndex: number) => void;
 }
 
-export function useMarkAllItemsDirty() {
-  const { id } = useWishlistContext();
+export function useScheduleSyncUp(wishlistId: string) {
   return () => {
     'worklet';
-    const markAllItemsDirty = global.wishlists[id]
-      .markAllItemsDirty as any as () => void;
-    return markAllItemsDirty();
+    const scheduleSyncUp = global.wishlists[wishlistId]
+      .scheduleSyncUp as any as () => void;
+
+    return scheduleSyncUp();
   };
 }
 
-export function useOnFlushCallback(listener: () => void) {
-  const { id } = useWishlistContext();
+export function useOnFlushCallback(
+  listener: (viewportObserver: ViewportObserver) => void,
+  wishlistId: string,
+) {
 
   useEffect(() => {
     runOnUI(() => {
@@ -32,16 +33,16 @@ export function useOnFlushCallback(listener: () => void) {
       if (!global.wishlists) {
         global.wishlists = {};
       }
-      if (!global.wishlists[id]) {
-        global.wishlists[id] = {};
+      if (!global.wishlists[wishlistId]) {
+        global.wishlists[wishlistId] = {};
       }
-      global.wishlists[id].listener = listener;
+      global.wishlists[wishlistId].listener = listener;
     })();
     return () => {
       runOnUI(() => {
         'worklet';
-        global.wishlists[id].listener = undefined;
+        global.wishlists[wishlistId].listener = undefined;
       })();
     };
-  }, [id, listener]);
+  }, []);
 }

@@ -143,6 +143,7 @@ const maybeInit = () => {
           innerMapping.set(nativeId, inflateMethod);
           mapping.set(templateType, innerMapping);
           mappings.set(inflatorId, mapping);
+          console.log('registered!@');
         },
         getTemplateValueState: (id) => {
           return templateValueStates.get(id);
