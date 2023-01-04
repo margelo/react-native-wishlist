@@ -27,6 +27,8 @@ using namespace facebook::react;
 - (instancetype)initWithFrame:(CGRect)frame
 {
   if (self = [super initWithFrame:frame]) {
+      self.scrollView.delaysContentTouches = NO;
+      self.scrollView.canCancelContentTouches = true;
   }
   return self;
 }
@@ -37,6 +39,7 @@ using namespace facebook::react;
 {
   return concreteComponentDescriptorProvider<WishlistComponentDescriptor>();
 }
+
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
@@ -58,25 +61,17 @@ using namespace facebook::react;
     auto &data = newState->getData();
     _sharedState = newState;
     self.scrollView.contentOffset = CGPointMake(0, data.viewportObserver->offset);//
-    
- /* _state = std::static_pointer_cast<ScrollViewShadowNode::ConcreteState const>(state);
-  auto &data = _state->getData();
 
-  auto contentOffset = RCTCGPointFromPoint(data.contentOffset);
+  /* auto contentOffset = RCTCGPointFromPoint(data.contentOffset);
   if (!oldState && !CGPointEqualToPoint(contentOffset, CGPointZero)) {
     _scrollView.contentOffset = contentOffset;
   } */
 
- // CGSize contentSize = RCTCGSizeFromSize(data.getContentSize());
+  CGSize contentSize = RCTCGSizeFromSize(data.contentBoundingRect.size);
 
- /* if (CGSizeEqualToSize(_contentSize, contentSize)) {
-    return;
-  }*/
+  self.containerView.frame = CGRect{RCTCGPointFromPoint(data.contentBoundingRect.origin), contentSize};
 
-  /*_contentSize = contentSize;
-  _containerView.frame = CGRect{RCTCGPointFromPoint(data.contentBoundingRect.origin), contentSize};
-
-  [self _preserveContentOffsetIfNeededWithBlock:^{
+  /*[self _preserveContentOffsetIfNeededWithBlock:^{
     self->_scrollView.contentSize = contentSize;
   }];*/
 }
