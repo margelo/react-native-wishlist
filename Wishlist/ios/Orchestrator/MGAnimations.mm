@@ -74,7 +74,10 @@ using namespace facebook::react;
 @end
 
 const float notFound = -12345;
-const float maxVelocity = 50; // TODO (it should be adjusted)
+const float maxVelocity = 20; // TODO (it should be adjusted)
+const float stiffness = 1;
+const float mass = 3.5;
+const float damping = 5;
 
 @implementation MGScrollToItemAnimation {
     std::shared_ptr<ViewportObserver> _viewportObserver;
@@ -110,29 +113,46 @@ const float maxVelocity = 50; // TODO (it should be adjusted)
     for (auto & item : _viewportObserver->window) {
         if (item.index == _targetIndex) {
             _targetOffset = item.offset;
-            break;
+            return;
         }
     }
+    _targetIndex = notFound;
 }
 
+// It won't work if we will change sizes of items during scrollTo.
+// inspired by https://blog.maximeheckel.com/posts/the-physics-behind-spring-animations/
 - (CGFloat)getDiffWithTimestamp:(double)timestamp {
-    CGFloat diff = 0;
     [self tryToFindTargetOffset];
     
-    if (_easingAnimation) {
-        return [_easingAnimation getDiffWithTimestamp:timestamp];
+    if (_targetOffset != notFound) {
+        CGFloat k = -stiffness;
+        CGFloat d = -damping;
+        
+        CGFloat FSpring = k * (_targetOffset - _lastOffset);
+        CGFloat FDamping = d * _velocity;
+        
+        CGFloat a = (FSpring + FDamping) / mass;
+        _velocity += a * (timestamp - _lastTimestamp);
+    } else {
+        if (_viewportObserver->window[0].index > _targetIndex) {
+            _velCoef *= -1;
+        }
+        _velocity = _velCoef * maxVelocity;
     }
     
     
-    
+    CGFloat diff = _velocity * (timestamp - _lastTimestamp);
+    _lastOffset += diff;
     _lastTimestamp = timestamp;
+    
+    if (diff < 0.01) {
+        _isFinished = YES;
+    }
+   
     return diff;
 }
 
 - (BOOL)isFinished {
-    if (_easingAnimation) {
-        return [_easingAnimation isFinished];
-    }
     return _isFinished;
 }
 
@@ -143,15 +163,6 @@ const float maxVelocity = 50; // TODO (it should be adjusted)
 - (void)setupWithTimestamp:(double)timestamp {
     _needsSetup = false;
     _lastTimestamp = timestamp;
-    [self tryToFindTargetOffset];
-    
-    if (_targetOffset != notFound) {
-        // (TODO)
-    } else {
-        if (_viewportObserver->window[0].index > _targetIndex) {
-            _velCoef *= -1;
-        }
-    }
 }
 
 @end
