@@ -33,7 +33,8 @@ NS_ASSUME_NONNULL_BEGIN
                    names:(std::vector<std::string>)names
         viewportObserver:(std::shared_ptr<ViewportObserver>)vo
               inflatorId:(std::string)inflatorId
-            initialIndex:(int)initialIndex;
+            initialIndex:(int)initialIndex
+              wishlistId:(std::string)wishlistId;
 - (void)notifyAboutEvent:(PanEvent *)event;
 - (void)notifyAboutNewTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates
                       withNames:(std::vector<std::string>)names
