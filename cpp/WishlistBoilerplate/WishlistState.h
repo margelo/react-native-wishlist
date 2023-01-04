@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 #pragma once
 
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
@@ -20,7 +27,7 @@ namespace react {
 /*
  * State for <ScrollView> component.
  */
-class JSI_EXPORT MGWishlistState final {
+class WishlistState final {
  public:
   //
   int revision;
@@ -32,11 +39,11 @@ class JSI_EXPORT MGWishlistState final {
   bool initialised = false;
   Rect contentBoundingRect;
 
-  virtual ~MGWishlistState();
+  virtual ~WishlistState();
 
 #ifdef ANDROID
-  MGWishlistState();
-  MGWishlistState(MGWishlistState const &previousState, folly::dynamic data);
+  WishlistState();
+  WishlistState(WishlistState const &previousState, folly::dynamic data);
   folly::dynamic getDynamic() const;
   MapBuffer getMapBuffer() const;
 
