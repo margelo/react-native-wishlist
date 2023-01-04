@@ -28,7 +28,7 @@ export const ChatItemView: React.FC<Props> = ({type}) => {
     item.likes > 0 ? 1 : 0.4,
   );
 
-  const reactions = useTemplateValue((item: ChatItem) => item.reactions);
+  //const reactions = useTemplateValue((item: ChatItem) => item.reactions);
 
   return (
     <View style={[styles.container, type === 'me' ? styles.me : styles.other]}>
@@ -50,7 +50,7 @@ export const ChatItemView: React.FC<Props> = ({type}) => {
         <Wishlist.Text style={styles.messageText}>{message}</Wishlist.Text>
       </View>
 
-      <Wishlist.ForEach items={reactions} template="reaction" />
+      { /* <Wishlist.ForEach items={reactions} template="reaction" /> */ }
     </View>
   );
 };
