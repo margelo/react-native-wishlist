@@ -48,7 +48,7 @@ using namespace facebook::react;
         alreadyRendered = true;
         CGRect frame = self.frame;
         self.scrollView.contentSize = CGSizeMake(frame.size.width, 1000000);
-        _sharedState.viewportObserver->boot(getSurfaceId(),
+        _sharedState->getData().viewportObserver->boot(
                                           5000,
                                           frame.size.height, frame.size.width, 5000, 10, templates, names, std::static_pointer_cast<const WishlistProps>(self.props)->inflatorId);
     }

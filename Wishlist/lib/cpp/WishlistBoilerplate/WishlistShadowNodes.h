@@ -73,7 +73,7 @@ public:
         auto state = getStateData();
         if (!state.initialised) {
             state.initialised = true;
-            state.viewportObserver->setInitialValues(sharedThis, layoutContext);
+            state.viewportObserver->setInitialValues(sharedThis.lock(), layoutContext);
             
             setStateData(std::move(state));
         }

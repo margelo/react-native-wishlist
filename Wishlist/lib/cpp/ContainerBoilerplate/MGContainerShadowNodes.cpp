@@ -37,7 +37,7 @@ void MGTemplateContainerComponentShadowNode::appendChild(ShadowNode::Shared cons
    auto props = std::dynamic_pointer_cast<const MGTemplateContainerComponentProps>(this->getProps());
    if (props->names.size() == this->templates.size()) { // last Child
        PropsParserContext propsParserContext{getSurfaceId(), *this->getComponentDescriptor().getContextContainer().get()};
-       std::shared_ptr<MGTemplateContainerComponentProps> newProps = std::make_shared<MGTemplateContainerComponentProps>(propsParserContext, props, nullptr);
+       std::shared_ptr<MGTemplateContainerComponentProps> newProps = this->getComponentDescriptor().cloneProps(propsParserContext, props, {});
        newProps->templates = templates;
        props_ = newProps;
    }
