@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import {useTemplateValue, WishList} from 'wishlist';
-import {ChatItem} from './Data';
+import type {ChatItem} from './Data';
 
 interface Props {
   type: 'me' | 'other';

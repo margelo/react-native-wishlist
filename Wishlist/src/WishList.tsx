@@ -15,7 +15,12 @@ import {
   ViewProps,
 } from 'react-native';
 import {initEventHandler} from './EventHandler';
-import InflatorRepository from './InflatorRepository';
+import InflatorRepository, {
+  ComponentPool,
+  InflateMethod,
+  MappingInflateMethod,
+  TemplateItem,
+} from './InflatorRepository';
 import NativeTemplateContainer from './NativeViews/NativeTemplateContainer';
 import NativeTemplateInterceptor from './NativeViews/NativeTemplateInterceptor';
 import NativeWishList, {
@@ -26,63 +31,81 @@ const OffsetComponent = '__offsetComponent';
 let InflatorId = 1000;
 
 type Mapping = {
-  [key: string]: {
-    templateType?: string;
-    onInflate: (value: any, item: any) => void;
-  };
+  templateType?: string;
+  onInflate: MappingInflateMethod;
 };
 
 const MappingContext = createContext<{inflatorId: string} | null>(null);
 
-function getTemplatesFromChildren(children, width) {
-  const nextTemplates = {
+function getTemplatesFromChildren(children: React.ReactNode, width: number) {
+  const nextTemplates: {[key: string]: React.ReactElement} = {
     [OffsetComponent]: <View style={{height: 0, width}} />,
   };
   React.Children.forEach(children, c => {
-    if (c.type.displayName === 'WishListTemplate') {
-      nextTemplates[c.props.type] = c;
+    if ((c as any).type.displayName === 'WishListTemplate') {
+      const templateElement = c as React.ReactElement<TemplateProps>;
+      nextTemplates[templateElement.props.type] = templateElement;
     }
   });
   return nextTemplates;
 }
 
-function getMappingsFromChildren(children) {
-  const nextMappings = {};
+function getMappingsFromChildren(children: React.ReactNode) {
+  const nextMappings: {
+    [key: string]: Mapping;
+  } = {};
   React.Children.forEach(children, c => {
-    if (c.type.displayName === 'WishListMapping') {
-      nextMappings[c.props.nativeId] = {
-        onInflate: c.props.onInflate,
-        templateType: c.props.templateType,
+    if ((c as any).type.displayName === 'WishListMapping') {
+      const mappingComponent = c as React.ReactElement<MappingProps>;
+      nextMappings[mappingComponent.props.nativeId] = {
+        onInflate: mappingComponent.props.onInflate,
+        templateType: mappingComponent.props.templateType,
       };
     }
   });
   return nextMappings;
 }
 
-type TemplateRegistry = {
-  getComponent: (type: string) => any;
+type WishListInstance = {
+  scrollToItem: (index: number, animated?: boolean) => void;
+  scrollToTop: () => void;
 };
 
-type Props = ViewProps & {
-  inflateItem?: (index: number, pool: TemplateRegistry) => React.ReactElement;
-  onItemNeeded?: (index: number) => any;
+export type BaseItem = {type: string};
+
+type Props<ItemT extends BaseItem> = ViewProps & {
+  inflateItem?: InflateMethod;
+  onItemNeeded: (index: number) => ItemT;
+  onStartReached?: () => void;
+  onEndReached?: () => void;
+  initialIndex?: number;
 };
 
-const Component = forwardRef<any, Props>(
-  ({inflateItem, onItemNeeded, children, style, ...rest}, ref) => {
+const Component = forwardRef(
+  <T extends BaseItem>(
+    {inflateItem, onItemNeeded, children, style, ...rest}: Props<T>,
+    ref: React.Ref<WishListInstance>,
+  ) => {
     const nativeWishlist = useRef(null); // TODO type it properly
-    useImperativeHandle(ref, () => ({
-      scrollToItem: (index: number, animated?: boolean) => {
-        WishlistCommands.scrollToItem(
-          nativeWishlist.current,
-          index,
-          animated ?? true,
-        );
-      },
-      scrollToTop: () => {
-        WishlistCommands.scrollToItem(nativeWishlist.current, 0, true);
-      },
-    }));
+    useImperativeHandle(
+      ref,
+      (): WishListInstance => ({
+        scrollToItem: (index: number, animated?: boolean) => {
+          if (nativeWishlist.current != null) {
+            WishlistCommands.scrollToItem(
+              nativeWishlist.current,
+              index,
+              animated ?? true,
+            );
+          }
+        },
+        scrollToTop: () => {
+          if (nativeWishlist.current != null) {
+            WishlistCommands.scrollToItem(nativeWishlist.current, 0, true);
+          }
+        },
+      }),
+    );
 
     const {width} = useWindowDimensions();
     useMemo(() => initEventHandler(), []);
@@ -92,7 +115,7 @@ const Component = forwardRef<any, Props>(
     }
 
     const templatesRef = useRef<{[key: string]: React.ReactElement}>({});
-    const mappingRef = useRef<Mapping>({});
+    const mappingRef = useRef<{[key: string]: Mapping}>({});
 
     // Template registration and tracking
     useMemo(() => {
@@ -105,14 +128,14 @@ const Component = forwardRef<any, Props>(
     }, [children, width]);
 
     // Resolve inflator - either use the provided callback or use the mapping
-    const resolvedInflater = useMemo(() => {
+    const resolvedInflater: InflateMethod = useMemo(() => {
       if (inflateItem) {
         return inflateItem;
       }
 
-      return (index: number, pool: any) => {
+      return (index: number, pool: ComponentPool) => {
         'worklet';
-        const value = onItemNeeded!(index);
+        const value = onItemNeeded(index);
         if (!value) {
           return undefined;
         }
@@ -189,7 +212,6 @@ const Component = forwardRef<any, Props>(
             onStartReached={rest?.onStartReached}
             initialIndex={rest.initialIndex ?? 0}
           />
-
           <NativeTemplateContainer
             names={keys}
             inflatorId={inflatorIdRef.current!}
@@ -276,10 +298,10 @@ function traverseObject(
   }
 }
 
-export function createTemplateComponent<T extends React.ComponentType<any>>(
-  Component: T,
-  addProps?: (templateItem, props: any) => void,
-): T {
+export function createTemplateComponent<PropsT extends {}>(
+  Component: React.ComponentType<PropsT>,
+  addProps?: (templateItem: TemplateItem, props: any) => void,
+): React.ComponentType<PropsT> {
   const WishListComponent = forwardRef<any, any>(({style, ...props}, ref) => {
     const {inflatorId} = useMappingContext();
     const resolvedStyle = StyleSheet.flatten(style);
@@ -327,9 +349,9 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
       );
     }, [inflatorId, nativeId]);
 
-    // @ts-expect-error TODO: fix this.
-    return <Component ref={ref} {...otherProps} nativeID={nativeId} />;
-  }) as unknown as T;
+    // @ts-expect-error: this is ok.
+    return <Component {...otherProps} ref={ref} nativeID={nativeId} />;
+  }) as unknown as React.ComponentType<PropsT>;
 
   WishListComponent.displayName = `WishList(${Component.displayName})`;
 
@@ -339,7 +361,7 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
 type MappingProps = {
   nativeId: string;
   templateType?: string;
-  onInflate: (value: any, item: any) => any;
+  onInflate: MappingInflateMethod;
 };
 
 const Mapping: React.FC<MappingProps> = () => null;
@@ -352,14 +374,12 @@ export const WishList = {
   Component,
   Template,
   Mapping,
-  // @ts-expect-error TODO: fix this.
   Image: createTemplateComponent(Image),
-  // @ts-expect-error TODO: fix this.
   Text: createTemplateComponent(Text, (item, props) => {
     'worklet';
 
     const {children, ...other} = props;
-    item.RawText.addProps({text: children});
+    item.RawText?.addProps({text: children});
     item.addProps(other);
   }),
 };
