@@ -8,11 +8,20 @@ interface Props {
 }
 
 export const Reaction = () => {
-  const emoji = useTemplateValue((item: ReactionItem) => {›
-    return item.emoji;
+  const emoji = useTemplateValue((item: ReactionItem) => {
+    if (!item.emoji) {
+      console.log('lol', item);
+    } else {
+      console.log('non lol', item.emoji);
+    }
+    return item.emoji || 'b';
   });
 
-  return <Wishlist.Text>{emoji}</Wishlist.Text>;
+  return (
+    <View>
+      <Wishlist.Text >{emoji}</Wishlist.Text>
+    </View>
+  );
 };
 
 export const ChatItemView: React.FC<Props> = ({type}) => {
