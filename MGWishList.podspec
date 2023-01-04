@@ -10,14 +10,14 @@ Pod::Spec.new do |s|
   s.version      = package["version"]
   s.summary      = package["description"]
   s.description  = <<-DESC
-                  MGWishList
+                  The fastest List component for React Native.
                    DESC
-  s.homepage     = "https://github.com/margelo/WishList"
+  s.homepage     = "https://github.com/margelo/react-native-wishlist"
   s.license      = "MIT"
   # s.license    = { :type => "MIT", :file => "FILE_LICENSE" }
   s.author       = { "author" => "author@domain.cn" }
   s.platforms    =  { :ios => "12.4", :tvos => "12.4" }
-  s.source       = { :git => "https://github.com/margelo/WishList.git", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/margelo/react-native-wishlist.git", :tag => "#{s.version}" }
 
   s.source_files = [
     "ios/**/*.{mm,h,m,cpp}",

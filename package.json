@@ -1,7 +1,7 @@
 {
-  "name": "wishlist",
-  "version": "0.1.0",
-  "description": "test",
+  "name": "react-native-wishlist",
+  "version": "0.0.1-alpha.0",
+  "description": "The fastest List component for React Native.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/index.d.ts",
@@ -39,16 +39,61 @@
   },
   "keywords": [
     "react-native",
+    "react-native-wishlist",
     "ios",
-    "android"
+    "android",
+    "fast",
+    "infinite",
+    "list",
+    "wishlist",
+    "margelo",
+    "flatlist",
+    "scroll",
+    "scrollview",
+    "flashlist",
+    "recyclerlist",
+    "recycling",
+    "recycled",
+    "virtualized"
   ],
-  "repository": "https://github.com/margelo/WishList",
-  "author": "Marc & Szymon & Christian & Janic",
+  "repository": "https://github.com/margelo/react-native-wishlist",
+  "author": {
+    "name" : "Margelo",
+    "email" : "hello@margelo.io",
+    "url" : "http://margelo.io/"
+  },
+  "contributors": [
+    {
+      "name": "Marc Rousavy",
+      "email": "marc@margelo.io",
+      "url": "https://github.com/mrousavy"
+    },
+    {
+      "name": "Szymon Kapala",
+      "email": "szymon@margelo.io",
+      "url": "https://github.com/Szymon20000"
+    },
+    {
+      "name": "Janic Duplessis",
+      "email": "janic@margelo.io",
+      "url": "https://github.com/janicduplessis"
+    },
+    {
+      "name": "Terry Sahaidak",
+      "email": "terry@margelo.io",
+      "url": "https://github.com/terrysahaidak"
+    },
+    {
+      "name": "Christian Falch",
+      "email": "christian.falch@gmail.com",
+      "url": "https://github.com/chrfalch"
+    }
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/margelo/WishList/issues"
+    "url": "https://github.com/margelo/react-native-wishlist/issues"
   },
-  "homepage": "https://github.com/margelo/WishList#readme",
+  "homepage": "https://github.com/margelo/react-native-wishlist#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
@@ -57,7 +102,6 @@
   },
   "devDependencies": {
     "@arkweid/lefthook": "^0.7.7",
-    "@commitlint/config-conventional": "^17.0.2",
     "@jamesacarr/eslint-formatter-github-actions": "^0.1.0",
     "@react-native-community/eslint-config": "^3.0.2",
     "@release-it/conventional-changelog": "^5.0.0",
@@ -65,7 +109,6 @@
     "@types/react": "^18.0.21",
     "@types/react-native": "^0.70.6",
     "clang-format": "^1.8.0",
-    "commitlint": "^17.0.2",
     "eslint": "^8.4.1",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
@@ -94,11 +137,6 @@
     "modulePathIgnorePatterns": [
       "<rootDir>/example/node_modules",
       "<rootDir>/lib/"
-    ]
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
     ]
   },
   "release-it": {
