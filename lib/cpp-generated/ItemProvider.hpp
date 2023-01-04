@@ -13,6 +13,7 @@
 #include "ComponentsPool.h"
 #include "decorator.h"
 #include <react/renderer/uimanager/primitives.h>
+#include "ReanimatedRuntimeHandler.hpp"
 
 using namespace facebook::react;
 
@@ -87,8 +88,6 @@ struct ItemProviderTestImpl : ItemProvider
 
 struct WorkletItemProvider : ItemProvider
 {
-    static std::shared_ptr<jsi::Runtime> rtPtr;
-    
     std::shared_ptr<ComponentsPool> cp;
     int tag;
     
