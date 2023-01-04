@@ -31,35 +31,48 @@ export const ChatListView: React.FC<Props> = ({data, onLikeItem, style}) => {
       onItemNeeded={index => {
         'worklet';
         return data[index];
-      }}
-      mapping={{
-        content: (value: any, item: any) => {
+      }}>
+      <WishList.Mapping
+        mappingKey="content"
+        onResolve={(value: any, item: any) => {
           'worklet';
           item.RawText.addProps({text: value.message});
-        },
-        author: (value: any, item: any) => {
+        }}
+      />
+      <WishList.Mapping
+        mappingKey="author"
+        onResolve={(value: any, item: any) => {
           'worklet';
           item.RawText.addProps({text: value.author});
-        },
-        avatar: (value: any, item: any) => {
+        }}
+      />
+      <WishList.Mapping
+        mappingKey="avatar"
+        onResolve={(value: any, item: any) => {
           'worklet';
           item.addProps({source: {uri: value.avatarUrl}});
-        },
-        likes: (value: any, item: any) => {
+        }}
+      />
+      <WishList.Mapping
+        mappingKey="likes"
+        onResolve={(value: any, item: any) => {
           'worklet';
           value.likes > 0
             ? item.RawText.addProps({text: '♥️'})
             : item.RawText.addProps({text: '🖤'});
           value.likes === 0 && item.addProps({opacity: 0.4});
-        },
-        likeButton: (value: any, item: any) => {
+        }}
+      />
+      <WishList.Mapping
+        mappingKey="likeButton"
+        onResolve={(value: any, item: any) => {
           'worklet';
           item.addProps({pointerEvents: 'box-only'});
           item.setCallback('touchEnd', () => {
             runOnJS(handleLikeItem)(value);
           });
-        },
-      }}>
+        }}
+      />
       <WishList.Template type="me">
         <ChatItemView type="me" />
       </WishList.Template>

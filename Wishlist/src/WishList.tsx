@@ -21,6 +21,19 @@ function getTemplatesFromChildren(children, width) {
   return nextTemplates;
 }
 
+function getMappingsFromChildren(children) {
+  const nextMappings = {};
+  React.Children.forEach(children, (c) => {
+    if (c.type.displayName === "WishListMapping") {
+      nextMappings[c.props.mappingKey] = {
+        onResolve: c.props.onResolve,
+        templateType: c.props.templateType,
+      };
+    }
+  });
+  return nextMappings;
+}
+
 type TemplateRegistry = {
   getComponent: (type: string) => any;
 };
@@ -28,12 +41,10 @@ type TemplateRegistry = {
 type Props = ViewProps & {
   inflateItem?: (index: number, pool: TemplateRegistry) => React.ReactElement;
   onItemNeeded?: (index: number) => any;
-  mapping?: { [key: string]: (value: any, item: any) => void };
 };
 
 const Component: React.FC<Props> = ({
   inflateItem,
-  mapping,
   onItemNeeded,
   children,
   style,
@@ -41,12 +52,27 @@ const Component: React.FC<Props> = ({
   const { width } = useWindowDimensions();
   useMemo(() => initEventHandler(), []);
 
-  if (
-    inflateItem === undefined &&
-    (mapping === undefined || onItemNeeded === undefined)
-  ) {
-    throw Error("Either inflateItem or mapping / onItemNeeded must be defined");
+  if (inflateItem === undefined && onItemNeeded === undefined) {
+    throw Error("Either inflateItem or onItemNeeded must be defined");
   }
+
+  const templatesRef = useRef<{ [key: string]: React.ReactElement }>({});
+  const mappingRef = useRef<{
+    [key: string]: {
+      templateType: string;
+      onResolve: (value: any, item: any) => void;
+    };
+  }>({});
+
+  // Template registration and tracking
+  useMemo(() => {
+    templatesRef.current = getTemplatesFromChildren(children, width);
+  }, [children, width]);
+
+  // Mapping registration and tracking
+  useMemo(() => {
+    mappingRef.current = getMappingsFromChildren(children);
+  }, [children, width]);
 
   // Resolve inflator - either use the provided callback or use the mapping
   const resolvedInflater = useMemo(() => {
@@ -66,11 +92,17 @@ const Component: React.FC<Props> = ({
         return undefined;
       }
 
-      Object.keys(mapping!).forEach((key) => {
+      Object.keys(mappingRef.current!).forEach((key) => {
         const templateItem = item.getByWishId(key);
-        if (templateItem) {
+        console.log(key, templateItem);
+        if (
+          templateItem &&
+          (mappingRef.current![key].templateType !== undefined
+            ? mappingRef.current![key].templateType === value.type
+            : true)
+        ) {
           try {
-            mapping![key](value, templateItem);
+            mappingRef.current![key].onResolve(value, templateItem);
           } catch (err) {
             console.error(err);
           }
@@ -78,9 +110,8 @@ const Component: React.FC<Props> = ({
       });
       return item;
     };
-  }, [inflateItem, mapping, onItemNeeded]);
+  }, [inflateItem, onItemNeeded]);
 
-  const templatesRef = useRef<{ [key: string]: React.ReactElement }>({});
   const inflatorIdRef = useRef<string | null>(null);
   const prevInflatorRef = useRef<typeof resolvedInflater>();
 
@@ -96,11 +127,6 @@ const Component: React.FC<Props> = ({
       InflatorRepository.register(inflatorIdRef.current, resolvedInflater);
     }
   }, [resolvedInflater]);
-
-  // Template registration and tracking
-  useMemo(() => {
-    templatesRef.current = getTemplatesFromChildren(children, width);
-  }, [children, width]);
 
   const keys = Object.keys(templatesRef.current);
   console.log("@@@ Render WishList", inflatorIdRef.current, keys.join(", "));
@@ -138,13 +164,22 @@ type TemplateProps = {
 };
 
 const Template: React.FC<TemplateProps> = ({ children }) => {
-  console.log("**** Render Template");
   return children;
 };
 
+type MappingProps = {
+  mappingKey: string;
+  templateType?: string;
+  onResolve: (value: any, item: any) => any;
+};
+
+const Mapping: React.FC<MappingProps> = () => null;
+
 Template.displayName = "WishListTemplate";
+Mapping.displayName = "WishListMapping";
 
 export const WishList = {
   Component,
   Template,
+  Mapping,
 };
