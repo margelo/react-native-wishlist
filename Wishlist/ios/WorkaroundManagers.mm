@@ -74,7 +74,6 @@ RCT_EXPORT_METHOD(registerList)
 
 - (void)invalidate
 {
-    NSLog(@"SDFSDF");
     [_surfacePresenter.scheduler removeEventListener: _eventListener];
 }
 

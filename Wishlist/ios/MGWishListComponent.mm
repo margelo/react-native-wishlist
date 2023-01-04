@@ -146,7 +146,6 @@ using namespace facebook::react;
 }
 
 - (void)scrollToItem:(NSInteger)index animated:(BOOL)animated {
-    NSLog(@"scrollToItem has been called :D ");
     if (animated && _orchestrator != nil) {
         [_orchestrator scrollToItem:index];
     }
