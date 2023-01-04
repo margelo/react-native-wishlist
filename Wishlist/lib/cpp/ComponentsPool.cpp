@@ -2,7 +2,6 @@
 using namespace facebook::react;
 using namespace jsi;
 
-
 Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
   std::string name = nameProp.utf8(rt);
 
@@ -28,68 +27,67 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
           return jsi::Value::undefined();
         });
   }
-    
+
   if (name == "setChildren") { // TODO implement that
-      return jsi::Function::createFromHostFunction(
-          rt,
-          nameProp,
-          1,
-          [=](jsi::Runtime &rt,
-              jsi::Value const &thisValue,
-              jsi::Value const *args,
-              size_t count) -> jsi::Value {
-            RawProps rawProps(rt, args[0]);
+    return jsi::Function::createFromHostFunction(
+        rt,
+        nameProp,
+        1,
+        [=](jsi::Runtime &rt,
+            jsi::Value const &thisValue,
+            jsi::Value const *args,
+            size_t count) -> jsi::Value {
+          RawProps rawProps(rt, args[0]);
 
-            auto &cd = sn->getComponentDescriptor();
+          auto &cd = sn->getComponentDescriptor();
 
-            PropsParserContext propsParserContext{
-                sn->getFamily().getSurfaceId(),
-                *cd.getContextContainer().get()};
+          PropsParserContext propsParserContext{
+              sn->getFamily().getSurfaceId(), *cd.getContextContainer().get()};
 
-            auto nextProps =
-                cd.cloneProps(propsParserContext, sn->getProps(), rawProps);
-            std::cout << nextProps->getDebugValue() << std::endl;
+          auto nextProps =
+              cd.cloneProps(propsParserContext, sn->getProps(), rawProps);
+          std::cout << nextProps->getDebugValue() << std::endl;
 
-            auto clonedShadowNode = cd.cloneShadowNode(
-                *sn,
-                {
-                    nextProps,
-                    nullptr,
-                });
-            
-                  auto oldChildren = sn->getChildren();
-                  auto cp = this->wcp.lock();
-                  for (int i = 0; i < oldChildren.size(); ++i) {
-                      if (cp) {
-                          cp->returnToPool(oldChildren[i]);
-                      }
-                  }
+          auto clonedShadowNode = cd.cloneShadowNode(
+              *sn,
+              {
+                  nextProps,
+                  nullptr,
+              });
 
-            sn = clonedShadowNode;
-
-            std::shared_ptr<ShadowNodeBinding> currentParent = parent;
-            std::shared_ptr<ShadowNode> currentSN = clonedShadowNode;
-            while (currentParent != nullptr) {
-              auto &cd = currentParent->sn->getComponentDescriptor();
-              auto children = currentParent->sn->getChildren();
-              for (int i = 0; i < children.size(); ++i) {
-                if (children[i]->getTag() == currentSN->getTag()) {
-                  children[i] = currentSN;
-                  break;
-                }
-              }
-              currentSN = cd.cloneShadowNode(
-                  *(currentParent->sn),
-                  {nullptr,
-                   std::make_shared<ShadowNode::ListOfShared>(children)});
-              currentParent->sn = currentSN;
-              currentParent = currentParent->parent;
-              std::cout << "is currentParent null "
-                        << (currentParent == nullptr) << std::endl;
+          auto oldChildren = sn->getChildren();
+          auto cp = this->wcp.lock();
+          for (int i = 0; i < oldChildren.size(); ++i) {
+            if (cp) {
+              cp->returnToPool(oldChildren[i]);
             }
+          }
 
-            return jsi::Value::undefined();
-          });
+          sn = clonedShadowNode;
+
+          std::shared_ptr<ShadowNodeBinding> currentParent = parent;
+          std::shared_ptr<ShadowNode> currentSN = clonedShadowNode;
+          while (currentParent != nullptr) {
+            auto &cd = currentParent->sn->getComponentDescriptor();
+            auto children = currentParent->sn->getChildren();
+            for (int i = 0; i < children.size(); ++i) {
+              if (children[i]->getTag() == currentSN->getTag()) {
+                children[i] = currentSN;
+                break;
+              }
+            }
+            currentSN = cd.cloneShadowNode(
+                *(currentParent->sn),
+                {nullptr,
+                 std::make_shared<ShadowNode::ListOfShared>(children)});
+            currentParent->sn = currentSN;
+            currentParent = currentParent->parent;
+            std::cout << "is currentParent null " << (currentParent == nullptr)
+                      << std::endl;
+          }
+
+          return jsi::Value::undefined();
+        });
   }
 
   if (name == "addProps") {
@@ -101,23 +99,25 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
             jsi::Value const &thisValue,
             jsi::Value const *args,
             size_t count) -> jsi::Value {
-                jsi::Array subItems = args[0].asObject(rt).asArray(rt);
-          
+          jsi::Array subItems = args[0].asObject(rt).asArray(rt);
 
           auto &cd = sn->getComponentDescriptor();
 
           PropsParserContext propsParserContext{
-              sn->getFamily().getSurfaceId(),
-              *cd.getContextContainer().get()};
-                
-          ShadowNode::UnsharedListOfShared newChildren = std::make_shared<ShadowNode::ListOfShared>();
-                
-            for (int i = 0; i < subItems.size(rt); ++i) {
-                std::shared_ptr<ShadowNodeBinding> child = subItems.getValueAtIndex(rt, i).getObject(rt).getHostObject<ShadowNodeBinding>(rt);
-                newChildren->push_back(child->sn);
-                child->parent = shared_from_this();
-            }
-          
+              sn->getFamily().getSurfaceId(), *cd.getContextContainer().get()};
+
+          ShadowNode::UnsharedListOfShared newChildren =
+              std::make_shared<ShadowNode::ListOfShared>();
+
+          for (int i = 0; i < subItems.size(rt); ++i) {
+            std::shared_ptr<ShadowNodeBinding> child =
+                subItems.getValueAtIndex(rt, i)
+                    .getObject(rt)
+                    .getHostObject<ShadowNodeBinding>(rt);
+            newChildren->push_back(child->sn);
+            child->parent = shared_from_this();
+          }
+
           auto clonedShadowNode = cd.cloneShadowNode(
               *sn,
               {
@@ -144,8 +144,8 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
                  std::make_shared<ShadowNode::ListOfShared>(children)});
             currentParent->sn = currentSN;
             currentParent = currentParent->parent;
-            std::cout << "is currentParent null "
-                      << (currentParent == nullptr) << std::endl;
+            std::cout << "is currentParent null " << (currentParent == nullptr)
+                      << std::endl;
           }
 
           return jsi::Value::undefined();
@@ -180,8 +180,8 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
         });
   }
 
-  if (name == "getByWishId") { // TODO(Szymon) That can be optimised to O(depth) when
-                               // template preprocessing
+  if (name == "getByWishId") { // TODO(Szymon) That can be optimised to O(depth)
+                               // when template preprocessing
     return jsi::Function::createFromHostFunction(
         rt,
         nameProp,
@@ -218,8 +218,7 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
             if (sibiling->getComponentName() == type) {
               if (i == index) {
                 return jsi::Object::createFromHostObject(
-                    rt,
-                    std::make_shared<ShadowNodeBinding>(sibiling, parent));
+                    rt, std::make_shared<ShadowNodeBinding>(sibiling, parent));
               }
               i++;
             }

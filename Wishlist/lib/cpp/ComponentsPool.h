@@ -23,10 +23,10 @@ struct ShadowNodeBinding : public jsi::HostObject,
   ShadowNodeBinding(
       std::shared_ptr<const ShadowNode> sn,
       std::weak_ptr<ComponentsPool> wcp,
-                    std::shared_ptr<ShadowNodeBinding> parent = nullptr) {
-      this->sn = sn;
-      this->parent = parent;
-      this->wcp = wcp;
+      std::shared_ptr<ShadowNodeBinding> parent = nullptr) {
+    this->sn = sn;
+    this->parent = parent;
+    this->wcp = wcp;
   }
 
   void describe(
@@ -69,7 +69,7 @@ struct ShadowNodeBinding : public jsi::HostObject,
   }
 
   virtual Value get(Runtime &rt, const PropNameID &nameProp);
-                               
+
   virtual void set(Runtime &rt, const PropNameID &name, const Value &value) {
     throw jsi::JSError(rt, "set hasn't been implemented yet");
   }
