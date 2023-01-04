@@ -100,6 +100,8 @@ const Component = forwardRef(
         update: (updateJob: any /* TODO type properly */) => {
           runOnUI(() => {
             'worklet';
+            // we have to do sth here to get rid of frozen objs
+            // otherwise data can't be modified
             data().update(updateJob);
           })();
         },
@@ -135,7 +137,7 @@ const Component = forwardRef(
         'worklet';
         _log('ooo resolved inflator');
         const value = data().at(index);
-        _log('ooo after using data');
+        _log(`ooo after using data value:${JSON.stringify(value)}`);
         if (!value) {
           return undefined;
         }

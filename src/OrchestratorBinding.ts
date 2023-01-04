@@ -22,6 +22,7 @@ export function useScheduleSyncUp(wishlistId?: string) {
     'worklet';
     const scheduleSyncUp = global.wishlists[id]
       .scheduleSyncUp as any as () => void;
+
     return scheduleSyncUp();
   };
 }

@@ -74,12 +74,14 @@ jsi::Value ViewportObserver::getBinding() {
       [=](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) -> jsi::Value {
         
           jsi::Array items(rt, window.size());
+          int i = 0;
           for (WishItem & item : window) {
               jsi::Object temp(rt);
               temp.setProperty(rt, "index", item.index);
               temp.setProperty(rt, "key", item.key);
+              items.setValueAtIndex(rt, i++, temp);
           }
-        return jsi::Value::undefined();
+        return items;
       }));
     
     obj.setProperty(

@@ -258,7 +258,7 @@
     jsi::Value val = obj.getProperty(rt, "listener");
     if (val.isObject()) {
         jsi::Function f = val.getObject(rt).getFunction(rt);
-        f.call(rt, std::move(val));
+        f.call(rt, std::move(observerBinding));
     }
 }
 
@@ -271,8 +271,13 @@
   }
 
   jsi::Object wishlists = global.getPropertyAsObject(rt, "wishlists");
+    
+    
 
   jsi::Object binding(rt);
+    if (wishlists.getProperty(rt, _wishlistId.c_str()).isObject()) {
+        binding = wishlists.getProperty(rt, _wishlistId.c_str()).asObject(rt);
+    }
   __weak MGScrollViewOrchestrator *weakSelf = self;
     binding.setProperty(
         rt,
