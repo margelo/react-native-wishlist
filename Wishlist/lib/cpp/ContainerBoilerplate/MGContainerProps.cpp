@@ -22,8 +22,11 @@ MGTemplateContainerComponentProps::MGTemplateContainerComponentProps(
     const MGTemplateContainerComponentProps &sourceProps,
     const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
     names(convertRawProp(context, rawProps, "names", sourceProps.names, {})),
-    inflatorId(convertRawProp(context, rawProps, "inflatorId", sourceProps.inflatorId, {}))
-      {}
+    inflatorId(convertRawProp(context, rawProps, "inflatorId", sourceProps.inflatorId,
+                              {}))
+      {
+          templates = sourceProps.templates;
+      }
 
 
 } // namespace react
