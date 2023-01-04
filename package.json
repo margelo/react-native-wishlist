@@ -128,7 +128,7 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
-    "react-naitve-gesture-handler": "*",
+    "react-native-gesture-handler": "*",
     "react-native-worklets": "*"
   },
   "jest": {
