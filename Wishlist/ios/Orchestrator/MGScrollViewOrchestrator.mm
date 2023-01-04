@@ -180,8 +180,9 @@
     [self maybeRegisterForNextVSync];
 }
 
-- (void)notifyAboutNewTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates withNames:(std::vector<std::string>)names
+- (void)notifyAboutNewTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates withNames:(std::vector<std::string>)names inflatorId:(std::string)inflatorId
 {
+    _inflatorId = inflatorId;
     _pendingTemplates = templates;
     _pendingNames = names;
     _doWeHavePendingTemplates = YES;
