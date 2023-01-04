@@ -31,8 +31,6 @@ class ModuleState final {
  public:
     double originContentOffset = 50000;
     int originItemIndex = 10; // Hardcode for now
-    std::weak_ptr<ShadowNode> weakSn;
-    ComponentsPool componentsPool;
     ViewportObserver viewportObserver;
 
 #ifdef ANDROID

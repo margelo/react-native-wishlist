@@ -9,28 +9,33 @@
 #define ViewportObserver_hpp
 
 #include <stdio.h>
-#include "ComponentsPool.h"
+#include "ItemProvider.hpp"
+#include <deque>
+#import "RCTFollyConvert.h"
 
-struct WishItem
-{
-    float offset;
-    int index;
-    float height;
-    std::shared_ptr<const LayoutableShadowNode> sn;
-};
+// Temporary solution only for PoC
+#include <react/renderer/uimanager/UIManager.h>
+
 
 struct ViewportObserver {
     float offset;
     float windowHeight;
     int surfaceId;
     
-    ComponentsPool componentsPool;
-    ItemProvider itemProvider;
+    std::shared_ptr<ComponentsPool> componentsPool = std::make_shared<ComponentsPool>();
+    std::shared_ptr<ItemProvider> itemProvider;
     std::deque<WishItem> window;
     
-    void initOrUpdate(int surfaceId, float offset, float windowHeight, float originItemOffset, float originItem) {
+    std::weak_ptr<ShadowNode> weakWishListNode;
+    
+    void initOrUpdate(int surfaceId, float offset, float windowHeight, float originItemOffset, float originItem, std::weak_ptr<ShadowNode> weakWishListNode) {
+        
+        this->weakWishListNode = weakWishListNode;
+        itemProvider = std::static_pointer_cast<ItemProvider>(std::make_shared<ItemProviderTestImpl>());
+        itemProvider->setComponentsPool(componentsPool);
+        
         for (WishItem & item : window) {
-            componentsPool.returnToPool(item.sn);
+            componentsPool->returnToPool(item.sn);
         }
         window.clear();
         
@@ -38,7 +43,7 @@ struct ViewportObserver {
         this->offset = offset;
         this->windowHeight = windowHeight;
         
-        window.push_back(itemProvider.provide(originItem));
+        window.push_back(itemProvider->provide(originItem));
         window.back().offset = originItemOffset;
         updateWindow();
     }
@@ -57,7 +62,7 @@ struct ViewportObserver {
             float bottom = item.offset + item.height;
             
             if (bottom < bottomEdge) {
-                WishItem wishItem = itemProvider.provide(item.index-1);
+                WishItem wishItem = itemProvider->provide(item.index-1);
                 if (wishItem.sn.get() == nullptr) {
                     break;
                 }
@@ -74,7 +79,7 @@ struct ViewportObserver {
             float bottom = item.offset + item.height;
 
             if (item.offset > topEdge) {
-                WishItem wishItem = itemProvider.provide(item.index+1);
+                WishItem wishItem = itemProvider->provide(item.index+1);
                 if (wishItem.sn.get() == nullptr) {
                     break;
                 }
@@ -85,13 +90,15 @@ struct ViewportObserver {
             }
         }
         
+        std::vector<WishItem> itemsToRemove;
+        
         // remove above
         while (1) {
             WishItem & item = window.front();
             float bottom = item.offset + item.height;
             if (bottom <= topEdge) {
                 window.pop_front();
-                componentsPool.returnToPool(item.sn);
+                itemsToRemove.push_back(std::move(item));
                 continue;
             } else {
                 break;
@@ -101,15 +108,45 @@ struct ViewportObserver {
         // remove below
         while (1) {
             WishItem & item = window.front();
-            float bottom = item.offset + item.height;
             if (item.offset >= bottomEdge) {
                 window.pop_back();
-                componentsPool.returnToPool(item.sn);
+                itemsToRemove.push_back(std::move(item));
                 continue;
             } else {
                 break;
             }
         }
+        
+        pushChildren();
+        
+        for (auto & item : itemsToRemove) {
+            componentsPool->returnToPool(item.sn);
+        }
+    }
+    
+    std::shared_ptr<ShadowNode> getOffseter(float offset);
+    
+    void pushChildren() {
+        std::shared_ptr<ShadowNode> sWishList = weakWishListNode.lock();
+        if (sWishList.get() == nullptr) {
+            return;
+        }
+        KeyClassHolder::shadowTreeRegistry->visit(surfaceId, [&](const ShadowTree & st) {
+            ShadowTreeCommitTransaction transaction = [&](RootShadowNode const &oldRootShadowNode) -> std::shared_ptr<RootShadowNode> {
+                return std::static_pointer_cast<RootShadowNode>(oldRootShadowNode.cloneTree(sWishList->getFamily(), [&](const ShadowNode & sn) -> std::shared_ptr<ShadowNode> {
+                    auto children = std::make_shared<ShadowNode::ListOfShared>();
+                    
+                    children->push_back(getOffseter(window[0].offset));
+                    
+                    for (WishItem & wishItem : window) {
+                      children->push_back(wishItem.sn);
+                    }
+                    
+                    return sn.clone(ShadowNodeFragment{nullptr, children, nullptr});
+                }));
+            };
+            st.commit(transaction);
+        });
     }
 };
 
