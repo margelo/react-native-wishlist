@@ -59,8 +59,31 @@
     _doWeHaveOngoingEvent = NO;
     _inflatorId = inflatorId;
     _touchEvents = [NSMutableArray new];
+    
+    [self adjustOffsetIfInitialValueIsCloseToEnd];
   }
   return self;
+}
+
+// when someone sets initial element to last element we need to correct an offset
+// because otherwise we will only display first element
+- (void)adjustOffsetIfInitialValueIsCloseToEnd {
+    CGFloat topElementY = _viewportObserver->window[0].offset;
+    CGFloat bottomElementY = _viewportObserver->window.back().offset;
+
+    CGFloat topViewportEdge = _scrollView.contentOffset.y;
+    CGFloat bottomViewPortEdge = topViewportEdge + _scrollView.frame.size.height;
+
+    if (bottomElementY < bottomViewPortEdge) {
+      CGFloat diff = bottomElementY - bottomViewPortEdge;
+      CGPoint oldOffset = _scrollView.contentOffset;
+
+      _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + diff);
+      bottomViewPortEdge += diff;
+      topViewportEdge += diff;
+
+      _viewportObserver->reactToOffsetChange(_scrollView.contentOffset.y);
+    }
 }
 
 - (void)maybeRegisterForNextVSync
