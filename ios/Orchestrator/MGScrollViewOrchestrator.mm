@@ -18,8 +18,7 @@
   // ViewportObserer
   std::shared_ptr<ViewportObserver> _viewportObserver;
   std::string _inflatorId;
-  std::set<std::string> dirtyItems;
-  BOOL rerenderAllItems;
+    BOOL _needToSyncUpWithJS;
 
   id<MGScrollAnimation> _currentAnimation;
   std::string _wishlistId;
@@ -60,7 +59,7 @@
     _doWeHaveOngoingEvent = NO;
     _inflatorId = inflatorId;
     _touchEvents = [NSMutableArray new];
-      rerenderAllItems = NO;
+      _needToSyncUpWithJS = NO;
 
     [self adjustOffsetIfInitialValueIsCloseToEnd];
   }
@@ -148,23 +147,16 @@
     _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y - yDiff);
   }
     
-    [self syncData];
-
-  // rerender dirty items
-  if (!dirtyItems.empty()) {
-    std::set<std::string> localDirtyItems;
-    localDirtyItems.swap(dirtyItems);
-      if (!rerenderAllItems) {
-          _viewportObserver->rerenderDirtyItems(std::move(localDirtyItems));
-      }
-  }
+    if (_needToSyncUpWithJS) {
+        [self syncUpWithJS: _viewportObserver->getBinding()];
+        _viewportObserver->updateDirtyItems();
+    }
 
   // update teamplates if needed
-  if (_doWeHavePendingTemplates or rerenderAllItems) {
+  if (_doWeHavePendingTemplates) {
     _viewportObserver->update(
-        _scrollView.frame.size.height, _scrollView.frame.size.width, _pendingTemplates, _pendingNames, _inflatorId, rerenderAllItems && !_doWeHaveOngoingEvent);
+        _scrollView.frame.size.height, _scrollView.frame.size.width, _pendingTemplates, _pendingNames, _inflatorId);
     _doWeHavePendingTemplates = NO;
-    rerenderAllItems = NO;
   }
 
   // cover Viewport if possible
@@ -212,7 +204,7 @@
   }
 
   // pause Vsync listener if there is nothing to do
-  if ([_touchEvents count] == 0 && _currentAnimation == nil && !_doWeHavePendingTemplates && dirtyItems.empty() && !rerenderAllItems) {
+  if ([_touchEvents count] == 0 && _currentAnimation == nil && !_doWeHavePendingTemplates && !_needToSyncUpWithJS) {
     [_displayLink setPaused:YES];
   }
 }
@@ -246,21 +238,13 @@
   [self maybeRegisterForNextVSync];
 }
 
-- (void)markItemsDirty:(std::vector<std::string>)items
+- (void)scheduleSyncUp
 {
-  for (auto &key : items) {
-    dirtyItems.insert(key);
-  }
+  _needToSyncUpWithJS = YES;
   [self maybeRegisterForNextVSync];
 }
 
-- (void)markAllItemsDirty
-{
-  rerenderAllItems = YES;
-  [self maybeRegisterForNextVSync];
-}
-
-- (void)syncData
+- (void)syncUpWithJS:(jsi::Value)observerBinding
 {
     jsi::Runtime &rt = *ReanimatedRuntimeHandler::rtPtr;
     jsi::Object global = rt.global().getPropertyAsObject(rt, "global");
@@ -273,7 +257,7 @@
     jsi::Value val = obj.getProperty(rt, "listener");
     if (val.isObject()) {
         jsi::Function f = val.getObject(rt).getFunction(rt);
-        f.call(rt);
+        f.call(rt, std::move(val));
     }
 }
 
@@ -289,35 +273,16 @@
 
   jsi::Object binding(rt);
   __weak MGScrollViewOrchestrator *weakSelf = self;
-  binding.setProperty(
-      rt,
-      "markItemsDirty",
-      jsi::Function::createFromHostFunction(
-          rt,
-          jsi::PropNameID::forAscii(rt, "markItemsDirty"),
-          1,
-          [=](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) -> jsi::Value {
-            jsi::Array arr = args[0].getObject(rt).getArray(rt);
-
-            std::vector<std::string> keys;
-
-            for (int i = 0; i < arr.size(rt); ++i) {
-              keys.push_back(arr.getValueAtIndex(rt, i).asString(rt).utf8(rt));
-            }
-
-            [weakSelf markItemsDirty:keys];
-            return jsi::Value::undefined();
-          }));
     binding.setProperty(
         rt,
-        "markAllItemsDirty",
+        "scheduleSyncUp",
         jsi::Function::createFromHostFunction(
             rt,
-            jsi::PropNameID::forAscii(rt, "markAllItemsDirty"),
+            jsi::PropNameID::forAscii(rt, "scheduleSyncUp"),
             1,
             [=](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) -> jsi::Value {
               
-              [weakSelf markAllItemsDirty];
+              [weakSelf scheduleSyncUp];
               return jsi::Value::undefined();
             }));
 
