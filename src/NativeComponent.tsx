@@ -87,6 +87,7 @@ export type Void = void;
 
 export type WishlistProps = Readonly<ViewProps & {
   kkk: Int;
+  reanimatedRuntime: Double,
   inflatorId: string;
   names: ReadonlyArray<string>;
   onBubblingEventDefinedInline: BubblingEventHandler<EventInFile>;

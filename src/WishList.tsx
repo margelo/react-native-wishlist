@@ -15,6 +15,8 @@ export default function createWishList() {
     const { inflateItem } = props;
     const inflatorId = useRef(null);
 
+    const reaRt = global._WORKLET_RUNTIME;
+
     if (inflatorId.current == null) {
       inflatorId.current = Math.random().toString();
       InflatorRepository.register(inflatorId.current, inflateItem);
@@ -25,7 +27,7 @@ export default function createWishList() {
     }), []);
     
     return (
-      <NativeWishList  {...props} removeClippedSubviews={false} inflatorId={inflatorId.current} kkk={6} names={Array.from(componentsRegistry.keys())} >
+      <NativeWishList  {...props} removeClippedSubviews={false} inflatorId={inflatorId.current} kkk={6} names={Array.from(componentsRegistry.keys())} reanimatedRuntime={reaRt}>
         { Array.from(componentsRegistry.values())}
       </NativeWishList>
     );

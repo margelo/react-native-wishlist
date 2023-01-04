@@ -1,0 +1,43 @@
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.h b/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.h
+index 0ebb31a..563135a 100644
+--- a/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.h
++++ b/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.h
+@@ -94,7 +94,9 @@ class EventEmitter {
+ 
+   friend class UIManagerBinding;
+ 
++  public:
+   mutable SharedEventTarget eventTarget_;
++  private:
+ 
+   EventDispatcher::Weak eventDispatcher_;
+   mutable int enableCounter_{0};
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.h b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.h
+index 16553ad..1a8c3a4 100644
+--- a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.h
++++ b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.h
+@@ -190,7 +190,9 @@ class UIManager final : public ShadowTreeDelegate {
+   UIManagerDelegate *delegate_;
+   UIManagerAnimationDelegate *animationDelegate_{nullptr};
+   RuntimeExecutor const runtimeExecutor_{};
++  public:
+   ShadowTreeRegistry shadowTreeRegistry_{};
++  private:
+   BackgroundExecutor const backgroundExecutor_{};
+   ContextContainer::Shared contextContainer_;
+ 
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManagerBinding.h b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManagerBinding.h
+index 9ddd53d..fdf7211 100644
+--- a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManagerBinding.h
++++ b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManagerBinding.h
+@@ -72,8 +72,9 @@ class UIManagerBinding : public jsi::HostObject {
+    */
+   jsi::Value get(jsi::Runtime &runtime, jsi::PropNameID const &name) override;
+ 
+- private:
++ public:
+   std::shared_ptr<UIManager> uiManager_;
++ private:
+   std::unique_ptr<EventHandler const> eventHandler_;
+   mutable ReactEventPriority currentEventPriority_;
+ 

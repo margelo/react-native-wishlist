@@ -63,19 +63,6 @@ public:
     }
     
     void appendChild(ShadowNode::Shared const &childNode) {
-        
-        //ConcreteViewShadowNode::appendChild(childNode);
-        /*std::shared_ptr<const LayoutableShadowNode> lsn = std::dynamic_pointer_cast<const LayoutableShadowNode>(childNode);
-        LayoutContext lc;
-        LayoutConstraints lcc;
-        //lsn->layoutTree(lc);
-        std::cout << "sdfwefwef" << std::endl;
-        for (int i = 0; i < 10000; ++i) {
-            Size sz = lsn->measure(lc, lcc);
-            int x = 5;
-        }
-        
-        std::cout << "2 sdfwefwef" << std::endl;*/
         auto state = getStateData();
         if (state.initialised) {
             return;
@@ -83,10 +70,6 @@ public:
         
         registeredViews.push_back(childNode);
         auto props = std::dynamic_pointer_cast<const WishlistProps>(this->getProps());
-        if (props->names.size() == registeredViews.size()) { // last Child
-            
-            /*state.viewportObserver.initOrUpdate(this->getSurfaceId(), 5000, 20, 5000, 10, this->clone(ShadowNodeFragment{}));*/
-        }
     }
                                     
     void layout(LayoutContext layoutContext) {

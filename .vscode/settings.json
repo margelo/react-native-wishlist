@@ -1,0 +1,7 @@
+{
+  "files.watcherInclude": [
+    "**/node_modules/react-native/**",
+    "**/node_modules/react-native-reanimated/**"
+  ],
+  "search.useIgnoreFiles": false
+}
