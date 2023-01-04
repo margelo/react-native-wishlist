@@ -50,9 +50,9 @@ export const ChatListView: React.FC<Props> = ({data, onLikeItem, style}) => {
       <WishList.Template type="other">
         <ChatItemView type="other" />
       </WishList.Template>
-      <WishList.Template type="reaction">
+      { /*<WishList.Template type="reaction">
         <Reaction />
-      </WishList.Template>
+      </WishList.Template> */}
     </WishList.Component>
   );
 };

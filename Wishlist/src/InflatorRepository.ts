@@ -33,15 +33,15 @@ const maybeInit = () => {
         },
         useMappings: (item, value, id, pool) => {
           const mapping = mappings.get(id);
-            if (mapping) {
-              for (const [nativeId, inflate] of mapping.entries()) {
-                const templateItem = item.getByWishId(nativeId);
-                if (templateItem) {
-                  inflate(value, templateItem, pool);
-                }
+          if (mapping) {
+            for (const [nativeId, inflate] of mapping.entries()) {
+              const templateItem = item.getByWishId(nativeId);
+              if (templateItem) {
+                inflate(value, templateItem, pool);
               }
             }
-            return item;
+          }
+          return item;
         },
         registerInflator: (id, inflateMethod) => {
           console.log("InflatorRegistry::register", id);
