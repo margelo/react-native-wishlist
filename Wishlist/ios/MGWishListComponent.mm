@@ -43,7 +43,7 @@ using namespace facebook::react;
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
-    NSLog(@"wegwgw");
+    NSLog(@"updateProps");
   const auto &oldSliderProps = *std::static_pointer_cast<const WishlistProps>(_props);
   const auto &newSliderProps = *std::static_pointer_cast<const WishlistProps>(props);
     int z = 3;
