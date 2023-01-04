@@ -26,7 +26,7 @@ function getMappingsFromChildren(children) {
   React.Children.forEach(children, (c) => {
     if (c.type.displayName === "WishListMapping") {
       nextMappings[c.props.nativeId] = {
-        onResolve: c.props.onResolve,
+        onInflate: c.props.onInflate,
         templateType: c.props.templateType,
       };
     }
@@ -60,7 +60,7 @@ const Component: React.FC<Props> = ({
   const mappingRef = useRef<{
     [key: string]: {
       templateType: string;
-      onResolve: (value: any, item: any) => void;
+      onInflate: (value: any, item: any) => void;
     };
   }>({});
 
@@ -101,7 +101,7 @@ const Component: React.FC<Props> = ({
             : true)
         ) {
           try {
-            mappingRef.current![key].onResolve(value, templateItem);
+            mappingRef.current![key].onInflate(value, templateItem);
           } catch (err) {
             console.error(
               "Error calling mapper for key / template",
@@ -174,7 +174,7 @@ const Template: React.FC<TemplateProps> = ({ children }) => {
 type MappingProps = {
   nativeId: string;
   templateType?: string;
-  onResolve: (value: any, item: any) => any;
+  onInflate: (value: any, item: any) => any;
 };
 
 const Mapping: React.FC<MappingProps> = () => null;
