@@ -37,18 +37,20 @@
 
 - (void)computeDestination
 {
-    double d = 1000 * log(_decRate);
-    _destination = 0 - _intialVelocity / d;
+    double d = 1000.0 * log(_decRate);
+    _destination = - (_intialVelocity / d);
+    NSLog(@"aaa dest %f", _destination);
 }
 
 - (CGFloat)getValueAtTimestamp:(double)timestamp {
-    double d = 1000 * log(_decRate);
-    return (pow(_decRate, 1000 * (timestamp - _initialTimestamp)) - 1.0) / d * _intialVelocity;
+    double d = 1000.0 * log(_decRate);
+    return (pow(_decRate, 1000.0 * (timestamp - _initialTimestamp)) - 1.0) / d * _intialVelocity;
 }
 
 - (CGFloat)getDiffWithTimestamp:(double)timestamp {
     double nextVal = [self getValueAtTimestamp:timestamp];
     double diff = nextVal - _totalDistanceTraveled;
+    NSLog(@"aaa diff %f", diff);
     _totalDistanceTraveled = nextVal;
     _lastTimestamp = timestamp;
     if (abs(_totalDistanceTraveled - _destination) < 0.01) {
@@ -104,9 +106,10 @@
         
         _viewportObserver = vo;
         
+        _scrollView.contentOffset = CGPointMake(0, 500000);
         _viewportObserver->boot( //TODO Mostlikly needs to adujst offset?
-                              0,
-                              _scrollView.frame.size.height, _scrollView.frame.size.width, 0, 0, templates, names, inflatorId);
+                              500000,
+                              _scrollView.frame.size.height, _scrollView.frame.size.width, 500000, 0, templates, names, inflatorId);
         
     
         _doWeHavePendingTemplates = NO;
@@ -130,6 +133,7 @@
     CGFloat yDiff = 0;
     // Check Touch Events
     if (_touchEvents.count > 0) {
+        NSLog(@"aaa stop Animation gesture");
         _currentAnimation = nil;
         for (PanEvent * event in _touchEvents) {
             if (event.state == UIGestureRecognizerStateBegan) {
@@ -144,8 +148,8 @@
             if (event.state == UIGestureRecognizerStateEnded) {
                 _doWeHaveOngoingEvent = NO;
                 // start Animation with velocity
-                _currentAnimation = [[MGDecayAnimation alloc] initWithVelocity:event.velocity/1000];
-                [_currentAnimation setupWithTimestamp:displayLink.timestamp * 1000];
+                _currentAnimation = [[MGDecayAnimation alloc] initWithVelocity:event.velocity];
+                [_currentAnimation setupWithTimestamp:displayLink.timestamp];
             }
         }
            
@@ -153,8 +157,9 @@
     }
     // Run Animations
     if (_currentAnimation != nil) {
-        yDiff += [_currentAnimation getDiffWithTimestamp:displayLink.timestamp * 1000];
+        yDiff += [_currentAnimation getDiffWithTimestamp:displayLink.timestamp];
         if ([_currentAnimation isFinished]) {
+            NSLog(@"aaa stop Animation isFinished");
             _currentAnimation = nil;
         }
     }
@@ -181,6 +186,13 @@
     CGFloat topViewportEdge = _scrollView.contentOffset.y;
     CGFloat bottomViewPortEdge = topViewportEdge + _scrollView.frame.size.height;
     
+    NSLog(@"aaa topElementY %f", topElementY);
+    NSLog(@"aaa bottomElementY %f", bottomElementY);
+
+    NSLog(@"aaa topViewportEdge %f", topViewportEdge);
+    NSLog(@"aaa bottomViewPortEdge %f", bottomViewPortEdge);
+
+    
     // ugly casework
     // topElementY < topViewportEdge (possibly new elementsOnTheTop)
         /* stop overscrollAnimation */
@@ -194,6 +206,7 @@
         bottomViewPortEdge += diff;
         topViewportEdge += diff;
         
+        NSLog(@"aaa stop bottom overscroll");
         _currentAnimation = nil;
     }
     
@@ -205,6 +218,7 @@
         _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + diff);
         bottomViewPortEdge += diff;
         topViewportEdge += diff;
+        NSLog(@"aaa stop top overscroll");
         _currentAnimation = nil;
     }
     

@@ -38,6 +38,7 @@ using namespace facebook::react;
       [self.scrollView removeGestureRecognizer: self.scrollView.panGestureRecognizer];
       
       UIPanGestureRecognizer * customR = [UIPanGestureRecognizer new];
+      [customR setMinimumNumberOfTouches:1];
       [self.scrollView addGestureRecognizer:customR];
       [customR addTarget:self action:@selector(handlePan:)];
   }
@@ -57,7 +58,10 @@ using namespace facebook::react;
         PanEvent * panEvent = [PanEvent new];
         panEvent.state = gesture.state;
         panEvent.velocity = [gesture velocityInView:self].y;
-        panEvent.translation = [gesture translationInView:self].y;
+        panEvent.translation = [gesture translationInView:self.scrollView].y;
+        if (panEvent.state == UIGestureRecognizerStateEnded) {
+            NSLog(@"aaa velocity %f", panEvent.velocity);
+        }
         [_orchestrator notifyAboutEvent:panEvent];
     }
 }
