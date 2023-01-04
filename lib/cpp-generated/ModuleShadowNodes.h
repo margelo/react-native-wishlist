@@ -89,12 +89,21 @@ public:
             ViewportObserver::isPushingChildren = false;
             setStateData(std::move(state));
             
-            state.viewportObserver.initOrUpdate(this->getSurfaceId(), 5000, float windowHeight, 5000, float originItem, this->clone(ShadowNodeFragment{}));
+            state.viewportObserver.initOrUpdate(this->getSurfaceId(), 5000, 20, 5000, 10, this->clone(ShadowNodeFragment{}));
         }
     }
                                     
     void layout(LayoutContext layoutContext) {
       // TODO probably the best place to initialize children in the future
+        if (!state.initialised) {
+            state.initialised = true;
+        }
+      auto state = getStateData();
+        
+      state.viewportObserver.init(state.viewportObserver.surfaceId,
+                                          state.viewportObserver.offset,
+                                          layoutContext., 5000, 10, state.viewportObserver.weakWishListNode);
+        
       ConcreteViewShadowNode::layout(layoutContext);
       //updateScrollContentOffsetIfNeeded();
       updateStateIfNeeded();
@@ -102,10 +111,6 @@ public:
                                     
     void updateStateIfNeeded() {
         ensureUnsealed();
-
-        auto state = getStateData();
-        state.weakSn = this->clone(ShadowNodeFragment{});
-        setStateData(std::move(state));
     }
 
     

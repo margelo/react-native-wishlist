@@ -49,11 +49,11 @@ struct ItemProviderTestImpl : ItemProvider
         std::shared_ptr<LayoutableShadowNode> sn;
         if (index & 1) {
             std::shared_ptr<const ShadowNode> item = cp->getNodeForType("type1");
-            sn = std::static_pointer_cast<LayoutableShadowNode>(item);
+            sn = std::static_pointer_cast<LayoutableShadowNode>(std::const_pointer_cast<ShadowNode>(item));
             // TODO change some things
         } else {
             std::shared_ptr<const ShadowNode> item = cp->getNodeForType("type2");
-            sn = std::static_pointer_cast<LayoutableShadowNode>(item);
+            sn = std::static_pointer_cast<LayoutableShadowNode>(std::const_pointer_cast<ShadowNode>(item));
             // TODO change some things
         }
         
