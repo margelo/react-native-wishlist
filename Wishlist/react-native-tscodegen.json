@@ -9,5 +9,5 @@
     "tests",
     "shadow-nodes"
   ],
-  "inputFile": "./src/NativeComponent.tsx"
+  "inputFile": "./src/NativeViews/NativeTemplateInterceptor.tsx"
 }

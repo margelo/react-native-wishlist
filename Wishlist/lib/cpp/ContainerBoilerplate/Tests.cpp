@@ -16,28 +16,28 @@
 
 using namespace facebook::react;
 
-TEST(MGTemplateInterceptorComponentProps_DoesNotDie, etc) {
+TEST(MGTemplateContainerComponentProps_DoesNotDie, etc) {
   auto propParser = RawPropsParser();
-  propParser.prepare<MGTemplateInterceptorComponentProps>();
-  auto const &sourceProps = MGTemplateInterceptorComponentProps();
+  propParser.prepare<MGTemplateContainerComponentProps>();
+  auto const &sourceProps = MGTemplateContainerComponentProps();
   auto const &rawProps = RawProps(folly::dynamic::object("xx_invalid_xx", "xx_invalid_xx"));
 
   ContextContainer contextContainer{};
   PropsParserContext parserContext{-1, contextContainer};
 
   rawProps.parse(propParser, parserContext);
-  MGTemplateInterceptorComponentProps(parserContext, sourceProps, rawProps);
+  MGTemplateContainerComponentProps(parserContext, sourceProps, rawProps);
 }
 
-TEST(MGTemplateInterceptorComponentProps_inflatorId, etc) {
+TEST(MGTemplateContainerComponentProps_inflatorId, etc) {
   auto propParser = RawPropsParser();
-  propParser.prepare<MGTemplateInterceptorComponentProps>();
-  auto const &sourceProps = MGTemplateInterceptorComponentProps();
+  propParser.prepare<MGTemplateContainerComponentProps>();
+  auto const &sourceProps = MGTemplateContainerComponentProps();
   auto const &rawProps = RawProps(folly::dynamic::object("inflatorId", "foo"));
 
   ContextContainer contextContainer{};
   PropsParserContext parserContext{-1, contextContainer};
 
   rawProps.parse(propParser, parserContext);
-  MGTemplateInterceptorComponentProps(parserContext, sourceProps, rawProps);
+  MGTemplateContainerComponentProps(parserContext, sourceProps, rawProps);
 }
