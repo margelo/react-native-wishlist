@@ -6,13 +6,15 @@
   "author": "Marc & Szymon",
   "license": "MIT",
   "private": true,
-  "scripts": {},
+  "scripts": {
+    "clang-format": "clang-format -i --glob='{ios,android,lib}/**/*.{h,cpp,m,mm}'"
+  },
   "devDependencies": {
-    "@types/react-native": "^0.70.0"
+    "@types/react-native": "^0.70.0",
+    "clang-format": "^1.8.0"
   },
   "peerDependencies": {
     "react-native": "^0.70.0"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
