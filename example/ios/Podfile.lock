@@ -633,7 +633,7 @@ PODS:
   - React-jsinspector (0.70.3)
   - React-logger (0.70.3):
     - glog
-  - react-native-worklets (0.1.2):
+  - react-native-worklets (0.1.4):
     - RCT-Folly
     - RCTRequired
     - RCTTypeSafety
@@ -935,7 +935,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 7e2e1772ef7b97168c880eeaf3749d8c145ffd6e
   React-jsinspector: 0553c9fe7218e1f127be070bd5a4d2fc19fb8190
   React-logger: cffcc09e8aba8a3014be8d18da7f922802e9f19e
-  react-native-worklets: 37af876a3284f28badb465a785ff96b495f753e5
+  react-native-worklets: c17525a6497f1430fe088cab94bcdf2173e8e08b
   React-perflogger: 082b4293f0b3914ff41da35a6c06ac4490fcbcc8
   React-RCTActionSheet: 83da3030deb5dea54b398129f56540a44e64d3ae
   React-RCTAnimation: bac3a4f4c0436554d9f7fbb1352a0cdcb1fb0f1c
