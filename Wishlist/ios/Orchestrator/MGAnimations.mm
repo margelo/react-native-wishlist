@@ -50,10 +50,10 @@ using namespace facebook::react;
     double diff = nextVal - _totalDistanceTraveled;
     NSLog(@"aaa diff %f", diff);
     _totalDistanceTraveled = nextVal;
-    _lastTimestamp = timestamp;
-    if (abs(_totalDistanceTraveled - _destination) < 0.01) {
+    if (_lastTimestamp != timestamp && abs(diff) < 0.1) {
         _isFinished = YES;
     }
+    _lastTimestamp = timestamp;
     return diff;
 }
 
@@ -149,12 +149,11 @@ const float damping = 5;
         _velocity = _velCoef * maxVelocity;
     }
     
-    
     CGFloat diff = _velocity * timeDiff / 1000.0;
     _lastOffset += diff;
     _lastTimestamp = timestamp;
     
-    if (diff < 0.01) {
+    if (diff < 0.1) {
         _isFinished = YES;
     }
    

@@ -66,6 +66,11 @@ using namespace facebook::react;
     }
 }
 
+- (BOOL)scrollViewShouldScrollToTop:(UIScrollView *)scrollView {
+    [self scrollToItem:0 animated:YES]; // Maybe it would be better to scroll to initial (which is not always 0)
+    return NO;
+}
+
 #pragma mark - RCTComponentViewProtocol
 
 + (ComponentDescriptorProvider)componentDescriptorProvider

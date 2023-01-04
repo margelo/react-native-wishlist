@@ -54,6 +54,9 @@ const Component= forwordRef((({
     scrollToItem: (index: number, animated?: boolean) => {
       WishlistCommands.scrollToItem(nativeWishlist.current, index, animated ?? true);
     },
+    scrollToTop: () => {
+      WishlistCommands.scrollToItem(nativeWishlist.current, 0, true);
+    },
   }));
 
   const { width } = useWindowDimensions();
