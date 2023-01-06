@@ -151,6 +151,7 @@ using namespace facebook::react;
 {
   _sharedState.reset();
   _orchestrator = nil;
+  alreadyRendered = false;
   [super prepareForRecycle];
 }
 
