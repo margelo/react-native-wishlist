@@ -1,5 +1,9 @@
-import { useMemo } from 'react';
-import { useOnFlushCallback, useScheduleSyncUp } from './OrchestratorBinding';
+import { useCallback, useMemo } from 'react';
+import {
+  useOnFlushCallback,
+  useScheduleSyncUp,
+  ViewportObserver,
+} from './OrchestratorBinding';
 import { useWishlistContext } from './WishlistContext';
 
 export type Item = {
@@ -179,30 +183,38 @@ export function useInternalWishlistData<T extends Item>(
     };
   }, [initialData, scheduleSyncUp, wishlistId]);
 
-  useOnFlushCallback((viewportObserver) => {
-    'worklet';
+  const callback = useCallback(
+    (viewportObserver: ViewportObserver) => {
+      'worklet';
 
-    const pendingUpdates = data().pendingUpdates;
-    const pendingUpdatesCopy = pendingUpdates.splice(0, pendingUpdates.length);
+      const pendingUpdates = data().pendingUpdates;
+      const pendingUpdatesCopy = pendingUpdates.splice(
+        0,
+        pendingUpdates.length,
+      );
 
-    const dirty =
-      data().__currentlyRenderedCopy.applyChanges(pendingUpdatesCopy);
-    const window = viewportObserver.getAllVisibleItems();
+      const dirty =
+        data().__currentlyRenderedCopy.applyChanges(pendingUpdatesCopy);
+      const window = viewportObserver.getAllVisibleItems();
 
-    // Right now we only support adding items but it can be easily extended
-    const newIndex = data().__currentlyRenderedCopy.getIndex(window[0].key);
-    viewportObserver.updateIndices(newIndex!);
+      // Right now we only support adding items but it can be easily extended
+      const newIndex = data().__currentlyRenderedCopy.getIndex(window[0].key);
+      viewportObserver.updateIndices(newIndex!);
 
-    const dirtyItems = [];
-    let i = 0;
-    for (let item of window) {
-      if (dirty.has(item.key)) {
-        dirtyItems.push(i);
+      const dirtyItems = [];
+      let i = 0;
+      for (let item of window) {
+        if (dirty.has(item.key)) {
+          dirtyItems.push(i);
+        }
+        i++;
       }
-      i++;
-    }
-    viewportObserver.markItemsDirty(dirtyItems);
-  }, wishlistId);
+      viewportObserver.markItemsDirty(dirtyItems);
+    },
+    [data],
+  );
+
+  useOnFlushCallback(callback, wishlistId);
 
   return data as () => Data<T>;
 }

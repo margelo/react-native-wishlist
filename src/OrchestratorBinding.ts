@@ -43,7 +43,5 @@ export function useOnFlushCallback(
         global.wishlists[wishlistId].listener = undefined;
       })();
     };
-    // it will not depend on rerenders anyway
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [listener, wishlistId]);
 }
