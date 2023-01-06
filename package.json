@@ -1,6 +1,6 @@
 {
   "name": "react-native-wishlist",
-  "version": "0.0.1-alpha.3",
+  "version": "0.0.1-alpha.4",
   "description": "The fastest List component for React Native.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
