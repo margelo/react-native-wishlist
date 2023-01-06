@@ -48,6 +48,11 @@ using namespace facebook::react;
   return self;
 }
 
+- (void)mountChildComponentView:(UIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index
+{
+  [super mountChildComponentView: childComponentView index:index];
+}
+
 - (void)setInflatorId:(std::string)nextInflatorId
 {
   inflatorId = nextInflatorId;
@@ -151,6 +156,7 @@ using namespace facebook::react;
 {
   _sharedState.reset();
   _orchestrator = nil;
+  alreadyRendered = NO;
   [super prepareForRecycle];
 }
 
