@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { createRunInWishlistFn } from './WishlistJsRuntime';
 
 interface VisibleItem {
@@ -13,13 +13,13 @@ export interface ViewportObserver {
 }
 
 export function useScheduleSyncUp(wishlistId: string) {
-  return () => {
+  return useCallback(() => {
     'worklet';
     const scheduleSyncUp = global.wishlists[wishlistId]
       .scheduleSyncUp as any as () => void;
 
     return scheduleSyncUp();
-  };
+  }, [wishlistId]);
 }
 
 export function useOnFlushCallback(

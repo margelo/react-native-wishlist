@@ -177,8 +177,7 @@ export function useInternalWishlistData<T extends Item>(
       }
       return global.dataCtx[wishlistId] as Data<T>;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initialData, scheduleSyncUp, wishlistId]);
 
   useOnFlushCallback((viewportObserver) => {
     'worklet';
