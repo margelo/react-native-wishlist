@@ -199,6 +199,10 @@ export function useInternalWishlistData<T extends Item>(
 
       // Right now we only support adding items but it can be easily extended
       const newIndex = data().__currentlyRenderedCopy.getIndex(window[0].key);
+      if (newIndex == null) {
+        // TODO: throw?
+        return;
+      }
       viewportObserver.updateIndices(newIndex!);
 
       const dirtyItems = [];
