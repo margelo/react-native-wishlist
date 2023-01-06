@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
-import { createRunInJsFn, Wishlist } from 'wishlist';
+import { createRunInJsFn, Wishlist } from 'react-native-wishlist';
 import { AssetItem } from './AssetItem';
 import { AssetListHeader } from './AssetListHeader';
 import { AssetListSeparator } from './AssetListSeparator';

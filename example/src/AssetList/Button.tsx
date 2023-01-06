@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { TemplateValue, Wishlist } from 'wishlist';
+import { TemplateValue, Wishlist } from 'react-native-wishlist';
 
 type HeaderProps = {
   active: boolean;

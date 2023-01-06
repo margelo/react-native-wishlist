@@ -1,6 +1,6 @@
 import React from 'react';
 import { processColor, StyleSheet, View } from 'react-native';
-import { useTemplateValue, Wishlist } from 'wishlist';
+import { useTemplateValue, Wishlist } from 'react-native-wishlist';
 import type { AssetListItemWithState } from './AssetListExample';
 
 const blue = processColor('#1F87FF');

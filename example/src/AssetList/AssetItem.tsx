@@ -1,6 +1,6 @@
 import React from 'react';
 import { processColor, StyleSheet, View } from 'react-native';
-import { useTemplateValue, Wishlist } from 'wishlist';
+import { useTemplateValue, Wishlist } from 'react-native-wishlist';
 import { AssetIcon } from './AssetIcon';
 import type { AssetListItemWithState } from './AssetListExample';
 import type { AssetItemType } from './assets';

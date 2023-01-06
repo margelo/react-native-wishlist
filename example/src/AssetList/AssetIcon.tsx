@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useTemplateValue, Wishlist } from 'wishlist';
+import { useTemplateValue, Wishlist } from 'react-native-wishlist';
 import type { AssetItemType } from './assets';
 
 const ethIcon = require('./assets/eth.png');

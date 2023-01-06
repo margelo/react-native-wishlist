@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
-import { useTemplateValue, Wishlist, useData } from 'wishlist';
+import { useTemplateValue, Wishlist, useData } from 'react-native-wishlist';
 import type { ChatItem, ReactionItem } from './Data';
 
 const addReaction = require('./assets/add_reaction.png');

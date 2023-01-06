@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button } from './Button';
-import { useTemplateValue, Wishlist } from 'wishlist';
+import { useTemplateValue, Wishlist } from 'react-native-wishlist';
 import type { AssetListSeparatorWithState } from './AssetListExample';
 
 type AssetListSeparatorProps = {

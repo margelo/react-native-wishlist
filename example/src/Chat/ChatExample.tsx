@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { createRunInJsFn, WishListInstance } from 'wishlist';
+import { createRunInJsFn, WishListInstance } from 'react-native-wishlist';
 import { ChatHeader } from './ChatHeader';
 import { ChatListView } from './ChatList';
 import { ChatItem, fetchData, getSendedMessage } from './Data';

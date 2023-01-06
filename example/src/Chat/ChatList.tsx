@@ -1,6 +1,6 @@
 import React, { ForwardedRef } from 'react';
 import type { ViewProps } from 'react-native';
-import { Wishlist, WishListInstance } from 'wishlist';
+import { Wishlist, WishListInstance } from 'react-native-wishlist';
 import { ChatItemView } from './ChatItem';
 import type { ChatItem } from './Data';
 
