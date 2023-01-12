@@ -2,7 +2,6 @@ import React, { useCallback, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import {
   createRunInJsFn,
-  createRunInWishlistFn,
   useWishlistData,
   WishListInstance,
 } from 'react-native-wishlist';
@@ -23,29 +22,34 @@ export default function App() {
     listRef.current?.scrollToItem(index);
   });
 
-  const handleSend = (text: string) => {
+  const handleSend = async (text: string) => {
     const newItem = getSendedMessage(text);
-    createRunInWishlistFn(() => {
+
+    const index = await data.update((dataCopy) => {
       'worklet';
 
-      // TODO: Use async await when rn-worklets supports it.
-      data()
-        .update((dataCopy) => {
-          dataCopy.push(newItem);
-          return dataCopy.length() - 1;
-        })
-        .then((index) => {
-          scrollToIndex(index);
-        });
-    })();
+      dataCopy.push(newItem);
+      return dataCopy.length() - 1;
+    });
+    scrollToIndex(index);
   };
 
   // Load data
   // useEffect(() => {
-  //   setTimeout(() => {
-  //     setData(fetchData(200));
-  //   }, 500);
-  // }, []);
+  //   const timeout = setTimeout(() => {
+  //     const newData = fetchData(100);
+  //     createRunInWishlistFn(() => {
+  //       'worklet';
+  //       data().update((dataCopy) => {
+  //         console.log('did update');
+  //         dataCopy.replace(newData);
+  //       });
+  //     })();
+  //   }, 5000);
+  //   return () => {
+  //     clearTimeout(timeout);
+  //   };
+  // }, [data]);
 
   const [activeMessageIdForReaction, setActiveMessageIdForReaction] = useState<
     string | null
@@ -58,15 +62,12 @@ export default function App() {
   const onAddReaction = createRunInJsFn(showAddReactionModal);
 
   const onPickReaction = (emoji: string) => {
-    createRunInWishlistFn(() => {
+    data.update((dataCopy) => {
       'worklet';
-
-      data().update((dataCopy) => {
-        const oldValue = dataCopy.get(activeMessageIdForReaction!)!;
-        oldValue.reactions.push({ emoji, key: Math.random().toString() });
-        dataCopy.set(activeMessageIdForReaction!, oldValue);
-      });
-    })();
+      const oldValue = dataCopy.get(activeMessageIdForReaction!)!;
+      oldValue.reactions.push({ emoji, key: Math.random().toString() });
+      dataCopy.set(activeMessageIdForReaction!, oldValue);
+    });
 
     setActiveMessageIdForReaction(null);
   };

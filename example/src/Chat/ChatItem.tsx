@@ -99,20 +99,24 @@ export const ChatItemView: React.FC<Props> = ({ type, onAddReaction }) => {
   const likeItemListener = (value: ChatItem) => {
     'worklet';
 
-    data().update((dataCopy) => {
+    data.update((dataCopy) => {
       const oldValue = dataCopy.get(value.key);
-      oldValue!.liked = !oldValue!.liked;
-      dataCopy.set(value.key, oldValue!);
+      if (oldValue) {
+        oldValue.liked = !oldValue.liked;
+        dataCopy.set(value.key, oldValue);
+      }
     });
   };
 
   const toggleImage = (value: ChatItem) => {
     'worklet';
 
-    data().update((dataCopy) => {
+    data.update((dataCopy) => {
       const oldValue = dataCopy.get(value.key);
-      oldValue!.showBiggerAvatar = !oldValue!.showBiggerAvatar;
-      dataCopy.set(value.key, oldValue!);
+      if (oldValue) {
+        oldValue.showBiggerAvatar = !oldValue.showBiggerAvatar;
+        dataCopy.set(value.key, oldValue);
+      }
     });
   };
 

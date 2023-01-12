@@ -29,7 +29,6 @@ import { TemplateContext } from './TemplateContext';
 import { generateId } from './Utils';
 import { useWishlistContext, WishlistContext } from './WishlistContext';
 import type { WishlistData, WishlistDataInternal } from './WishlistData';
-import { createRunInWishlistFn } from './WishlistJsRuntime';
 
 const OffsetComponent = '__offsetComponent';
 
@@ -62,7 +61,7 @@ export type WishListInstance = {
 export type BaseItem = { type: string; key: string };
 
 type Props = ViewProps & {
-  data: () => WishlistData<any>;
+  data: WishlistData<any>;
   onStartReached?: () => void;
   onEndReached?: () => void;
   initialIndex?: number;
@@ -126,7 +125,7 @@ function ComponentBase<T extends BaseItem>(
   const resolvedInflater: InflateMethod = useMemo(() => {
     return (index: number, pool: ComponentPool) => {
       'worklet';
-      const value = data().at(index);
+      const value = (data as WishlistDataInternal<T>).__at(index);
       if (!value) {
         return undefined;
       }
@@ -165,18 +164,10 @@ function ComponentBase<T extends BaseItem>(
   }, [resolvedInflater]);
 
   useEffect(() => {
-    createRunInWishlistFn(() => {
-      'worklet';
-
-      (data() as WishlistDataInternal<T>).__attach(wishlistId.current!);
-    })();
+    (data as WishlistDataInternal<T>).__attach(wishlistId.current!);
 
     return () => {
-      createRunInWishlistFn(() => {
-        'worklet';
-
-        (data() as WishlistDataInternal<T>).__detach(wishlistId.current!);
-      })();
+      (data as WishlistDataInternal<T>).__detach(wishlistId.current!);
     };
   }, [data]);
 

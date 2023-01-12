@@ -2,12 +2,14 @@ import { useMemo } from 'react';
 import { scheduleSyncUp, ViewportObserver } from './OrchestratorBinding';
 import { useGeneratedId } from './Utils';
 import { useWishlistContext } from './WishlistContext';
+import { createRunInJsFn, createRunInWishlistFn } from './WishlistJsRuntime';
 
 export type Item = {
   key: string;
 };
 
 export type UpdateJob<T extends Item, ResT> = (datacopy: DataCopy<T>) => ResT;
+
 export interface DataCopy<T extends Item> {
   getIndex: (key: string) => number | undefined;
   deque: Array<T>;
@@ -21,27 +23,28 @@ export interface DataCopy<T extends Item> {
   push: (value: T) => void;
   unshift: (value: T) => void;
   applyChanges: (pendingUpdates: Array<UpdateJob<T, any>>) => Set<string>;
-  isTrackingChanges: boolean;
-  dirtyKeys: Set<string>;
+}
+
+interface DataCopyInternal<T extends Item> extends DataCopy<T> {
+  __isTrackingChanges: boolean;
+  __dirtyKeys: Set<string>;
 }
 
 export interface WishlistData<T extends Item> {
   update: <ResT>(job: UpdateJob<T, ResT>) => Promise<ResT>;
-  at: (index: number) => T | undefined;
-  length: () => number;
-  forKey: (key: string) => T | undefined;
 }
 
 export interface WishlistDataInternal<T extends Item> extends WishlistData<T> {
   __attach: (wishlistId: string) => void;
   __detach: (wishlistId: string) => void;
+  __at: (index: number) => T | undefined;
 }
 
 export function useWishlistData<T extends Item>(
   initialData: Array<T>,
-): () => WishlistData<T> {
+): WishlistData<T> {
   const dataId = useGeneratedId();
-  const data = useMemo((): (() => WishlistDataInternal<T>) => {
+  const getWishlistData = useMemo((): (() => WishlistDataInternal<T>) => {
     return () => {
       'worklet';
 
@@ -53,11 +56,11 @@ export function useWishlistData<T extends Item>(
         return global.dataCtx[dataId] as WishlistDataInternal<T>;
       }
 
-      function createItemsDataStructure(initialData: Array<T>) {
+      function createItemsDataStructure(initialDeque: Array<T>) {
         // classes doesn't work :(
         // TODO it can be implmented so that all ops are O(log n)
-        const thiz: DataCopy<T> = {
-          deque: initialData,
+        const thiz: DataCopyInternal<T> = {
+          deque: initialDeque,
           getIndex: function getIndex(key: string) {
             // That's linear but can be log n (only for testing)
             for (let i = 0; i < this.deque.length; ++i) {
@@ -96,8 +99,8 @@ export function useWishlistData<T extends Item>(
           },
           setAt: function setAt(index: number, value: T) {
             this.deque[index] = value;
-            if (this.isTrackingChanges) {
-              this.dirtyKeys.add(value.key);
+            if (this.__isTrackingChanges) {
+              this.__dirtyKeys.add(value.key);
             }
           },
           push: function push(value: T) {
@@ -107,17 +110,17 @@ export function useWishlistData<T extends Item>(
             this.deque.unshift(value);
           },
           applyChanges: function applyChanges(pendingUpdates) {
-            this.isTrackingChanges = true;
+            this.__isTrackingChanges = true;
             for (let updateJob of pendingUpdates) {
               updateJob(this);
             }
-            this.isTrackingChanges = false;
-            const res = this.dirtyKeys;
-            this.dirtyKeys = new Set();
+            this.__isTrackingChanges = false;
+            const res = this.__dirtyKeys;
+            this.__dirtyKeys = new Set();
             return res;
           },
-          dirtyKeys: new Set<string>(),
-          isTrackingChanges: false,
+          __dirtyKeys: new Set<string>(),
+          __isTrackingChanges: false,
         };
 
         return thiz;
@@ -138,9 +141,7 @@ export function useWishlistData<T extends Item>(
         return x;
       }
 
-      const initialDataCopy__next = deepClone(initialData);
       const initialDataCopy__cur = deepClone(initialData);
-      const nextCopy = createItemsDataStructure(initialDataCopy__next);
       const currentlyRenderedCopy =
         createItemsDataStructure(initialDataCopy__cur);
       const attachedListIds = new Set<string>();
@@ -148,7 +149,6 @@ export function useWishlistData<T extends Item>(
 
       async function update<ResT>(updateJob: UpdateJob<T, ResT>) {
         return new Promise<ResT>((resolve) => {
-          updateJob(nextCopy);
           pendingUpdates.push((dataCopy: DataCopy<T>) => {
             const result = updateJob(dataCopy);
             resolve(result);
@@ -159,16 +159,8 @@ export function useWishlistData<T extends Item>(
         });
       }
 
-      function at(index: number) {
+      function __at(index: number) {
         return currentlyRenderedCopy.at(index);
-      }
-
-      function length() {
-        return currentlyRenderedCopy.length();
-      }
-
-      function forKey(key: string) {
-        return currentlyRenderedCopy.forKey(key);
       }
 
       function __attach(wishlistId: string) {
@@ -217,9 +209,7 @@ export function useWishlistData<T extends Item>(
 
       const internalData: WishlistDataInternal<T> = {
         update,
-        at,
-        forKey,
-        length,
+        __at,
         __attach,
         __detach,
       };
@@ -231,10 +221,49 @@ export function useWishlistData<T extends Item>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return data;
+  return useMemo(
+    () => ({
+      update: <ResT>(updateJob: UpdateJob<T, ResT>) => {
+        'worklet';
+
+        // This can be called from both JS and Wishlist context.
+        // TODO: Better api to check which JS runtime we are on.
+        if (global.dataCtx) {
+          return getWishlistData().update(updateJob);
+        } else {
+          return new Promise<ResT>((resolve) => {
+            const resolveJs = createRunInJsFn(resolve);
+            return createRunInWishlistFn(() => {
+              'worklet';
+
+              getWishlistData().update(updateJob).then(resolveJs);
+            })();
+          });
+        }
+      },
+      __at(index: number) {
+        'worklet';
+
+        return getWishlistData().__at(index);
+      },
+      __attach: (wishlistId: string) => {
+        createRunInWishlistFn(() => {
+          'worklet';
+          getWishlistData().__attach(wishlistId);
+        })();
+      },
+      __detach: (wishlistId: string) => {
+        createRunInWishlistFn(() => {
+          'worklet';
+          getWishlistData().__detach(wishlistId);
+        })();
+      },
+    }),
+    [getWishlistData],
+  );
 }
 
 export function useData<T extends Item>() {
   const { data } = useWishlistContext();
-  return data as () => WishlistData<T>;
+  return data as WishlistData<T>;
 }

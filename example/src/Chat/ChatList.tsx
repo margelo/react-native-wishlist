@@ -9,7 +9,7 @@ import { ChatItemView } from './ChatItem';
 import type { ChatItem } from './Data';
 
 interface Props extends ViewProps {
-  data: () => WishlistData<ChatItem>;
+  data: WishlistData<ChatItem>;
   onAddReaction: (item: ChatItem) => void;
   intialIndex?: number;
 }
