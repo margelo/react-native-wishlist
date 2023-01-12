@@ -22,12 +22,11 @@ class WishlistJsRuntime {
 
   jsi::Runtime &getRuntime() const;
 
-
  private:
   WishlistJsRuntime();
   WishlistJsRuntime(const WishlistJsRuntime &) = delete;
   WishlistJsRuntime &operator=(const WishlistJsRuntime &) = delete;
-  
+
   class Decorator : public RNWorklet::JsiBaseDecorator {
     void decorateRuntime(jsi::Runtime &runtime) override;
   };

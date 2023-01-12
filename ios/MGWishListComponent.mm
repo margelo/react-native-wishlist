@@ -50,7 +50,7 @@ using namespace facebook::react;
 
 - (void)mountChildComponentView:(UIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index
 {
-  [super mountChildComponentView: childComponentView index:index];
+  [super mountChildComponentView:childComponentView index:index];
 }
 
 - (void)setInflatorId:(std::string)nextInflatorId

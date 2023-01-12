@@ -61,4 +61,3 @@ static jsi::Value convertObjCObjectToJSIValue(jsi::Runtime &runtime, id value)
   }
   return jsi::Value::undefined();
 }
-

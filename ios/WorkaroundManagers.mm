@@ -32,36 +32,7 @@ using namespace Wishlist;
 
 RCT_EXPORT_MODULE(Workaround);
 
-- (void)setBridge:(RCTBridge *)bridge
-{
-  _bridge = bridge;
-  _surfacePresenter = _bridge.surfacePresenter;
-  __weak __typeof(self) weakSelf = self;
-  _eventListener = std::make_shared<EventListener>([weakSelf](const RawEvent &event) -> bool {
-    __typeof(self) strongSelf = weakSelf;
-    if (!strongSelf) {
-      return false;
-    }
-    return [strongSelf handleFabricEvent:event];
-  });
-  [_surfacePresenter.scheduler addEventListener:_eventListener];
-
-  [[bridge.moduleRegistry moduleForName:"EventDispatcher" lazilyLoadIfNecessary:YES] addDispatchObserver:self];
-
-  RCTCxxBridge *cxxBridge = (RCTCxxBridge *)_bridge;
-  auto callInvoker = cxxBridge.jsCallInvoker;
-  facebook::jsi::Runtime *jsRuntime = (facebook::jsi::Runtime *)cxxBridge.runtime;
-
-  WishlistJsRuntime::getInstance().initialize(
-      jsRuntime,
-      [=](std::function<void()> &&f) {
-        __block auto retainedWork = std::move(f);
-        dispatch_async(dispatch_get_main_queue(), ^{
-          retainedWork();
-        });
-      },
-      [=](std::function<void()> &&f) { callInvoker->invokeAsync(std::move(f)); });
-}
+@synthesize bridge = _bridge;
 
 - (void)eventDispatcherWillDispatchEvent:(id<RCTEvent>)event
 {
@@ -127,6 +98,34 @@ RCT_EXPORT_MODULE(Workaround);
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 {
+  _surfacePresenter = _bridge.surfacePresenter;
+  __weak __typeof(self) weakSelf = self;
+  _eventListener = std::make_shared<EventListener>([weakSelf](const RawEvent &event) -> bool {
+    __typeof(self) strongSelf = weakSelf;
+    if (!strongSelf) {
+      return false;
+    }
+    return [strongSelf handleFabricEvent:event];
+  });
+  [_surfacePresenter.scheduler addEventListener:_eventListener];
+
+  [[_bridge.moduleRegistry moduleForName:"EventDispatcher" lazilyLoadIfNecessary:YES] addDispatchObserver:self];
+
+  RCTCxxBridge *cxxBridge = (RCTCxxBridge *)_bridge;
+  auto callInvoker = cxxBridge.jsCallInvoker;
+  facebook::jsi::Runtime *jsRuntime = (facebook::jsi::Runtime *)cxxBridge.runtime;
+
+  WishlistJsRuntime::getInstance().initialize(
+      jsRuntime,
+      [=](std::function<void()> &&f) {
+        callInvoker->invokeAsync(std::move(f));
+      },
+      [=](std::function<void()> &&f) {
+        __block auto retainedWork = std::move(f);
+        RCTExecuteOnMainQueue(^{
+          retainedWork();
+        });
+      });
   // This is only used to force the native module to load and setBridge to be called.
   return @true;
 }
