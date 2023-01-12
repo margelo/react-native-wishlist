@@ -61,15 +61,15 @@ export type WishListInstance = {
 
 export type BaseItem = { type: string; key: string };
 
-type Props<ItemT extends BaseItem> = ViewProps & {
-  data: () => WishlistData<ItemT>;
+type Props = ViewProps & {
+  data: () => WishlistData<any>;
   onStartReached?: () => void;
   onEndReached?: () => void;
   initialIndex?: number;
 };
 
 function ComponentBase<T extends BaseItem>(
-  { children, style, data, ...rest }: Props<T>,
+  { children, style, data, ...rest }: Props,
   ref: React.Ref<WishListInstance>,
 ) {
   const nativeWishlist = useRef(null); // TODO type it properly
@@ -223,8 +223,8 @@ function ComponentBase<T extends BaseItem>(
 }
 
 const Component = React.forwardRef(
-  ComponentBase as <T extends BaseItem>(
-    props: Props<T> & { ref?: Ref<WishListInstance> },
+  ComponentBase as (
+    props: Props & { ref?: Ref<WishListInstance> },
   ) => ReturnType<typeof ComponentBase>,
 );
 

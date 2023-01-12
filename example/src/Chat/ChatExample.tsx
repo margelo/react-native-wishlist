@@ -1,33 +1,51 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { createRunInJsFn, WishListInstance } from 'react-native-wishlist';
+import React, { useCallback, useRef, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import {
+  createRunInJsFn,
+  createRunInWishlistFn,
+  useWishlistData,
+  WishListInstance,
+} from 'react-native-wishlist';
 import { ChatHeader } from './ChatHeader';
 import { ChatListView } from './ChatList';
 import { ChatItem, fetchData, getSendedMessage } from './Data';
 import { MessageInput } from './MessageInput';
 import { ReactionPicker } from './ReactionPicker';
 
+const INITIAL_ITEMS_COUNT = 200;
+
 export default function App() {
-  const [data, setData] = useState<ChatItem[]>(fetchData(200));
+  const data = useWishlistData(fetchData(INITIAL_ITEMS_COUNT));
 
   const listRef = useRef<WishListInstance | null>(null);
 
-  const handleSend = useCallback(async (text: string) => {
-    const newItem = getSendedMessage(text);
-    const index = (await listRef.current?.update((dataCopy) => {
-      'worklet';
-      dataCopy.push(newItem);
-      return dataCopy.length() - 1;
-    })) as number;
+  const scrollToIndex = createRunInJsFn((index: number) => {
     listRef.current?.scrollToItem(index);
-  }, []);
+  });
+
+  const handleSend = (text: string) => {
+    const newItem = getSendedMessage(text);
+    createRunInWishlistFn(() => {
+      'worklet';
+
+      // TODO: Use async await when rn-worklets supports it.
+      data()
+        .update((dataCopy) => {
+          dataCopy.push(newItem);
+          return dataCopy.length() - 1;
+        })
+        .then((index) => {
+          scrollToIndex(index);
+        });
+    })();
+  };
 
   // Load data
-  useEffect(() => {
-    setTimeout(() => {
-      setData(fetchData(200));
-    }, 500);
-  }, []);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     setData(fetchData(200));
+  //   }, 500);
+  // }, []);
 
   const [activeMessageIdForReaction, setActiveMessageIdForReaction] = useState<
     string | null
@@ -40,25 +58,29 @@ export default function App() {
   const onAddReaction = createRunInJsFn(showAddReactionModal);
 
   const onPickReaction = (emoji: string) => {
-    listRef.current?.update((dataCopy) => {
+    createRunInWishlistFn(() => {
       'worklet';
-      const oldValue = dataCopy.get(activeMessageIdForReaction!)!;
-      oldValue.reactions.push({ emoji, key: Math.random().toString() });
-      dataCopy.set(activeMessageIdForReaction!, oldValue);
-    });
+
+      data().update((dataCopy) => {
+        const oldValue = dataCopy.get(activeMessageIdForReaction!)!;
+        oldValue.reactions.push({ emoji, key: Math.random().toString() });
+        dataCopy.set(activeMessageIdForReaction!, oldValue);
+      });
+    })();
+
     setActiveMessageIdForReaction(null);
   };
 
-  if (!data.length) {
-    return (
-      <>
-        <ChatHeader isLoading />
-        <View style={[styles.container, styles.center]}>
-          <ActivityIndicator size="small" />
-        </View>
-      </>
-    );
-  }
+  // if (!data.length) {
+  //   return (
+  //     <>
+  //       <ChatHeader isLoading />
+  //       <View style={[styles.container, styles.center]}>
+  //         <ActivityIndicator size="small" />
+  //       </View>
+  //     </>
+  //   );
+  // }
 
   return (
     <>
@@ -66,7 +88,8 @@ export default function App() {
         <ChatHeader isLoading={false} />
         <ChatListView
           style={styles.list}
-          initialData={data}
+          data={data}
+          intialIndex={INITIAL_ITEMS_COUNT - 1}
           onAddReaction={onAddReaction}
           ref={listRef}
         />

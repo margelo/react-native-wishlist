@@ -193,6 +193,10 @@ export function useWishlistData<T extends Item>(
 
           // Right now we only support adding items but it can be easily extended
           const newIndex = currentlyRenderedCopy.getIndex(window[0].key);
+          if (newIndex == null) {
+            // TODO: throw?
+            return;
+          }
           viewportObserver.updateIndices(newIndex!);
 
           const dirtyItems = [];
@@ -224,7 +228,8 @@ export function useWishlistData<T extends Item>(
 
       return internalData;
     };
-  }, [initialData, scheduleSyncUp, wishlistId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return data;
 }
