@@ -78,8 +78,6 @@ function ComponentBase<T extends BaseItem>(
     wishlistId.current = generateId();
   }
 
-  console.log('render', wishlistId.current);
-
   useImperativeHandle(
     ref,
     (): WishListInstance => ({
