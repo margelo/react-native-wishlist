@@ -1,5 +1,5 @@
-import React, { useCallback, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import {
   createRunInJsFn,
   useWishlistData,
@@ -15,6 +15,7 @@ const INITIAL_ITEMS_COUNT = 200;
 
 export default function App() {
   const data = useWishlistData(fetchData(INITIAL_ITEMS_COUNT));
+  const [loading, setLoading] = useState(true);
 
   const listRef = useRef<WishListInstance | null>(null);
 
@@ -35,21 +36,11 @@ export default function App() {
   };
 
   // Load data
-  // useEffect(() => {
-  //   const timeout = setTimeout(() => {
-  //     const newData = fetchData(100);
-  //     createRunInWishlistFn(() => {
-  //       'worklet';
-  //       data().update((dataCopy) => {
-  //         console.log('did update');
-  //         dataCopy.replace(newData);
-  //       });
-  //     })();
-  //   }, 5000);
-  //   return () => {
-  //     clearTimeout(timeout);
-  //   };
-  // }, [data]);
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
+  }, []);
 
   const [activeMessageIdForReaction, setActiveMessageIdForReaction] = useState<
     string | null
@@ -72,16 +63,16 @@ export default function App() {
     setActiveMessageIdForReaction(null);
   };
 
-  // if (!data.length) {
-  //   return (
-  //     <>
-  //       <ChatHeader isLoading />
-  //       <View style={[styles.container, styles.center]}>
-  //         <ActivityIndicator size="small" />
-  //       </View>
-  //     </>
-  //   );
-  // }
+  if (loading) {
+    return (
+      <>
+        <ChatHeader isLoading />
+        <View style={[styles.container, styles.center]}>
+          <ActivityIndicator size="small" />
+        </View>
+      </>
+    );
+  }
 
   return (
     <>
