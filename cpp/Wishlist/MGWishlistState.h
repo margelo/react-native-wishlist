@@ -10,7 +10,7 @@
 #endif
 
 #include "ComponentsPool.h"
-#include "ViewportObserver.h"
+#include "MGViewportCarerImpl.h"
 
 using namespace Wishlist;
 
@@ -29,8 +29,8 @@ class JSI_EXPORT MGWishlistState final {
   //
   double originContentOffset = 50000;
   int originItemIndex = 10; // Hardcode for now
-  std::shared_ptr<ViewportObserver> viewportObserver =
-      std::make_shared<ViewportObserver>();
+  std::shared_ptr<MGViewportCarerImpl> viewportCarer =
+      std::make_shared<MGViewportCarerImpl>();
   bool initialised = false;
   Rect contentBoundingRect;
 

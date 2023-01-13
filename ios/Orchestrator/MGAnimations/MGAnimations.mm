@@ -1,7 +1,5 @@
 #import "MGAnimations.h"
 
-using namespace facebook::react;
-
 @implementation MGDecayAnimation {
   double _lastTimestamp;
   double _initialTimestamp;
@@ -69,14 +67,13 @@ using namespace facebook::react;
 
 @end
 
-const float notFound = -12345;
 const float maxVelocity = 20000; // TODO (it should be adjusted)
 const float stiffness = 10;
 const float mass = 0.5;
 const float damping = 5;
 
 @implementation MGScrollToItemAnimation {
-  std::shared_ptr<ViewportObserver> _viewportObserver;
+    std::weak_ptr<MGAnimationSight> _animationSight;
 
   BOOL _needsSetup;
   BOOL _isFinished;
@@ -90,13 +87,13 @@ const float damping = 5;
 
 - (instancetype)initWithIndex:(int)index
                        offset:(CGFloat)offset
-             viewportObserver:(std::shared_ptr<ViewportObserver>)viewportObserver
+               animationSight:(std::shared_ptr<MGAnimationSight>)animationSight
 {
   if (self = [super init]) {
-    _viewportObserver = viewportObserver;
+      _animationSight = animationSight;
     _lastOffset = offset;
     _targetIndex = index;
-    _targetOffset = notFound;
+    _targetOffset = MGAnimationSight::NOT_FOUND;
     _velocity = 0;
 
     _velCoef = 1;
@@ -109,13 +106,7 @@ const float damping = 5;
 
 - (void)tryToFindTargetOffset
 {
-  for (auto &item : _viewportObserver->window) {
-    if (item.index == _targetIndex) {
-      _targetOffset = item.offset;
-      return;
-    }
-  }
-  _targetOffset = notFound;
+  _targetOffset = _animationSight.lock()->getOffsetIfItemIsAlreadyRendered(_targetIndex);
 }
 
 // TODO Should be clamped on ends
@@ -128,7 +119,7 @@ const float damping = 5;
 
   CGFloat timeDiff = fmin((timestamp - _lastTimestamp), 16 * 3);
 
-  if (_targetOffset != notFound) {
+  if (_targetOffset != MGAnimationSight::NOT_FOUND) {
     CGFloat k = -stiffness;
     CGFloat d = -damping;
 
@@ -139,7 +130,7 @@ const float damping = 5;
     _velocity += a * timeDiff / 1000.0;
     _velocity = fmin(abs(_velocity), abs(maxVelocity)) * ((_velocity < 0) ? -1.0 : 1.0);
   } else {
-    if (_viewportObserver->window[0].index > _targetIndex) {
+    if (!_animationSight.lock()->isTargetItemLocatedBelow(_targetIndex)) {
       _velCoef = 1;
     } else {
       _velCoef = -1;

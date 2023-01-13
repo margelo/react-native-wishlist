@@ -8,7 +8,7 @@ MGWishlistState::~MGWishlistState() {}
 #ifdef ANDROID
 
 MGWishlistState::MGWishlistState() {
-  this->viewportObserver = std::make_shared<ViewportObserver>();
+  this->viewportCarer = std::make_shared<MGViewportCarerImpl>();
 };
 
 MGWishlistState::MGWishlistState(

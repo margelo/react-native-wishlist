@@ -25,7 +25,7 @@ class MGWishlistComponentDescriptor
         ShadowNodeFragment{
             fragment.props,
             wishlistSourceShadowNode.getStateData()
-                .viewportObserver->wishlistChildren,
+                .viewportCarer->wishlistChildren,
             fragment.state});
 
     adopt(shadowNode);

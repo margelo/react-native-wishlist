@@ -12,6 +12,7 @@
 #import "MGScrollViewOrchestrator.h"
 #import "MGWishlistComponentDescriptor.h"
 #import "RCTFabricComponentsPlugins.h"
+#import "MGDIImpl.hpp"
 
 using namespace facebook::react;
 
@@ -29,6 +30,7 @@ using namespace facebook::react;
   MGScrollViewOrchestrator *_orchestrator;
   std::shared_ptr<const MGWishlistEventEmitter> _emitter;
   int _initialIndex;
+  std::shared_ptr<MGDIImpl> di;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -90,14 +92,27 @@ using namespace facebook::react;
     self.scrollView.contentSize = CGSizeMake(frame.size.width, 10000000);
     self.scrollView.frame =
         CGRectMake(self.scrollView.frame.origin.x, self.scrollView.frame.origin.y, frame.size.width, frame.size.height);
+      
+      di = std::make_shared<MGDIImpl>();
+      std::shared_ptr<MGViewportCarerImpl> viewportCarer = _sharedState->getData().viewportCarer;
+      viewportCarer->setDI(di);
+      di->setViewportCarerImpl(viewportCarer);
 
     _orchestrator = [[MGScrollViewOrchestrator alloc] initWith:self.scrollView
-                                                     templates:templates
-                                                         names:names
-                                              viewportObserver:_sharedState->getData().viewportObserver
+                                                            di:di->getWeak()
                                                     inflatorId:inflatorId
-                                                  initialIndex:_initialIndex
                                                     wishlistId:_wishlistId];
+      __weak MGScrollViewOrchestrator * weakOrchestrator = _orchestrator;
+      di->setOrchestratorCppAdaper(std::make_shared<MGOrchestratorCppAdapter>([=](float top, float bottom){
+          [weakOrchestrator edgesChangedWithTopEdge:top bottomEdge:bottom];
+      }, [=]() {
+          [weakOrchestrator requestVSync];
+      }));
+      di->setDataBindingImpl(std::make_shared<MGDataBindingImpl>(_wishlistId, di->getWeak()));
+      di->setWindowKeeper(std::make_shared<MGWindowKeeper>(di->getWeak()));
+      di->setUIScheduler(std::make_shared<MGUIScheduleriOS>());
+      
+      [_orchestrator runWithTemplates:templates names:names initialIndex:_initialIndex];
 
     _orchestrator.delegate = self;
 
@@ -156,6 +171,7 @@ using namespace facebook::react;
 {
   _sharedState.reset();
   _orchestrator = nil;
+  di = nullptr;
   alreadyRendered = NO;
   [super prepareForRecycle];
 }

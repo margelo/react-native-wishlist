@@ -5,13 +5,13 @@
 #import <string>
 #import <vector>
 #import "MGAnimations.h"
+#include "MGDI.hpp"
 
-using namespace Wishlist;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface PanEvent : NSObject
-;
+
 
 @property (nonatomic, assign) UIGestureRecognizerState state;
 @property (nonatomic, assign) CGFloat translation;
@@ -31,17 +31,21 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak) id<MGScrollViewOrchestratorDelegate> delegate;
 
 - (instancetype)initWith:(UIScrollView *)scrollView
-               templates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates
-                   names:(std::vector<std::string>)names
-        viewportObserver:(std::shared_ptr<ViewportObserver>)vo
+                      di:(std::weak_ptr<MGDI>)di
               inflatorId:(std::string)inflatorId
-            initialIndex:(int)initialIndex
               wishlistId:(std::string)wishlistId;
+
+- (void)runWithTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates
+                   names:(std::vector<std::string>)names
+            initialIndex:(int)initialIndex;
+
 - (void)notifyAboutEvent:(PanEvent *)event;
 - (void)notifyAboutNewTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates
                       withNames:(std::vector<std::string>)names
                      inflatorId:(std::string)inflatorId;
 - (void)scrollToItem:(int)index;
+- (void)requestVSync;
+- (void)edgesChangedWithTopEdge:(float)topEdge bottomEdge:(float)bottomEdge;
 
 @end
 
