@@ -19,10 +19,6 @@ export default function App() {
 
   const listRef = useRef<WishListInstance | null>(null);
 
-  const scrollToIndex = createRunInJsFn((index: number) => {
-    listRef.current?.scrollToItem(index);
-  });
-
   const handleSend = async (text: string) => {
     const newItem = getSendedMessage(text);
 
@@ -32,12 +28,13 @@ export default function App() {
       dataCopy.push(newItem);
       return dataCopy.length() - 1;
     });
-    scrollToIndex(index);
+    listRef.current?.scrollToItem(index);
   };
 
   // Load data
   useEffect(() => {
     setTimeout(() => {
+      // TODO: data replace api to update.
       setLoading(false);
     }, 500);
   }, []);
