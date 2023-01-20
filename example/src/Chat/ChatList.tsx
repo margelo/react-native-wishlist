@@ -1,25 +1,30 @@
 import React, { ForwardedRef } from 'react';
 import type { ViewProps } from 'react-native';
-import { Wishlist, WishListInstance } from 'react-native-wishlist';
+import {
+  Wishlist,
+  WishlistData,
+  WishListInstance,
+} from 'react-native-wishlist';
 import { ChatItemView } from './ChatItem';
 import type { ChatItem } from './Data';
 
 interface Props extends ViewProps {
-  initialData: ChatItem[];
+  data: WishlistData<ChatItem>;
   onAddReaction: (item: ChatItem) => void;
+  intialIndex?: number;
 }
 
 export const ChatListView = React.memo(
   React.forwardRef(
     (
-      { initialData, onAddReaction, style }: Props,
-      ref: ForwardedRef<WishListInstance<ChatItem>>,
+      { data, intialIndex, onAddReaction, style }: Props,
+      ref: ForwardedRef<WishListInstance>,
     ) => {
       return (
         <Wishlist.Component
           style={style}
-          initialIndex={initialData.length - 1}
-          initialData={initialData}
+          initialIndex={intialIndex}
+          data={data}
           ref={ref}
         >
           <Wishlist.Template type="me">

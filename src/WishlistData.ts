@@ -1,16 +1,15 @@
-import { useCallback, useMemo } from 'react';
-import {
-  useOnFlushCallback,
-  useScheduleSyncUp,
-  ViewportObserver,
-} from './OrchestratorBinding';
+import { useMemo } from 'react';
+import { scheduleSyncUp, ViewportObserver } from './OrchestratorBinding';
+import { useGeneratedId } from './Utils';
 import { useWishlistContext } from './WishlistContext';
+import { createRunInJsFn, createRunInWishlistFn } from './WishlistJsRuntime';
 
 export type Item = {
   key: string;
 };
 
-export type UpdateJob<T extends Item> = (datacopy: DataCopy<T>) => unknown;
+export type UpdateJob<T extends Item, ResT> = (datacopy: DataCopy<T>) => ResT;
+
 export interface DataCopy<T extends Item> {
   getIndex: (key: string) => number | undefined;
   deque: Array<T>;
@@ -23,207 +22,254 @@ export interface DataCopy<T extends Item> {
   setAt: (index: number, value: T) => void;
   push: (value: T) => void;
   unshift: (value: T) => void;
-  applyChanges: (pendingUpdates: Array<UpdateJob<T>>) => Set<string>;
-  isTrackingChanges: boolean;
-  dirtyKeys: Set<string>;
+  applyChanges: (pendingUpdates: Array<UpdateJob<T, any>>) => Set<string>;
 }
 
-export interface Data<T extends Item> {
-  update: (job: UpdateJob<T>, callback?: (results: unknown) => void) => void;
-  at: (index: number) => T | undefined;
-  length: () => number;
-  forKey: (key: string) => T | undefined;
-  pendingUpdates: Array<UpdateJob<T>>;
-  __currentlyRenderedCopy: DataCopy<T>;
-  __nextCopy: DataCopy<T>;
+interface DataCopyInternal<T extends Item> extends DataCopy<T> {
+  __isTrackingChanges: boolean;
+  __dirtyKeys: Set<string>;
 }
 
-export function useInternalWishlistData<T extends Item>(
-  wishlistId: string,
+export interface WishlistData<T extends Item> {
+  update: <ResT>(job: UpdateJob<T, ResT>) => Promise<ResT>;
+}
+
+export interface WishlistDataInternal<T extends Item> extends WishlistData<T> {
+  __attach: (wishlistId: string) => void;
+  __detach: (wishlistId: string) => void;
+  __at: (index: number) => T | undefined;
+}
+
+/**
+ * Creates an instance of Wishlist data which can be passed to Wishlist components.
+ */
+export function useWishlistData<T extends Item>(
   initialData: Array<T>,
-) {
-  const scheduleSyncUp = useScheduleSyncUp(wishlistId);
-
-  const data = useMemo(() => {
+): WishlistData<T> {
+  const dataId = useGeneratedId();
+  const getWishlistData = useMemo((): (() => WishlistDataInternal<T>) => {
     return () => {
       'worklet';
 
       if (!global.dataCtx) {
         global.dataCtx = {};
       }
-      if (!global.dataCtx[wishlistId]) {
-        function createItemsDataStructure(initialData: Array<T>) {
-          // classes doesn't work :(
-          // TODO it can be implmented so that all ops are O(log n)
-          const thiz: DataCopy<T> = {
-            deque: initialData,
-            getIndex: function getIndex(key: string) {
-              // That's linear but can be log n (only for testing)
-              for (let i = 0; i < this.deque.length; ++i) {
-                if (this.deque[i].key === key) {
-                  return i;
-                }
-              }
-              return undefined;
-            },
-            at: function at(index: number) {
-              if (index == undefined || index >= this.length() || index < 0) {
-                return undefined;
-              }
 
-              return this.deque[index];
-            },
-            length: function length() {
-              return this.deque.length;
-            },
-            forKey: function forKey(key: string) {
-              const index = this.getIndex(key);
-              if (!index) {
-                return undefined;
-              }
-              return this.at(index);
-            },
-            get: function get(key: string) {
-              return this.forKey(key);
-            },
-            setItem: function setItem(key: string, value: T) {
-              const index = this.getIndex(key);
-              this.setAt(index!, value);
-            },
-            set: function set(key: string, value: T) {
-              return this.setItem(key, value);
-            },
-            setAt: function setAt(index: number, value: T) {
-              this.deque[index] = value;
-              if (this.isTrackingChanges) {
-                this.dirtyKeys.add(value.key);
-              }
-            },
-            push: function push(value: T) {
-              this.deque.push(value);
-            },
-            unshift: function unshift(value: T) {
-              this.deque.unshift(value);
-            },
-            applyChanges: function applyChanges(pendingUpdates) {
-              this.isTrackingChanges = true;
-              for (let updateJob of pendingUpdates) {
-                updateJob(this);
-              }
-              this.isTrackingChanges = false;
-              const res = this.dirtyKeys;
-              this.dirtyKeys = new Set();
-              return res;
-            },
-            dirtyKeys: new Set<string>(),
-            isTrackingChanges: false,
-          };
+      if (global.dataCtx[dataId]) {
+        return global.dataCtx[dataId] as WishlistDataInternal<T>;
+      }
 
-          return thiz;
-        }
-
-        function deepClone<ObjT>(x: ObjT): ObjT {
-          if ((x as any).map != null) {
-            return (x as any).map((ele: unknown) => deepClone(ele));
-          }
-
-          if (typeof x === 'object') {
-            const res: any = {};
-            for (let key of Object.keys(x as any)) {
-              res[key] = deepClone((x as any)[key]);
+      function createItemsDataStructure(initialDeque: Array<T>) {
+        // classes doesn't work :(
+        // TODO it can be implmented so that all ops are O(log n)
+        const thiz: DataCopyInternal<T> = {
+          deque: initialDeque,
+          getIndex: function getIndex(key: string) {
+            // That's linear but can be log n (only for testing)
+            for (let i = 0; i < this.deque.length; ++i) {
+              if (this.deque[i].key === key) {
+                return i;
+              }
             }
+            return undefined;
+          },
+          at: function at(index: number) {
+            if (index == null || index >= this.length() || index < 0) {
+              return undefined;
+            }
+
+            return this.deque[index];
+          },
+          length: function length() {
+            return this.deque.length;
+          },
+          forKey: function forKey(key: string) {
+            const index = this.getIndex(key);
+            if (!index) {
+              return undefined;
+            }
+            return this.at(index);
+          },
+          get: function get(key: string) {
+            return this.forKey(key);
+          },
+          setItem: function setItem(key: string, value: T) {
+            const index = this.getIndex(key);
+            this.setAt(index!, value);
+          },
+          set: function set(key: string, value: T) {
+            return this.setItem(key, value);
+          },
+          setAt: function setAt(index: number, value: T) {
+            this.deque[index] = value;
+            if (this.__isTrackingChanges) {
+              this.__dirtyKeys.add(value.key);
+            }
+          },
+          push: function push(value: T) {
+            this.deque.push(value);
+          },
+          unshift: function unshift(value: T) {
+            this.deque.unshift(value);
+          },
+          applyChanges: function applyChanges(pendingUpdates) {
+            this.__isTrackingChanges = true;
+            for (let updateJob of pendingUpdates) {
+              updateJob(this);
+            }
+            this.__isTrackingChanges = false;
+            const res = this.__dirtyKeys;
+            this.__dirtyKeys = new Set();
             return res;
-          }
-          return x;
+          },
+          __dirtyKeys: new Set<string>(),
+          __isTrackingChanges: false,
+        };
+
+        return thiz;
+      }
+
+      function deepClone<ObjT>(x: ObjT): ObjT {
+        if ((x as any).map != null) {
+          return (x as any).map((ele: unknown) => deepClone(ele));
         }
 
-        const initialDataCopy__next = deepClone(initialData);
-        const initialDataCopy__cur = deepClone(initialData);
-        const __nextCopy = createItemsDataStructure(initialDataCopy__next);
-        const __currentlyRenderedCopy =
-          createItemsDataStructure(initialDataCopy__cur);
+        if (typeof x === 'object') {
+          const res: any = {};
+          for (let key of Object.keys(x as any)) {
+            res[key] = deepClone((x as any)[key]);
+          }
+          return res;
+        }
+        return x;
+      }
 
-        const pendingUpdates: Array<UpdateJob<T>> = [];
-        function update(
-          updateJob: UpdateJob<T>,
-          callback?: (result: any) => void,
-        ) {
-          updateJob(__nextCopy);
+      const initialDataCopy__cur = deepClone(initialData);
+      const currentlyRenderedCopy =
+        createItemsDataStructure(initialDataCopy__cur);
+      const attachedListIds = new Set<string>();
+      const pendingUpdates: Array<UpdateJob<T, unknown>> = [];
+
+      async function update<ResT>(updateJob: UpdateJob<T, ResT>) {
+        return new Promise<ResT>((resolve) => {
           pendingUpdates.push((dataCopy: DataCopy<T>) => {
             const result = updateJob(dataCopy);
-            callback?.(result);
+            resolve(result);
           });
-          scheduleSyncUp();
-        }
+          for (const id of attachedListIds) {
+            scheduleSyncUp(id);
+          }
+        });
+      }
 
-        function at(index: number) {
-          return __currentlyRenderedCopy.at(index);
-        }
+      function __at(index: number) {
+        return currentlyRenderedCopy.at(index);
+      }
 
-        function length() {
-          return __currentlyRenderedCopy.length();
-        }
+      function __attach(wishlistId: string) {
+        attachedListIds.add(wishlistId);
 
-        function forKey(key: string) {
-          return __currentlyRenderedCopy.forKey(key);
+        if (!global.wishlists) {
+          global.wishlists = {};
         }
+        if (!global.wishlists[wishlistId]) {
+          global.wishlists[wishlistId] = {};
+        }
+        global.wishlists[wishlistId].listener = (
+          viewportObserver: ViewportObserver,
+        ) => {
+          const pendingUpdatesCopy = pendingUpdates.splice(
+            0,
+            pendingUpdates.length,
+          );
 
-        const internalData = {
-          update,
-          at,
-          forKey,
-          length,
-          __currentlyRenderedCopy,
-          __nextCopy,
-          pendingUpdates,
+          const dirty = currentlyRenderedCopy.applyChanges(pendingUpdatesCopy);
+          const window = viewportObserver.getAllVisibleItems();
+
+          // Right now we only support adding items but it can be easily extended
+          const newIndex = currentlyRenderedCopy.getIndex(window[0].key);
+          if (newIndex == null) {
+            // TODO: throw?
+            return;
+          }
+          viewportObserver.updateIndices(newIndex!);
+
+          const dirtyItems = [];
+          let i = 0;
+          for (let item of window) {
+            if (dirty.has(item.key)) {
+              dirtyItems.push(i);
+            }
+            i++;
+          }
+          viewportObserver.markItemsDirty(dirtyItems);
         };
-        global.dataCtx[wishlistId] = internalData;
       }
-      return global.dataCtx[wishlistId] as Data<T>;
+
+      function __detach(wishlistId: string) {
+        global.wishlists[wishlistId].listener = undefined;
+      }
+
+      const internalData: WishlistDataInternal<T> = {
+        update,
+        __at,
+        __attach,
+        __detach,
+      };
+
+      global.dataCtx[dataId] = internalData;
+
+      return internalData;
     };
-  }, [initialData, scheduleSyncUp, wishlistId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const callback = useCallback(
-    (viewportObserver: ViewportObserver) => {
-      'worklet';
+  return useMemo(
+    () => ({
+      update: <ResT>(updateJob: UpdateJob<T, ResT>) => {
+        'worklet';
 
-      const pendingUpdates = data().pendingUpdates;
-      const pendingUpdatesCopy = pendingUpdates.splice(
-        0,
-        pendingUpdates.length,
-      );
+        // This can be called from both JS and Wishlist context.
+        // TODO: Better api to check which JS runtime we are on.
+        if (global.dataCtx) {
+          return getWishlistData().update(updateJob);
+        } else {
+          return new Promise<ResT>((resolve) => {
+            const resolveJs = createRunInJsFn(resolve);
+            return createRunInWishlistFn(() => {
+              'worklet';
 
-      const dirty =
-        data().__currentlyRenderedCopy.applyChanges(pendingUpdatesCopy);
-      const window = viewportObserver.getAllVisibleItems();
-
-      // Right now we only support adding items but it can be easily extended
-      const newIndex = data().__currentlyRenderedCopy.getIndex(window[0].key);
-      if (newIndex == null) {
-        // TODO: throw?
-        return;
-      }
-      viewportObserver.updateIndices(newIndex!);
-
-      const dirtyItems = [];
-      let i = 0;
-      for (let item of window) {
-        if (dirty.has(item.key)) {
-          dirtyItems.push(i);
+              getWishlistData().update(updateJob).then(resolveJs);
+            })();
+          });
         }
-        i++;
-      }
-      viewportObserver.markItemsDirty(dirtyItems);
-    },
-    [data],
+      },
+      __at(index: number) {
+        'worklet';
+
+        return getWishlistData().__at(index);
+      },
+      __attach: (wishlistId: string) => {
+        createRunInWishlistFn(() => {
+          'worklet';
+          getWishlistData().__attach(wishlistId);
+        })();
+      },
+      __detach: (wishlistId: string) => {
+        createRunInWishlistFn(() => {
+          'worklet';
+          getWishlistData().__detach(wishlistId);
+        })();
+      },
+    }),
+    [getWishlistData],
   );
-
-  useOnFlushCallback(callback, wishlistId);
-
-  return data as () => Data<T>;
 }
 
-export function useData<T extends Item>() {
+/**
+ * Returns the data for the current Wishlist. Must be called inside template components.
+ */
+export function useWishlistContextData<T extends Item>() {
   const { data } = useWishlistContext();
-  return data as () => Data<T>;
+  return data as WishlistData<T>;
 }

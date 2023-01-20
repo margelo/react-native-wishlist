@@ -1,6 +1,10 @@
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
-import { useTemplateValue, Wishlist, useData } from 'react-native-wishlist';
+import {
+  useTemplateValue,
+  Wishlist,
+  useWishlistContextData,
+} from 'react-native-wishlist';
 import type { ChatItem, ReactionItem } from './Data';
 
 const addReaction = require('./assets/add_reaction.png');
@@ -94,25 +98,29 @@ export const ChatItemView: React.FC<Props> = ({ type, onAddReaction }) => {
     return Object.values(obj);
   });
 
-  const data = useData<ChatItem>();
+  const data = useWishlistContextData<ChatItem>();
 
   const likeItemListener = (value: ChatItem) => {
     'worklet';
 
-    data().update((dataCopy) => {
+    data.update((dataCopy) => {
       const oldValue = dataCopy.get(value.key);
-      oldValue!.liked = !oldValue!.liked;
-      dataCopy.set(value.key, oldValue!);
+      if (oldValue) {
+        oldValue.liked = !oldValue.liked;
+        dataCopy.set(value.key, oldValue);
+      }
     });
   };
 
   const toggleImage = (value: ChatItem) => {
     'worklet';
 
-    data().update((dataCopy) => {
+    data.update((dataCopy) => {
       const oldValue = dataCopy.get(value.key);
-      oldValue!.showBiggerAvatar = !oldValue!.showBiggerAvatar;
-      dataCopy.set(value.key, oldValue!);
+      if (oldValue) {
+        oldValue.showBiggerAvatar = !oldValue.showBiggerAvatar;
+        dataCopy.set(value.key, oldValue);
+      }
     });
   };
 
