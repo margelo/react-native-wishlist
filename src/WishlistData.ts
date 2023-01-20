@@ -40,6 +40,9 @@ export interface WishlistDataInternal<T extends Item> extends WishlistData<T> {
   __at: (index: number) => T | undefined;
 }
 
+/**
+ * Creates an instance of Wishlist data which can be passed to Wishlist components.
+ */
 export function useWishlistData<T extends Item>(
   initialData: Array<T>,
 ): WishlistData<T> {
@@ -263,7 +266,10 @@ export function useWishlistData<T extends Item>(
   );
 }
 
-export function useData<T extends Item>() {
+/**
+ * Returns the data for the current Wishlist. Must be called inside template components.
+ */
+export function useWishlistContextData<T extends Item>() {
   const { data } = useWishlistContext();
   return data as WishlistData<T>;
 }
