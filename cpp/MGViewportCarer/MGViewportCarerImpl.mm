@@ -237,5 +237,12 @@ void MGViewportCarerImpl::notifyAboutPushedChildren()
     }
     di.lock()->getUIScheduler()->scheduleOnUI(
         [newWindow, listener]() { listener->didPushChildren(std::move(newWindow)); });
+    WishlistJsRuntime::getInstance().accessRuntime([=, this](jsi::Runtime &rt) {
+      jsi::Function didPushChildren = rt.global()
+                                      .getPropertyAsObject(rt, "global")
+                                      .getPropertyAsObject(rt, "InflatorRegistry")
+                                      .getPropertyAsFunction(rt, "didPushChildren");
+      didPushChildren.call(rt, 0);
+    });
   }
 }

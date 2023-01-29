@@ -10,6 +10,7 @@ const maybeInit = () => {
       global.handlers = {};
 
       global.handleEvent = (type: string, tag: number, event: any) => {
+        console.log('handleEvent', type, tag, event);
         const callback = global.handlers[tag.toString() + type];
         if (callback) {
           callback(event);

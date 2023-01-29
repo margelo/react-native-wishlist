@@ -100,9 +100,6 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
 
           auto &cd = sn->getComponentDescriptor();
 
-          PropsParserContext propsParserContext{
-              sn->getFamily().getSurfaceId(), *cd.getContextContainer().get()};
-
           ShadowNode::UnsharedListOfShared newChildren =
               std::make_shared<ShadowNode::ListOfShared>();
 
