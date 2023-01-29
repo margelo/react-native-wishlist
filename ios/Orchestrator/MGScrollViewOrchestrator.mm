@@ -12,7 +12,7 @@ using namespace Wishlist;
   NSMutableArray<PanEvent *> *_touchEvents;
   CGFloat _lastTranslation;
   BOOL _doWeHaveOngoingEvent;
-    BOOL areEventsBlocked;
+  BOOL areEventsBlocked;
 
   // PendingTemplates
   std::vector<std::shared_ptr<facebook::react::ShadowNode const>> _pendingTemplates;
@@ -25,11 +25,10 @@ using namespace Wishlist;
 
   id<MGScrollAnimation> _currentAnimation;
   std::string _wishlistId;
-  
+
   // content edges
-    CGFloat topElementY;
-    CGFloat bottomElementBottomEdgeY;
-    
+  CGFloat topElementY;
+  CGFloat bottomElementBottomEdgeY;
 }
 
 - (instancetype)initWith:(UIScrollView *)scrollView
@@ -44,7 +43,7 @@ using namespace Wishlist;
     _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(handleVSync:)];
     [_displayLink addToRunLoop:NSRunLoop.currentRunLoop forMode:NSDefaultRunLoopMode];
     [_displayLink setPaused:YES];
-      
+
     areEventsBlocked = YES;
 
     _di = di;
@@ -63,7 +62,13 @@ using namespace Wishlist;
                    names:(std::vector<std::string>)names
             initialIndex:(int)initialIndex
 {
-    _di.lock()->getViewportCarer()->initialRenderAsync({(float)_scrollView.frame.size.width, (float)_scrollView.frame.size.height}, 500000, initialIndex, templates, names, _inflatorId);
+  _di.lock()->getViewportCarer()->initialRenderAsync(
+      {(float)_scrollView.frame.size.width, (float)_scrollView.frame.size.height},
+      500000,
+      initialIndex,
+      templates,
+      names,
+      _inflatorId);
 }
 
 - (void)maybeRegisterForNextVSync
@@ -115,18 +120,23 @@ using namespace Wishlist;
     _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y - yDiff);
   }
 
-    std::shared_ptr<MGDI> di = _di.lock();
-    if (di != nullptr) {
-        auto templatesCopy = std::vector<std::shared_ptr<facebook::react::ShadowNode const>>();
-        auto namesCopy = std::vector<std::string>();
-        
-        namesCopy.swap(_pendingNames);
-        templatesCopy.swap(_pendingTemplates);
-        
-        di->getViewportCarer()->didScrollAsync({(float)_scrollView.frame.size.width, (float)_scrollView.frame.size.height}, templatesCopy, namesCopy, ((float)_scrollView.contentOffset.y), _inflatorId);
-    }
-    
-    [self avoidOverscroll];
+  std::shared_ptr<MGDI> di = _di.lock();
+  if (di != nullptr) {
+    auto templatesCopy = std::vector<std::shared_ptr<facebook::react::ShadowNode const>>();
+    auto namesCopy = std::vector<std::string>();
+
+    namesCopy.swap(_pendingNames);
+    templatesCopy.swap(_pendingTemplates);
+
+    di->getViewportCarer()->didScrollAsync(
+        {(float)_scrollView.frame.size.width, (float)_scrollView.frame.size.height},
+        templatesCopy,
+        namesCopy,
+        ((float)_scrollView.contentOffset.y),
+        _inflatorId);
+  }
+
+  [self avoidOverscroll];
 
   // pause Vsync listener if there is nothing to do
   if ([_touchEvents count] == 0 && _currentAnimation == nil && !_needsVSync) {
@@ -136,9 +146,9 @@ using namespace Wishlist;
 
 - (void)notifyAboutEvent:(PanEvent *)event
 {
-    if (areEventsBlocked) {
-        return;
-    }
+  if (areEventsBlocked) {
+    return;
+  }
   [_touchEvents addObject:event];
   [self maybeRegisterForNextVSync];
 }
@@ -158,7 +168,7 @@ using namespace Wishlist;
   }
   _currentAnimation = [[MGScrollToItemAnimation alloc] initWithIndex:index
                                                               offset:_scrollView.contentOffset.y
-                                           itemSight:_di.lock()->getAnimationsSight()];
+                                                           itemSight:_di.lock()->getAnimationsSight()];
 
   [self requestVSync];
 }
@@ -169,38 +179,39 @@ using namespace Wishlist;
   [self maybeRegisterForNextVSync];
 }
 
-- (void)edgesChangedWithTopEdge:(float)topEdge bottomEdge:(float)bottomEdge {
-    
-    topElementY = topEdge;
-    bottomElementBottomEdgeY = bottomEdge;
-    areEventsBlocked = NO;
-    
-    [self avoidOverscroll];
+- (void)edgesChangedWithTopEdge:(float)topEdge bottomEdge:(float)bottomEdge
+{
+  topElementY = topEdge;
+  bottomElementBottomEdgeY = bottomEdge;
+  areEventsBlocked = NO;
+
+  [self avoidOverscroll];
 }
 
-- (void)avoidOverscroll {
-    CGFloat topViewportEdge = _scrollView.contentOffset.y;
-    CGFloat bottomViewPortEdge = topViewportEdge + _scrollView.frame.size.height;
+- (void)avoidOverscroll
+{
+  CGFloat topViewportEdge = _scrollView.contentOffset.y;
+  CGFloat bottomViewPortEdge = topViewportEdge + _scrollView.frame.size.height;
 
-    if (bottomElementBottomEdgeY < bottomViewPortEdge) {
-      CGFloat diff = bottomElementBottomEdgeY - bottomViewPortEdge;
-      CGPoint oldOffset = _scrollView.contentOffset;
+  if (bottomElementBottomEdgeY < bottomViewPortEdge) {
+    CGFloat diff = bottomElementBottomEdgeY - bottomViewPortEdge;
+    CGPoint oldOffset = _scrollView.contentOffset;
 
-      _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + diff);
-      bottomViewPortEdge += diff;
-      topViewportEdge += diff;
-    }
+    _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + diff);
+    bottomViewPortEdge += diff;
+    topViewportEdge += diff;
+  }
 
-    // topElementY > topViewPortEdge (top overscroll)
-    if (topElementY > topViewportEdge) {
-      CGFloat diff = topElementY - topViewportEdge;
-      CGPoint oldOffset = _scrollView.contentOffset;
+  // topElementY > topViewPortEdge (top overscroll)
+  if (topElementY > topViewportEdge) {
+    CGFloat diff = topElementY - topViewportEdge;
+    CGPoint oldOffset = _scrollView.contentOffset;
 
-      _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + diff);
-      bottomViewPortEdge += diff;
-      topViewportEdge += diff;
-      _currentAnimation = nil;
-    }
+    _scrollView.contentOffset = CGPointMake(oldOffset.x, oldOffset.y + diff);
+    bottomViewPortEdge += diff;
+    topViewportEdge += diff;
+    _currentAnimation = nil;
+  }
 }
 
 - (void)dealloc
@@ -214,4 +225,3 @@ using namespace Wishlist;
 @implementation PanEvent
 
 @end
-

@@ -35,8 +35,9 @@ RCT_EXPORT_MODULE(Workaround);
 
 - (void)setBridge:(RCTBridge *)bridge
 {
-    dispatch_queue_attr_t qos = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, -1);
-    wishlistQueue = dispatch_queue_create("wishlistqueue", qos);
+  dispatch_queue_attr_t qos =
+      dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, -1);
+  wishlistQueue = dispatch_queue_create("wishlistqueue", qos);
   _bridge = bridge;
   _surfacePresenter = _bridge.surfacePresenter;
   __weak __typeof(self) weakSelf = self;
@@ -68,9 +69,9 @@ RCT_EXPORT_MODULE(Workaround);
 
 - (void)eventDispatcherWillDispatchEvent:(id<RCTEvent>)event
 {
-    dispatch_async(wishlistQueue, ^{
-        [self handlePaperEvent:event];
-    });
+  dispatch_async(wishlistQueue, ^{
+    [self handlePaperEvent:event];
+  });
 }
 
 - (bool)handleFabricEvent:(const RawEvent &)event
@@ -83,10 +84,10 @@ RCT_EXPORT_MODULE(Workaround);
   int tag = event.eventTarget->getTag();
   if (tag >= 0)
     return false;
-  
-    WishlistJsRuntime::getInstance().accessRuntime([=](jsi::Runtime & rt) {
-        [self sendEventWithType:jsi::String::createFromUtf8(rt, type) tag:tag payload:event.payloadFactory(rt)];
-    });
+
+  WishlistJsRuntime::getInstance().accessRuntime([=](jsi::Runtime &rt) {
+    [self sendEventWithType:jsi::String::createFromUtf8(rt, type) tag:tag payload:event.payloadFactory(rt)];
+  });
 
   return true;
 }
@@ -96,11 +97,11 @@ RCT_EXPORT_MODULE(Workaround);
   NSNumber *tag = event.viewTag;
   NSString *type = event.eventName;
 
-    WishlistJsRuntime::getInstance().accessRuntime([=](jsi::Runtime & rt) {
-      [self sendEventWithType:jsi::String::createFromUtf8(rt, [type UTF8String])
-                          tag:tag.intValue
-                      payload:convertObjCObjectToJSIValue(rt, event.arguments[2])];
-    });
+  WishlistJsRuntime::getInstance().accessRuntime([=](jsi::Runtime &rt) {
+    [self sendEventWithType:jsi::String::createFromUtf8(rt, [type UTF8String])
+                        tag:tag.intValue
+                    payload:convertObjCObjectToJSIValue(rt, event.arguments[2])];
+  });
 }
 
 - (void)sendEventWithType:(const jsi::String &)type tag:(int)tag payload:(const jsi::Value &)payload

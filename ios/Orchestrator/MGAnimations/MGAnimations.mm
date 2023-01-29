@@ -73,7 +73,7 @@ const float mass = 0.5;
 const float damping = 5;
 
 @implementation MGScrollToItemAnimation {
-    std::weak_ptr<MGAnimationSight> _animationSight;
+  std::weak_ptr<MGAnimationSight> _animationSight;
 
   BOOL _needsSetup;
   BOOL _isFinished;
@@ -87,10 +87,10 @@ const float damping = 5;
 
 - (instancetype)initWithIndex:(int)index
                        offset:(CGFloat)offset
-               itemSight:(std::weak_ptr<MGAnimationSight>)animationSight
+                    itemSight:(std::weak_ptr<MGAnimationSight>)animationSight
 {
   if (self = [super init]) {
-      _animationSight = animationSight;
+    _animationSight = animationSight;
     _lastOffset = offset;
     _targetIndex = index;
     _targetOffset = MGAnimationSight::NOT_FOUND;

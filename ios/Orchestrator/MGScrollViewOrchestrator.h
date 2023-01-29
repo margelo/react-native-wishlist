@@ -7,11 +7,9 @@
 #import "MGAnimations.h"
 #include "MGDI.hpp"
 
-
 NS_ASSUME_NONNULL_BEGIN
 
 @interface PanEvent : NSObject
-
 
 @property (nonatomic, assign) UIGestureRecognizerState state;
 @property (nonatomic, assign) CGFloat translation;

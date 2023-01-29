@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
-#import "MGAnimationSight.hpp"
 #import <memory>
+#import "MGAnimationSight.hpp"
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -5,73 +5,83 @@
 
 using namespace facebook::react;
 
-void MGViewportCarerImpl::setDI(std::weak_ptr<MGDI> _di) {
-    this->di = _di;
+void MGViewportCarerImpl::setDI(std::weak_ptr<MGDI> _di)
+{
+  this->di = _di;
 }
 
-void MGViewportCarerImpl::setInitialValues(
-    std::shared_ptr<ShadowNode> wishListNode,
-    LayoutContext lc) {
+void MGViewportCarerImpl::setInitialValues(std::shared_ptr<ShadowNode> wishListNode, LayoutContext lc)
+{
   this->wishListNode = wishListNode;
   this->lc = lc;
 }
 
-void MGViewportCarerImpl::initialRenderAsync(MGDims dimensions,
-                              float initialOffset,
-                              int originItem,
-                              std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
-                              std::vector<std::string> names,
-                                             std::string inflatorId) {
-    WishlistJsRuntime::getInstance().accessRuntime([=, this](jsi::Runtime & rt) {
-        initialIndex = originItem;
+void MGViewportCarerImpl::initialRenderAsync(
+    MGDims dimensions,
+    float initialOffset,
+    int originItem,
+    std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
+    std::vector<std::string> names,
+    std::string inflatorId)
+{
+  WishlistJsRuntime::getInstance().accessRuntime([=, this](jsi::Runtime &rt) {
+    initialIndex = originItem;
 
-        componentsPool->registeredViews = registeredViews;
-        componentsPool->setNames(names);
+    componentsPool->registeredViews = registeredViews;
+    componentsPool->setNames(names);
 
-        itemProvider = std::static_pointer_cast<ItemProvider>(
-            std::make_shared<WorkletItemProvider>(dimensions.width, lc, inflatorId));
-        itemProvider->setComponentsPool(componentsPool);
+    itemProvider =
+        std::static_pointer_cast<ItemProvider>(std::make_shared<WorkletItemProvider>(dimensions.width, lc, inflatorId));
+    itemProvider->setComponentsPool(componentsPool);
 
-        this->surfaceId = wishListNode->getFamily().getSurfaceId();
-        this->offset = initialOffset;
-        this->windowHeight = dimensions.height;
-        this->windowWidth = dimensions.width;
-        this->inflatorId = inflatorId;
+    this->surfaceId = wishListNode->getFamily().getSurfaceId();
+    this->offset = initialOffset;
+    this->windowHeight = dimensions.height;
+    this->windowWidth = dimensions.width;
+    this->inflatorId = inflatorId;
 
-        window.push_back(itemProvider->provide(originItem));
-        window.back().offset = initialOffset;
-        updateWindow();
-    });
+    window.push_back(itemProvider->provide(originItem));
+    window.back().offset = initialOffset;
+    updateWindow();
+  });
 }
 
-void MGViewportCarerImpl::didScrollAsync(MGDims dimensions, std::vector<std::shared_ptr<ShadowNode const>> registeredViews, std::vector<std::string> names, float newOffset, std::string inflatorId) {
-    WishlistJsRuntime::getInstance().accessRuntime([=, this](jsi::Runtime & rt) {
-        if (dimensions.width != windowWidth or !names.empty() or inflatorId != this->inflatorId) {
-            componentsPool->registeredViews = registeredViews;
-            componentsPool->setNames(names);
-            
-            itemProvider = std::static_pointer_cast<ItemProvider>(
-                                                                  std::make_shared<WorkletItemProvider>(dimensions.width, lc, inflatorId));
-            itemProvider->setComponentsPool(componentsPool);
-            windowWidth = dimensions.width;
-            this->inflatorId = inflatorId;
-        } else {
-            std::set<int> dirty = di.lock()->getDataBinding()->applyChangesAndGetDirtyIndices({window[0].index, window.back().index});
-            for (auto & item : window) {
-                if (dirty.count(item.index) > 0) {
-                    item.dirty = true;
-                }
-            }
+void MGViewportCarerImpl::didScrollAsync(
+    MGDims dimensions,
+    std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
+    std::vector<std::string> names,
+    float newOffset,
+    std::string inflatorId)
+{
+  WishlistJsRuntime::getInstance().accessRuntime([=, this](jsi::Runtime &rt) {
+    if (dimensions.width != windowWidth or !names.empty() or inflatorId != this->inflatorId) {
+      componentsPool->registeredViews = registeredViews;
+      componentsPool->setNames(names);
+
+      itemProvider = std::static_pointer_cast<ItemProvider>(
+          std::make_shared<WorkletItemProvider>(dimensions.width, lc, inflatorId));
+      itemProvider->setComponentsPool(componentsPool);
+      windowWidth = dimensions.width;
+      this->inflatorId = inflatorId;
+    } else {
+      std::set<int> dirty =
+          di.lock()->getDataBinding()->applyChangesAndGetDirtyIndices({window[0].index, window.back().index});
+      for (auto &item : window) {
+        if (dirty.count(item.index) > 0) {
+          item.dirty = true;
         }
-        
-        this->offset = newOffset;
-        this->windowHeight = dimensions.height;
-        
-        updateWindow();
-    });
+      }
+    }
+
+    this->offset = newOffset;
+    this->windowHeight = dimensions.height;
+
+    updateWindow();
+  });
 }
 
-void MGViewportCarerImpl::updateWindow() {
+void MGViewportCarerImpl::updateWindow()
+{
   float topEdge = offset - windowHeight;
   float bottomEdge = offset + 2 * windowHeight;
 
@@ -137,22 +147,22 @@ void MGViewportCarerImpl::updateWindow() {
       break;
     }
   }
-    
-    float offset = window[0].offset;
-    for (auto & item : window) {
-        if (item.dirty) {
-            WishItem wishItem = itemProvider->provide(item.index);
-            if (wishItem.sn.get() == nullptr) {
-              continue;
-            }
-            item.offset = offset;
-            swap(item.sn, wishItem.sn);
-            item.height = wishItem.height;
-            
-            itemsToRemove.push_back(wishItem);
-        }
-        offset = item.offset + item.height;
+
+  float offset = window[0].offset;
+  for (auto &item : window) {
+    if (item.dirty) {
+      WishItem wishItem = itemProvider->provide(item.index);
+      if (wishItem.sn.get() == nullptr) {
+        continue;
+      }
+      item.offset = offset;
+      swap(item.sn, wishItem.sn);
+      item.height = wishItem.height;
+
+      itemsToRemove.push_back(wishItem);
     }
+    offset = item.offset + item.height;
+  }
 
   pushChildren();
 
@@ -160,7 +170,6 @@ void MGViewportCarerImpl::updateWindow() {
     componentsPool->returnToPool(item.sn);
   }
 }
-
 
 std::shared_ptr<ShadowNode> MGViewportCarerImpl::getOffseter(float offset)
 {
@@ -184,7 +193,6 @@ std::shared_ptr<ShadowNode> MGViewportCarerImpl::getOffseter(float offset)
 
 void MGViewportCarerImpl::pushChildren()
 {
-
   std::shared_ptr<ShadowNode> sWishList = wishListNode;
   if (sWishList.get() == nullptr) {
     return;
@@ -214,21 +222,20 @@ void MGViewportCarerImpl::pushChildren()
     };
     st.commit(transaction);
   });
-  
+
   notifyAboutPushedChildren();
 }
 
 // TODO That could cause a lag we may need to push it through state
-void MGViewportCarerImpl::notifyAboutPushedChildren() {
-    std::shared_ptr<MGPushChildrenListener> listener = di.lock()->getPushChildrenListener();
-    if (listener != nullptr) {
-        std::vector<Item> newWindow;
-        for (auto & item : window) {
-            newWindow.push_back({item.offset, item.height, item.index, item.key});
-        }
-        di.lock()->getUIScheduler()->scheduleOnUI([newWindow, listener]() {
-            listener->didPushChildren(std::move(newWindow));
-        });
+void MGViewportCarerImpl::notifyAboutPushedChildren()
+{
+  std::shared_ptr<MGPushChildrenListener> listener = di.lock()->getPushChildrenListener();
+  if (listener != nullptr) {
+    std::vector<Item> newWindow;
+    for (auto &item : window) {
+      newWindow.push_back({item.offset, item.height, item.index, item.key});
     }
+    di.lock()->getUIScheduler()->scheduleOnUI(
+        [newWindow, listener]() { listener->didPushChildren(std::move(newWindow)); });
+  }
 }
-

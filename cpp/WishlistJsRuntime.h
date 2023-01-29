@@ -21,15 +21,14 @@ class WishlistJsRuntime {
       std::function<void(std::function<void()> &&)> workletCallInvoker);
 
   jsi::Runtime &getRuntime() const;
-  void accessRuntime(std::function<void(jsi::Runtime &rt)> && f) const;
-  void accessRuntimeSync(std::function<void(jsi::Runtime &rt)> && f) const;
-
+  void accessRuntime(std::function<void(jsi::Runtime &rt)> &&f) const;
+  void accessRuntimeSync(std::function<void(jsi::Runtime &rt)> &&f) const;
 
  private:
   WishlistJsRuntime();
   WishlistJsRuntime(const WishlistJsRuntime &) = delete;
   WishlistJsRuntime &operator=(const WishlistJsRuntime &) = delete;
-  
+
   class Decorator : public RNWorklet::JsiBaseDecorator {
     void decorateRuntime(jsi::Runtime &runtime) override;
   };

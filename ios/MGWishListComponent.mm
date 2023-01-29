@@ -9,10 +9,10 @@
 #import <react/renderer/components/rncore/Props.h>
 #include <react/renderer/components/wishlist/Props.h>
 #include <react/renderer/components/wishlist/ShadowNodes.h>
+#import "MGDIImpl.hpp"
 #import "MGScrollViewOrchestrator.h"
 #import "MGWishlistComponentDescriptor.h"
 #import "RCTFabricComponentsPlugins.h"
-#import "MGDIImpl.hpp"
 
 using namespace facebook::react;
 
@@ -92,27 +92,25 @@ using namespace facebook::react;
     self.scrollView.contentSize = CGSizeMake(frame.size.width, 10000000);
     self.scrollView.frame =
         CGRectMake(self.scrollView.frame.origin.x, self.scrollView.frame.origin.y, frame.size.width, frame.size.height);
-      
-      di = std::make_shared<MGDIImpl>();
-      std::shared_ptr<MGViewportCarerImpl> viewportCarer = _sharedState->getData().viewportCarer;
-      viewportCarer->setDI(di);
-      di->setViewportCarerImpl(viewportCarer);
+
+    di = std::make_shared<MGDIImpl>();
+    std::shared_ptr<MGViewportCarerImpl> viewportCarer = _sharedState->getData().viewportCarer;
+    viewportCarer->setDI(di);
+    di->setViewportCarerImpl(viewportCarer);
 
     _orchestrator = [[MGScrollViewOrchestrator alloc] initWith:self.scrollView
                                                             di:di->getWeak()
                                                     inflatorId:inflatorId
                                                     wishlistId:_wishlistId];
-      __weak MGScrollViewOrchestrator * weakOrchestrator = _orchestrator;
-      di->setOrchestratorCppAdaper(std::make_shared<MGOrchestratorCppAdapter>([=](float top, float bottom){
-          [weakOrchestrator edgesChangedWithTopEdge:top bottomEdge:bottom];
-      }, [=]() {
-          [weakOrchestrator requestVSync];
-      }));
-      di->setDataBindingImpl(std::make_shared<MGDataBindingImpl>(_wishlistId, di->getWeak()));
-      di->setWindowKeeper(std::make_shared<MGWindowKeeper>(di->getWeak()));
-      di->setUIScheduler(std::make_shared<MGUIScheduleriOS>());
-      
-      [_orchestrator runWithTemplates:templates names:names initialIndex:_initialIndex];
+    __weak MGScrollViewOrchestrator *weakOrchestrator = _orchestrator;
+    di->setOrchestratorCppAdaper(std::make_shared<MGOrchestratorCppAdapter>(
+        [=](float top, float bottom) { [weakOrchestrator edgesChangedWithTopEdge:top bottomEdge:bottom]; },
+        [=]() { [weakOrchestrator requestVSync]; }));
+    di->setDataBindingImpl(std::make_shared<MGDataBindingImpl>(_wishlistId, di->getWeak()));
+    di->setWindowKeeper(std::make_shared<MGWindowKeeper>(di->getWeak()));
+    di->setUIScheduler(std::make_shared<MGUIScheduleriOS>());
+
+    [_orchestrator runWithTemplates:templates names:names initialIndex:_initialIndex];
 
     _orchestrator.delegate = self;
 

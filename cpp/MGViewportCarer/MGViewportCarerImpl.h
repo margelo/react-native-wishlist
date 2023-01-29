@@ -19,7 +19,7 @@ struct MGViewportCarerImpl : MGViewportCarer {
   float windowWidth;
   int surfaceId;
   int initialIndex;
-    std::string inflatorId;
+  std::string inflatorId;
 
   std::shared_ptr<ComponentsPool> componentsPool =
       std::make_shared<ComponentsPool>();
@@ -29,27 +29,34 @@ struct MGViewportCarerImpl : MGViewportCarer {
   LayoutContext lc;
   ShadowNode::SharedListOfShared wishlistChildren =
       std::make_shared<ShadowNode::ListOfShared>();
-    
-    std::weak_ptr<MGDI> di;
 
-  void setInitialValues(std::shared_ptr<ShadowNode> wishListNode,
-                        LayoutContext lc);
+  std::weak_ptr<MGDI> di;
+
+  void setInitialValues(
+      std::shared_ptr<ShadowNode> wishListNode,
+      LayoutContext lc);
   void setDI(std::weak_ptr<MGDI> _di);
-    
-    virtual void initialRenderAsync(MGDims dimensions,
-                                  float intialOffset,
-                                  int originItem,
-                                  std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
-                                  std::vector<std::string> names,
-                                    std::string inflatorId);
-    
-    virtual void didScrollAsync(MGDims dimentions, std::vector<std::shared_ptr<ShadowNode const>> registeredViews, std::vector<std::string> names, float newOffset, std::string inflatorId);
 
-    void updateWindow();
+  virtual void initialRenderAsync(
+      MGDims dimensions,
+      float intialOffset,
+      int originItem,
+      std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
+      std::vector<std::string> names,
+      std::string inflatorId);
+
+  virtual void didScrollAsync(
+      MGDims dimentions,
+      std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
+      std::vector<std::string> names,
+      float newOffset,
+      std::string inflatorId);
+
+  void updateWindow();
 
   std::shared_ptr<ShadowNode> getOffseter(float offset);
 
   void pushChildren();
 
-    void notifyAboutPushedChildren();
+  void notifyAboutPushedChildren();
 };
