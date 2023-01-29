@@ -87,7 +87,7 @@ const float damping = 5;
 
 - (instancetype)initWithIndex:(int)index
                        offset:(CGFloat)offset
-               animationSight:(std::shared_ptr<MGAnimationSight>)animationSight
+               itemSight:(std::weak_ptr<MGAnimationSight>)animationSight
 {
   if (self = [super init]) {
       _animationSight = animationSight;
