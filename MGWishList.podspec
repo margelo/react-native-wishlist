@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/margelo/react-native-wishlist.git", :tag => "#{s.version}" }
 
   s.source_files = [
-    "ios/**/*.{mm,h,m,cpp}",
+    "ios/**/*.{mm,h,m,cpp,hpp}",
     "cpp/**/*.{cpp,h,m,mm,hpp}",
   ]
 

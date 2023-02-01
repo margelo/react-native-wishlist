@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import { NativeModules, View, ViewProps } from 'react-native';
 import { createTemplateComponent } from '../createTemplateComponent';
 import { useTemplateCallback } from '../EventHandler';
+import { getUIInflatorRegistry } from '../InflatorRepository';
 import { createRunInJsFn } from '../WishlistJsRuntime';
 
 // TODO(janic): Figure out why those cannot be imported directly from RNGH in the example app.
@@ -80,7 +81,9 @@ const PressableView = createTemplateComponent(View, (item, props) => {
   const tag = item.getTag();
   item.addProps(props);
 
-  attachGestureHandler(tag);
+  getUIInflatorRegistry().addPushChildrenCallback(() => {
+    attachGestureHandler(tag);
+  });
 });
 
 export const Pressable = forwardRef<any, PressableProps>(

@@ -1,7 +1,6 @@
 #import <Foundation/Foundation.h>
-#import "ViewportObserver.h"
-
-using namespace Wishlist;
+#import <memory>
+#import "MGAnimationSight.hpp"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -23,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MGScrollToItemAnimation : NSObject <MGScrollAnimation>
 - (instancetype)initWithIndex:(int)index
                        offset:(CGFloat)offset
-             viewportObserver:(std::shared_ptr<ViewportObserver>)viewportObserver;
+                    itemSight:(std::weak_ptr<MGAnimationSight>)animationSight;
 @end
 
 NS_ASSUME_NONNULL_END

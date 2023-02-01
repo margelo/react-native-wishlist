@@ -20,7 +20,7 @@ void MGWishlistShadowNode::layout(LayoutContext layoutContext) {
   auto state = getStateData();
   if (!state.initialised) {
     state.initialised = true;
-    state.viewportObserver->setInitialValues(shared_from_this(), layoutContext);
+    state.viewportCarer->setInitialValues(shared_from_this(), layoutContext);
 
     setStateData(std::move(state));
   }

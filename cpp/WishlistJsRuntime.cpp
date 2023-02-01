@@ -2,6 +2,7 @@
 
 #include <react-native-worklets/JsiWorkletContext.h>
 #include <iostream>
+#include <mutex>
 
 namespace Wishlist {
 
@@ -18,7 +19,7 @@ void WishlistJsRuntime::initialize(
     std::function<void(std::function<void()> &&)> workletCallInvoker) {
   workletContext_ = std::make_shared<RNWorklet::JsiWorkletContext>();
   workletContext_->initialize(
-      "wishlist", runtime, jsCallInvoker, workletCallInvoker);
+      "wishlist", runtime, workletCallInvoker, jsCallInvoker);
   workletContext_->addDecorator(std::make_shared<Decorator>());
 
   runtime->global().setProperty(
@@ -29,6 +30,27 @@ void WishlistJsRuntime::initialize(
 
 jsi::Runtime &WishlistJsRuntime::getRuntime() const {
   return workletContext_->getWorkletRuntime();
+}
+
+void WishlistJsRuntime::accessRuntime(
+    std::function<void(jsi::Runtime &)> &&f) const {
+  workletContext_->invokeOnWorkletThread([=, ff = std::move(f)]() {
+    auto &rt = workletContext_->getWorkletRuntime();
+    ff(rt);
+  });
+}
+
+void WishlistJsRuntime::accessRuntimeSync(
+    std::function<void(jsi::Runtime &)> &&f) const {
+  static std::mutex mutex;
+  mutex.lock();
+  workletContext_->invokeOnWorkletThread([=, ff = std::move(f)]() {
+    auto &rt = workletContext_->getWorkletRuntime();
+    ff(rt);
+    mutex.unlock();
+  });
+  mutex.lock();
+  mutex.unlock();
 }
 
 void WishlistJsRuntime::Decorator::decorateRuntime(jsi::Runtime &rt) {

@@ -59,6 +59,8 @@ export type UIInflatorRegistry = {
   deleteTemplateValueState: (id: string) => void;
   getCurrentValue: () => any;
   getCurrentRootValue: () => any;
+  didPushChildren: () => void;
+  addPushChildrenCallback: (callback: () => void) => void;
 };
 
 let done = false;
@@ -74,6 +76,7 @@ const maybeInit = () => {
         Map<string, Map<string, MappingInflateMethod>>
       >();
       const templateValueStates = new Map<string, TemplateValueUIState>();
+      let pushChildrenCallbacks: (() => void)[] = [];
       let currentValue: any;
       let currentRootValue: any;
 
@@ -162,6 +165,14 @@ const maybeInit = () => {
         },
         getCurrentRootValue: () => {
           return currentRootValue;
+        },
+        // TODO: Scope this by wishlist
+        didPushChildren: () => {
+          pushChildrenCallbacks.forEach((cb) => cb());
+          pushChildrenCallbacks = [];
+        },
+        addPushChildrenCallback: (callback) => {
+          pushChildrenCallbacks.push(callback);
         },
       };
       global.InflatorRegistry = InflatorRegistry;
