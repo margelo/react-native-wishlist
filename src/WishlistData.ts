@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
-import { scheduleSyncUp, ViewportObserver } from './OrchestratorBinding';
+import { scheduleSyncUp } from './OrchestratorBinding';
 import { useGeneratedId } from './Utils';
 import { useWishlistContext } from './WishlistContext';
-import { createRunInJsFn, createRunInWishlistFn } from './WishlistJsRuntime';
 import {
-  Item,
-  UpdateJob,
   createItemsDataStructure,
   DataCopy,
+  Item,
+  UpdateJob,
 } from './WishlistDataCopy';
+import { createRunInJsFn, createRunInWishlistFn } from './WishlistJsRuntime';
 
 export interface WishlistData<T extends Item> {
   update: <ResT>(job: UpdateJob<T, ResT>) => Promise<ResT>;
