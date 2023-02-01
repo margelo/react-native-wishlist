@@ -34,21 +34,23 @@ jsi::Runtime &WishlistJsRuntime::getRuntime() const {
 
 void WishlistJsRuntime::accessRuntime(
     std::function<void(jsi::Runtime &)> &&f) const {
-  workletContext_->invokeOnWorkletThread([=, ff = std::move(f)]() {
-    auto &rt = workletContext_->getWorkletRuntime();
-    ff(rt);
-  });
+  workletContext_->invokeOnWorkletThread(
+      [=, ff = std::move(f)](
+          RNWorklet::JsiWorkletContext *context, jsi::Runtime &runtime) {
+        ff(runtime);
+      });
 }
 
 void WishlistJsRuntime::accessRuntimeSync(
     std::function<void(jsi::Runtime &)> &&f) const {
   static std::mutex mutex;
   mutex.lock();
-  workletContext_->invokeOnWorkletThread([=, ff = std::move(f)]() {
-    auto &rt = workletContext_->getWorkletRuntime();
-    ff(rt);
-    mutex.unlock();
-  });
+  workletContext_->invokeOnWorkletThread(
+      [=, ff = std::move(f)](
+          RNWorklet::JsiWorkletContext *context, jsi::Runtime &runtime) {
+        ff(runtime);
+        mutex.unlock();
+      });
   mutex.lock();
   mutex.unlock();
 }

@@ -28,16 +28,14 @@ using namespace Wishlist;
 @implementation Workaround {
   __weak RCTSurfacePresenter *_surfacePresenter;
   std::shared_ptr<EventListener> _eventListener;
-  dispatch_queue_t wishlistQueue;
+  std::shared_ptr<RNWorklet::DispatchQueue> _wishlistQueue;
 }
 
 RCT_EXPORT_MODULE(Workaround);
 
 - (void)setBridge:(RCTBridge *)bridge
 {
-  dispatch_queue_attr_t qos =
-      dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, -1);
-  wishlistQueue = dispatch_queue_create("wishlistqueue", qos);
+  _wishlistQueue = std::make_shared<RNWorklet::DispatchQueue>("wishlistqueue");
   _bridge = bridge;
   _surfacePresenter = _bridge.surfacePresenter;
   __weak __typeof(self) weakSelf = self;
@@ -59,17 +57,14 @@ RCT_EXPORT_MODULE(Workaround);
   WishlistJsRuntime::getInstance().initialize(
       jsRuntime,
       [=](std::function<void()> &&f) {
-        __block auto retainedWork = std::move(f);
-        dispatch_async(wishlistQueue, ^{
-          retainedWork();
-        });
+        _wishlistQueue->dispatch(std::move(f));
       },
       [=](std::function<void()> &&f) { callInvoker->invokeAsync(std::move(f)); });
 }
 
 - (void)eventDispatcherWillDispatchEvent:(id<RCTEvent>)event
 {
-  dispatch_async(wishlistQueue, ^{
+  _wishlistQueue->dispatch([=](){
     [self handlePaperEvent:event];
   });
 }
