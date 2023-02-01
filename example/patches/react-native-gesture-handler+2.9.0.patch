@@ -1,22 +1,22 @@
 diff --git a/node_modules/react-native-gesture-handler/ios/RNGestureHandlerActionType.h b/node_modules/react-native-gesture-handler/ios/RNGestureHandlerActionType.h
-index f05fc12..e543e9a 100644
+index 26adddc..1cf61a8 100644
 --- a/node_modules/react-native-gesture-handler/ios/RNGestureHandlerActionType.h
 +++ b/node_modules/react-native-gesture-handler/ios/RNGestureHandlerActionType.h
-@@ -5,4 +5,5 @@ typedef NS_ENUM(NSInteger, RNGestureHandlerActionType) {
-     RNGestureHandlerActionTypeNativeAnimatedEvent, // Animated.event with useNativeDriver: true
-     RNGestureHandlerActionTypeJSFunctionOldAPI, // JS function or Animated.event with useNativeDriver: false using old RNGH API
-     RNGestureHandlerActionTypeJSFunctionNewAPI, // JS function or Animated.event with useNativeDriver: false using new RNGH API
-+    RNGestureHandlerActionTypeDirectEvent, // Direct event that can be intercepted by native modules
+@@ -7,4 +7,5 @@ typedef NS_ENUM(NSInteger, RNGestureHandlerActionType) {
+                                               // RNGH API
+   RNGestureHandlerActionTypeJSFunctionNewAPI, // JS function or Animated.event with useNativeDriver: false using new
+                                               // RNGH API
++  RNGestureHandlerActionTypeDirectEvent, // Direct event that can be intercepted by native modules
  };
 diff --git a/node_modules/react-native-gesture-handler/ios/RNGestureHandlerManager.mm b/node_modules/react-native-gesture-handler/ios/RNGestureHandlerManager.mm
-index 8c2d99d..095011a 100644
+index 8c2d99d..2a1c3e6 100644
 --- a/node_modules/react-native-gesture-handler/ios/RNGestureHandlerManager.mm
 +++ b/node_modules/react-native-gesture-handler/ios/RNGestureHandlerManager.mm
 @@ -243,6 +243,10 @@
      case RNGestureHandlerActionTypeJSFunctionNewAPI:
        [self sendEventForJSFunctionNewAPI:event];
        break;
-+      
++
 +    case RNGestureHandlerActionTypeDirectEvent:
 +      [self sendEventForDirectEvent:event];
 +      break;

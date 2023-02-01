@@ -10,9 +10,9 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
-    "react": "18.1.0",
-    "react-native": "0.70.3",
-    "react-native-gesture-handler": "^2.8.0",
+    "react": "^18.2.0",
+    "react-native": "^0.71.1",
+    "react-native-gesture-handler": "^2.9.0",
     "react-native-worklets": "janicduplessis/react-native-worklets#react-native-worklets-v0.2.0-gitpkg"
   },
   "devDependencies": {

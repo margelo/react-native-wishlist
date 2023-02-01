@@ -1,8 +1,8 @@
 diff --git a/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.cpp b/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.cpp
-index 894ddf8..6ca53bf 100644
+index 282b25f..0684af0 100644
 --- a/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.cpp
 +++ b/node_modules/react-native/ReactCommon/react/renderer/core/EventEmitter.cpp
-@@ -54,6 +54,9 @@ void EventEmitter::dispatchEvent(
+@@ -53,6 +53,9 @@ void EventEmitter::dispatchEvent(
      const folly::dynamic &payload,
      EventPriority priority,
      RawEvent::Category category) const {
@@ -13,7 +13,7 @@ index 894ddf8..6ca53bf 100644
        std::move(type),
        [payload](jsi::Runtime &runtime) {
 diff --git a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.cpp b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.cpp
-index cd2d326..c927ad3 100644
+index 44692ee..7d99620 100644
 --- a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.cpp
 +++ b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.cpp
 @@ -45,7 +45,11 @@ UIManager::UIManager(
@@ -30,7 +30,7 @@ index cd2d326..c927ad3 100644
  UIManager::~UIManager() {
    LOG(WARNING) << "UIManager::~UIManager() was called (address: " << this
 diff --git a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.h b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.h
-index a30a594..6246aa6 100644
+index e0ba886..09887ec 100644
 --- a/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.h
 +++ b/node_modules/react-native/ReactCommon/react/renderer/uimanager/UIManager.h
 @@ -30,6 +30,11 @@ namespace facebook::react {
