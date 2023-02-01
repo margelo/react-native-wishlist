@@ -14,7 +14,7 @@ const ActionType = {
   DIRECT_EVENT: 5,
 } as const;
 
-type ActionTypeT = typeof ActionType[keyof typeof ActionType];
+type ActionTypeT = (typeof ActionType)[keyof typeof ActionType];
 
 type RNGestureHandlerModuleProps = {
   handleSetJSResponder: (tag: number, blockNativeResponder: boolean) => void;
