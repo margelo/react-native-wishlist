@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-worklets/cpp/JsiWorkletContext.cpp b/node_modules/react-native-worklets/cpp/JsiWorkletContext.cpp
-index e4cc7ba..3f64ed7 100644
+index 0621886..9335028 100644
 --- a/node_modules/react-native-worklets/cpp/JsiWorkletContext.cpp
 +++ b/node_modules/react-native-worklets/cpp/JsiWorkletContext.cpp
 @@ -156,7 +156,9 @@ void JsiWorkletContext::addDecorator(
