@@ -1,6 +1,6 @@
 #include "WishlistJsRuntime.h"
 
-#include <react-native-worklets/JsiWorkletContext.h>
+#include <rnworklets/JsiWorkletContext.h>
 #include <iostream>
 #include <mutex>
 
