@@ -14,8 +14,7 @@ set(PACKAGE_NAME "react_codegen_wishlist")
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(COMMON_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../cpp")
 set(LIB_ANDROID_GENERATED_JNI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build/generated/source/codegen/jni)
-set(WORKLETS_PACKAGE_NAME "react-native-worklets")
-set(WORKLETS_DIR "${REACT_ANDROID_DIR}/../../react-native-worklets")
+
 
 file(GLOB_RECURSE SOURCES_COMMON CONFIGURE_DEPENDS "${COMMON_SRC_DIR}/**.cpp")
 file(GLOB_RECURSE SOURCES_ANDROID CONFIGURE_DEPENDS "${SRC_DIR}/main/jni/**.cpp")
@@ -24,23 +23,7 @@ file(GLOB_RECURSE SOURCES_CODEGEN CONFIGURE_DEPENDS "${LIB_ANDROID_GENERATED_JNI
 # Consume shared libraries and headers from prefabs
 find_package(fbjni REQUIRED CONFIG)
 find_package(ReactAndroid REQUIRED CONFIG)
-
-add_library(
-  ${WORKLETS_PACKAGE_NAME}
-  SHARED
-  IMPORTED
-  GLOBAL
-)
-set_target_properties(${WORKLETS_PACKAGE_NAME}
-  PROPERTIES
-  IMPORTED_LOCATION
-  "${WORKLETS_DIR}/android/build/intermediates/merged_native_libs/debug/out/lib/arm64-v8a/librnworklets.so")
-target_include_directories(
-  ${WORKLETS_PACKAGE_NAME}
-  INTERFACE
-  "${WORKLETS_DIR}/cpp"
-  "${WORKLETS_DIR}/cpp/decorators"
-)
+find_package(react-native-worklets REQUIRED CONFIG)
 
 add_library(
   ${PACKAGE_NAME}
@@ -83,7 +66,7 @@ target_link_libraries(
 
 target_link_libraries(
   ${PACKAGE_NAME}
-  ${WORKLETS_PACKAGE_NAME}
+  react-native-worklets::rnworklets
   ReactAndroid::folly_runtime
   ReactAndroid::glog
   ReactAndroid::jsi
