@@ -1,6 +1,5 @@
 #include "ItemProvider.h"
 
-#include <React/RCTLog.h>
 #include <react/renderer/uimanager/UIManager.h>
 #include <react/renderer/uimanager/primitives.h>
 #include "WishlistJsRuntime.h"
@@ -25,7 +24,8 @@ struct
   try {
     returnedValue = inflateItem.call(rt, jsi::String::createFromUtf8(rt, tag), jsi::Value(index), cp->prepareProxy(rt));
   } catch (std::exception &error) {
-    RCTLogError(@"%@", [NSString stringWithUTF8String:error.what()]);
+    // TODO: Redbox from c++
+    // RCTLogError(@"%@", [NSString stringWithUTF8String:error.what()]);
     return wishItem;
   }
 

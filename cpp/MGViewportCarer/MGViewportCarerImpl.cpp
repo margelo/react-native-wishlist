@@ -1,9 +1,12 @@
 #include "MGViewportCarerImpl.h"
 #include "MGWishlistShadowNode.h"
-#import "RCTFollyConvert.h"
 #include "WishlistJsRuntime.h"
 
 using namespace facebook::react;
+
+#ifdef ANDROID
+ShadowTreeRegistry * KeyClassHolder::shadowTreeRegistry = nullptr;
+#endif
 
 void MGViewportCarerImpl::setDI(std::weak_ptr<MGDI> _di)
 {
@@ -24,7 +27,7 @@ void MGViewportCarerImpl::initialRenderAsync(
     std::vector<std::string> names,
     std::string inflatorId)
 {
-  WishlistJsRuntime::getInstance().accessRuntime([=, this](jsi::Runtime &rt) {
+  WishlistJsRuntime::getInstance().accessRuntime([=](jsi::Runtime &rt) {
     initialIndex = originItem;
 
     componentsPool->registeredViews = registeredViews;
@@ -53,7 +56,7 @@ void MGViewportCarerImpl::didScrollAsync(
     float newOffset,
     std::string inflatorId)
 {
-  WishlistJsRuntime::getInstance().accessRuntime([=, this](jsi::Runtime &rt) {
+  WishlistJsRuntime::getInstance().accessRuntime([=](jsi::Runtime &rt) {
     if (dimensions.width != windowWidth or !names.empty() or inflatorId != this->inflatorId) {
       componentsPool->registeredViews = registeredViews;
       componentsPool->setNames(names);
@@ -90,7 +93,6 @@ void MGViewportCarerImpl::updateWindow()
   // Add above
   while (1) {
     WishItem item = window.front();
-    float bottom = item.offset + item.height;
 
     if (item.offset > topEdge) {
       WishItem wishItem = itemProvider->provide(item.index - 1);
@@ -180,11 +182,10 @@ std::shared_ptr<ShadowNode> MGViewportCarerImpl::getOffseter(float offset)
   PropsParserContext propsParserContext{surfaceId, *cd.getContextContainer().get()};
 
   // todo remove color
-  folly::dynamic props = convertIdToFollyDynamic(@{
-    @"height" : @(offset),
-    @"width" : @(this->windowWidth),
-    @"backgroundColor" : @((*(colorFromComponents(ColorComponents{0, 0, 1, 1}))))
-  });
+  folly::dynamic props = folly::dynamic::object;
+  props["height"] = offset;
+  props["width"] = windowWidth;
+  props["backgroundColor"] = 0x00001111;
 
   Props::Shared newProps = cd.cloneProps(propsParserContext, offseterTemplate->getProps(), RawProps(props));
 
@@ -237,7 +238,7 @@ void MGViewportCarerImpl::notifyAboutPushedChildren()
     }
     di.lock()->getUIScheduler()->scheduleOnUI(
         [newWindow, listener]() { listener->didPushChildren(std::move(newWindow)); });
-    WishlistJsRuntime::getInstance().accessRuntime([=, this](jsi::Runtime &rt) {
+    WishlistJsRuntime::getInstance().accessRuntime([=](jsi::Runtime &rt) {
       jsi::Function didPushChildren = rt.global()
                                       .getPropertyAsObject(rt, "global")
                                       .getPropertyAsObject(rt, "InflatorRegistry")

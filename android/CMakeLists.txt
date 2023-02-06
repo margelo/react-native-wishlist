@@ -15,7 +15,6 @@ set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(COMMON_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../cpp")
 set(LIB_ANDROID_GENERATED_JNI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build/generated/source/codegen/jni)
 
-
 file(GLOB_RECURSE SOURCES_COMMON CONFIGURE_DEPENDS "${COMMON_SRC_DIR}/**.cpp")
 file(GLOB_RECURSE SOURCES_ANDROID CONFIGURE_DEPENDS "${SRC_DIR}/main/jni/**.cpp")
 file(GLOB_RECURSE SOURCES_CODEGEN CONFIGURE_DEPENDS "${LIB_ANDROID_GENERATED_JNI_DIR}/**.cpp")
@@ -38,11 +37,6 @@ target_include_directories(
   ${PACKAGE_NAME}
   PUBLIC
   "${SRC_DIR}/main/jni"
-)
-
-target_include_directories(
-  ${PACKAGE_NAME}
-  PRIVATE
   "${COMMON_SRC_DIR}/DataBinding"
   "${COMMON_SRC_DIR}/DependencyInjection"
   "${COMMON_SRC_DIR}/ItemProvider"
@@ -66,15 +60,21 @@ target_link_libraries(
 
 target_link_libraries(
   ${PACKAGE_NAME}
+  fbjni::fbjni
   react-native-worklets::rnworklets
   ReactAndroid::folly_runtime
   ReactAndroid::glog
   ReactAndroid::jsi
-  ReactAndroid::reactnativejni
+  ReactAndroid::react_codegen_rncore
+  ReactAndroid::react_debug
+  ReactAndroid::react_nativemodule_core
+  ReactAndroid::react_render_core
+  ReactAndroid::react_render_debug
   ReactAndroid::react_render_graphics
+  ReactAndroid::react_render_mapbuffer
+  ReactAndroid::react_render_mounting
+  ReactAndroid::reactnativejni
+  ReactAndroid::rrc_view
   ReactAndroid::runtimeexecutor
   ReactAndroid::yoga
-  ReactAndroid::react_nativemodule_core
-  ReactAndroid::rrc_view
-  fbjni::fbjni
 )

@@ -10,6 +10,13 @@
 #include "MGDI.hpp"
 #include "MGViewportCarer.hpp"
 
+#ifdef ANDROID
+class KeyClassHolder {
+public:
+    static ShadowTreeRegistry * shadowTreeRegistry;
+};
+#endif
+
 using namespace Wishlist;
 // TODO make this class testable by injecting componentsPool and itemProvider
 // or their factories
