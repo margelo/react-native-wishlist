@@ -10,7 +10,9 @@ namespace facebook {
 namespace react {
 
 JSI_EXPORT
-std::shared_ptr<TurboModule> wishlist_ModuleProvider(const std::string &moduleName, const JavaTurboModule::InitParams &params);
+std::shared_ptr<TurboModule> wishlist_ModuleProvider(
+    const std::string &moduleName,
+    const JavaTurboModule::InitParams &params);
 
 } // namespace react
 } // namespace facebook

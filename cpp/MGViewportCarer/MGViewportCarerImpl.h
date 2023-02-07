@@ -12,8 +12,8 @@
 
 #ifdef ANDROID
 class KeyClassHolder {
-public:
-    static ShadowTreeRegistry * shadowTreeRegistry;
+ public:
+  static ShadowTreeRegistry *shadowTreeRegistry;
 };
 #endif
 

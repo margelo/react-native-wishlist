@@ -5,16 +5,16 @@
 using namespace facebook::react;
 
 #ifdef ANDROID
-ShadowTreeRegistry * KeyClassHolder::shadowTreeRegistry = nullptr;
+ShadowTreeRegistry *KeyClassHolder::shadowTreeRegistry = nullptr;
 #endif
 
-void MGViewportCarerImpl::setDI(std::weak_ptr<MGDI> _di)
-{
+void MGViewportCarerImpl::setDI(std::weak_ptr<MGDI> _di) {
   this->di = _di;
 }
 
-void MGViewportCarerImpl::setInitialValues(std::shared_ptr<ShadowNode> wishListNode, LayoutContext lc)
-{
+void MGViewportCarerImpl::setInitialValues(
+    std::shared_ptr<ShadowNode> wishListNode,
+    LayoutContext lc) {
   this->wishListNode = wishListNode;
   this->lc = lc;
 }
@@ -25,16 +25,16 @@ void MGViewportCarerImpl::initialRenderAsync(
     int originItem,
     std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
     std::vector<std::string> names,
-    std::string inflatorId)
-{
+    std::string inflatorId) {
   WishlistJsRuntime::getInstance().accessRuntime([=](jsi::Runtime &rt) {
     initialIndex = originItem;
 
     componentsPool->registeredViews = registeredViews;
     componentsPool->setNames(names);
 
-    itemProvider =
-        std::static_pointer_cast<ItemProvider>(std::make_shared<WorkletItemProvider>(dimensions.width, lc, inflatorId));
+    itemProvider = std::static_pointer_cast<ItemProvider>(
+        std::make_shared<WorkletItemProvider>(
+            dimensions.width, lc, inflatorId));
     itemProvider->setComponentsPool(componentsPool);
 
     this->surfaceId = wishListNode->getFamily().getSurfaceId();
@@ -54,21 +54,23 @@ void MGViewportCarerImpl::didScrollAsync(
     std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
     std::vector<std::string> names,
     float newOffset,
-    std::string inflatorId)
-{
+    std::string inflatorId) {
   WishlistJsRuntime::getInstance().accessRuntime([=](jsi::Runtime &rt) {
-    if (dimensions.width != windowWidth or !names.empty() or inflatorId != this->inflatorId) {
+    if (dimensions.width != windowWidth or !names.empty() or
+        inflatorId != this->inflatorId) {
       componentsPool->registeredViews = registeredViews;
       componentsPool->setNames(names);
 
       itemProvider = std::static_pointer_cast<ItemProvider>(
-          std::make_shared<WorkletItemProvider>(dimensions.width, lc, inflatorId));
+          std::make_shared<WorkletItemProvider>(
+              dimensions.width, lc, inflatorId));
       itemProvider->setComponentsPool(componentsPool);
       windowWidth = dimensions.width;
       this->inflatorId = inflatorId;
     } else {
       std::set<int> dirty =
-          di.lock()->getDataBinding()->applyChangesAndGetDirtyIndices({window[0].index, window.back().index});
+          di.lock()->getDataBinding()->applyChangesAndGetDirtyIndices(
+              {window[0].index, window.back().index});
       for (auto &item : window) {
         if (dirty.count(item.index) > 0) {
           item.dirty = true;
@@ -83,8 +85,7 @@ void MGViewportCarerImpl::didScrollAsync(
   });
 }
 
-void MGViewportCarerImpl::updateWindow()
-{
+void MGViewportCarerImpl::updateWindow() {
   float topEdge = offset - windowHeight;
   float bottomEdge = offset + 2 * windowHeight;
 
@@ -173,13 +174,14 @@ void MGViewportCarerImpl::updateWindow()
   }
 }
 
-std::shared_ptr<ShadowNode> MGViewportCarerImpl::getOffseter(float offset)
-{
+std::shared_ptr<ShadowNode> MGViewportCarerImpl::getOffseter(float offset) {
   std::shared_ptr<const YogaLayoutableShadowNode> offseterTemplate =
-      std::static_pointer_cast<const YogaLayoutableShadowNode>(componentsPool->getNodeForType("__offsetComponent"));
+      std::static_pointer_cast<const YogaLayoutableShadowNode>(
+          componentsPool->getNodeForType("__offsetComponent"));
 
   auto &cd = offseterTemplate->getComponentDescriptor();
-  PropsParserContext propsParserContext{surfaceId, *cd.getContextContainer().get()};
+  PropsParserContext propsParserContext{
+      surfaceId, *cd.getContextContainer().get()};
 
   // todo remove color
   folly::dynamic props = folly::dynamic::object;
@@ -187,62 +189,69 @@ std::shared_ptr<ShadowNode> MGViewportCarerImpl::getOffseter(float offset)
   props["width"] = windowWidth;
   props["backgroundColor"] = 0x00001111;
 
-  Props::Shared newProps = cd.cloneProps(propsParserContext, offseterTemplate->getProps(), RawProps(props));
+  Props::Shared newProps = cd.cloneProps(
+      propsParserContext, offseterTemplate->getProps(), RawProps(props));
 
   return offseterTemplate->clone({newProps, nullptr, nullptr});
 }
 
-void MGViewportCarerImpl::pushChildren()
-{
+void MGViewportCarerImpl::pushChildren() {
   std::shared_ptr<ShadowNode> sWishList = wishListNode;
   if (sWishList.get() == nullptr) {
     return;
   }
 
-  KeyClassHolder::shadowTreeRegistry->visit(surfaceId, [&](const ShadowTree &st) {
-    ShadowTreeCommitTransaction transaction =
-        [&](RootShadowNode const &oldRootShadowNode) -> std::shared_ptr<RootShadowNode> {
-      return std::static_pointer_cast<RootShadowNode>(
-          oldRootShadowNode.cloneTree(sWishList->getFamily(), [&](const ShadowNode &sn) -> std::shared_ptr<ShadowNode> {
-            auto children = std::make_shared<ShadowNode::ListOfShared>();
+  KeyClassHolder::shadowTreeRegistry->visit(
+      surfaceId, [&](const ShadowTree &st) {
+        ShadowTreeCommitTransaction transaction =
+            [&](RootShadowNode const &oldRootShadowNode)
+            -> std::shared_ptr<RootShadowNode> {
+          return std::static_pointer_cast<
+              RootShadowNode>(oldRootShadowNode.cloneTree(
+              sWishList->getFamily(),
+              [&](const ShadowNode &sn) -> std::shared_ptr<ShadowNode> {
+                auto children = std::make_shared<ShadowNode::ListOfShared>();
 
-            children->push_back(getOffseter(window[0].offset));
+                children->push_back(getOffseter(window[0].offset));
 
-            for (WishItem &wishItem : window) {
-              if (wishItem.sn != nullptr) {
-                children->push_back(wishItem.sn);
-              }
-            }
+                for (WishItem &wishItem : window) {
+                  if (wishItem.sn != nullptr) {
+                    children->push_back(wishItem.sn);
+                  }
+                }
 
-            // That doesn't seem right as this method can be called on multiple threads
-            // another problem is that it can be called multiple times
-            wishlistChildren = children;
+                // That doesn't seem right as this method can be called on
+                // multiple threads another problem is that it can be called
+                // multiple times
+                wishlistChildren = children;
 
-            return sn.clone(ShadowNodeFragment{nullptr, children, nullptr});
-          }));
-    };
-    st.commit(transaction);
-  });
+                return sn.clone(ShadowNodeFragment{nullptr, children, nullptr});
+              }));
+        };
+        st.commit(transaction);
+      });
 
   notifyAboutPushedChildren();
 }
 
 // TODO That could cause a lag we may need to push it through state
-void MGViewportCarerImpl::notifyAboutPushedChildren()
-{
-  std::shared_ptr<MGPushChildrenListener> listener = di.lock()->getPushChildrenListener();
+void MGViewportCarerImpl::notifyAboutPushedChildren() {
+  std::shared_ptr<MGPushChildrenListener> listener =
+      di.lock()->getPushChildrenListener();
   if (listener != nullptr) {
     std::vector<Item> newWindow;
     for (auto &item : window) {
       newWindow.push_back({item.offset, item.height, item.index, item.key});
     }
-    di.lock()->getUIScheduler()->scheduleOnUI(
-        [newWindow, listener]() { listener->didPushChildren(std::move(newWindow)); });
+    di.lock()->getUIScheduler()->scheduleOnUI([newWindow, listener]() {
+      listener->didPushChildren(std::move(newWindow));
+    });
     WishlistJsRuntime::getInstance().accessRuntime([=](jsi::Runtime &rt) {
-      jsi::Function didPushChildren = rt.global()
-                                      .getPropertyAsObject(rt, "global")
-                                      .getPropertyAsObject(rt, "InflatorRegistry")
-                                      .getPropertyAsFunction(rt, "didPushChildren");
+      jsi::Function didPushChildren =
+          rt.global()
+              .getPropertyAsObject(rt, "global")
+              .getPropertyAsObject(rt, "InflatorRegistry")
+              .getPropertyAsFunction(rt, "didPushChildren");
       didPushChildren.call(rt, 0);
     });
   }
