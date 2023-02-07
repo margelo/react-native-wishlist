@@ -47,6 +47,7 @@ target_include_directories(
   "${COMMON_SRC_DIR}/Wishlist"
   "${COMMON_SRC_DIR}"
   "${LIB_ANDROID_GENERATED_JNI_DIR}"
+  "${REACT_ANDROID_DIR}/src/main/jni/react/turbomodule"
 )
 
 # build shared lib

@@ -1,6 +1,10 @@
-#import <Foundation/Foundation.h>
 #import <React/RCTViewManager.h>
+#import <wishlist/wishlist.h>
+
 NS_ASSUME_NONNULL_BEGIN
+
+@interface MGWishlistManager : NSObject <NativeWishlistManagerSpec>
+@end
 
 @interface MGWishlistComponentManager : RCTViewManager
 @end

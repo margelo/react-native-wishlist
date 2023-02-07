@@ -177,8 +177,8 @@
   },
   "codegenConfig": {
     "name": "wishlist",
-    "type": "components",
-    "jsSrcsDir": "./src/NativeViews",
+    "type": "all",
+    "jsSrcsDir": "./src/Specs",
     "android": {
       "javaPackageName": "com.wishlist"
     }

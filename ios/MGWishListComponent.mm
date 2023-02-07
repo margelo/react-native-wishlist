@@ -13,6 +13,7 @@
 #import "MGScrollViewOrchestrator.h"
 #import "MGWishlistComponentDescriptor.h"
 #import "RCTFabricComponentsPlugins.h"
+#import "MGUIScheduleriOS.hpp"
 
 using namespace facebook::react;
 

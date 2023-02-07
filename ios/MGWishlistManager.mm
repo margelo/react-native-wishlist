@@ -1,8 +1,8 @@
-#import "WorkaroundManagers.h"
+#import "MGWishlistManager.h"
+
 #import <React/RCTBridge+Private.h>
 #import <React/RCTBridge.h>
 #import <React/RCTComponentViewFactory.h>
-#import <React/RCTInitializing.h>
 #import <React/RCTScheduler.h>
 #import <React/RCTSurfacePresenter.h>
 #import <React/RCTSurfacePresenterStub.h>
@@ -15,23 +15,22 @@
 #import "MGWishListComponent.h"
 #include "WishlistJsRuntime.h"
 
-using EventListener = facebook::react::EventListener;
-using RawEvent = facebook::react::RawEvent;
+using namespace facebook::react;
 using namespace Wishlist;
 
-@interface Workaround : NSObject <RCTBridgeModule, RCTInvalidating, RCTInitializing, RCTEventDispatcherObserver>
+@interface MGWishlistManager () <RCTEventDispatcherObserver>
 
 @property (nonatomic, weak) RCTBridge *bridge;
 
 @end
 
-@implementation Workaround {
+@implementation MGWishlistManager {
   __weak RCTSurfacePresenter *_surfacePresenter;
   std::shared_ptr<EventListener> _eventListener;
   std::shared_ptr<RNWorklet::DispatchQueue> _wishlistQueue;
 }
 
-RCT_EXPORT_MODULE(Workaround);
+RCT_EXPORT_MODULE(WishlistManager);
 
 - (void)setBridge:(RCTBridge *)bridge
 {
@@ -56,17 +55,13 @@ RCT_EXPORT_MODULE(Workaround);
 
   WishlistJsRuntime::getInstance().initialize(
       jsRuntime,
-      [=](std::function<void()> &&f) {
-        _wishlistQueue->dispatch(std::move(f));
-      },
+      [=](std::function<void()> &&f) { _wishlistQueue->dispatch(std::move(f)); },
       [=](std::function<void()> &&f) { callInvoker->invokeAsync(std::move(f)); });
 }
 
 - (void)eventDispatcherWillDispatchEvent:(id<RCTEvent>)event
 {
-  _wishlistQueue->dispatch([=](){
-    [self handlePaperEvent:event];
-  });
+  _wishlistQueue->dispatch([=]() { [self handlePaperEvent:event]; });
 }
 
 - (bool)handleFabricEvent:(const RawEvent &)event
@@ -129,6 +124,11 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 {
   // This is only used to force the native module to load and setBridge to be called.
   return @true;
+}
+
+- (std::shared_ptr<TurboModule>)getTurboModule:(const ObjCTurboModule::InitParams &)params
+{
+  return std::make_shared<NativeWishlistManagerSpecJSI>(params);
 }
 
 @end
