@@ -32,10 +32,10 @@ void WishlistManagerModule::nativeInstall(
   WishlistJsRuntime::getInstance().initialize(
       jsiRuntime,
       [=](std::function<void()> &&f) {
-        _wishlistQueue->dispatch(std::move(f));
+        jsCallInvoker->invokeAsync(std::move(f));
       },
       [=](std::function<void()> &&f) {
-        jsCallInvoker->invokeAsync(std::move(f));
+        _wishlistQueue->dispatch(std::move(f));
       });
 }
 
