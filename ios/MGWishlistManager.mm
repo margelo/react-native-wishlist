@@ -55,8 +55,8 @@ RCT_EXPORT_MODULE(WishlistManager);
 
   WishlistJsRuntime::getInstance().initialize(
       jsRuntime,
-      [=](std::function<void()> &&f) { _wishlistQueue->dispatch(std::move(f)); },
-      [=](std::function<void()> &&f) { callInvoker->invokeAsync(std::move(f)); });
+      [=](std::function<void()> &&f) { callInvoker->invokeAsync(std::move(f)); },
+      [=](std::function<void()> &&f) { _wishlistQueue->dispatch(std::move(f)); });
 }
 
 - (void)eventDispatcherWillDispatchEvent:(id<RCTEvent>)event
