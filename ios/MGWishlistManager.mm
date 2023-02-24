@@ -61,7 +61,7 @@ RCT_EXPORT_MODULE(WishlistManager);
 
 - (void)eventDispatcherWillDispatchEvent:(id<RCTEvent>)event
 {
-  _wishlistQueue->dispatch([=]() { [self handlePaperEvent:event]; });
+  [self handlePaperEvent:event];
 }
 
 - (bool)handleFabricEvent:(const RawEvent &)event
