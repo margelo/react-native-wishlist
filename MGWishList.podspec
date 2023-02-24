@@ -1,5 +1,5 @@
 require "json"
-require_relative '../react-native/scripts/react_native_pods'
+require File.join(File.dirname(`node --print "require.resolve('react-native/package.json')"`), "scripts/react_native_pods")
 
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 
