@@ -4,9 +4,7 @@ import com.facebook.jni.HybridData
 import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.module.annotations.ReactModule
-import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.turbomodule.core.CallInvokerHolderImpl
-import com.facebook.react.turbomodule.core.interfaces.CallInvokerHolder
 import com.facebook.soloader.SoLoader
 
 @ReactModule(name = WishlistManagerModule.NAME)
@@ -33,5 +31,8 @@ class WishlistManagerModule(reactContext: ReactApplicationContext) :
 
   private external fun initHybrid(): HybridData
 
-  private external fun nativeInstall(jsiRuntimeRef: Long, jsCallInvokerHolder: CallInvokerHolderImpl)
+  private external fun nativeInstall(
+      jsiRuntimeRef: Long,
+      jsCallInvokerHolder: CallInvokerHolderImpl
+  )
 }

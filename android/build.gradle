@@ -1,53 +1,58 @@
 buildscript {
-  def kotlin_version = rootProject.ext.has("kotlinVersion") ? rootProject.ext.get("kotlinVersion") : project.properties["Wishlist_kotlinVersion"]
+    def kotlin_version = rootProject.ext.has("kotlinVersion") ? rootProject.ext.get("kotlinVersion") : project.properties["Wishlist_kotlinVersion"]
 
-  repositories {
-    mavenCentral()
-    google()
-  }
+    repositories {
+        mavenCentral()
+        google()
+    }
 
-  dependencies {
-    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
-    classpath("com.android.tools.build:gradle:7.3.1")
-  }
+    dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
+        classpath("com.android.tools.build:gradle:7.3.1")
+        classpath("com.diffplug.spotless:spotless-plugin-gradle:6.11.0")
+    }
 }
 
 def getExtOrDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["Wishlist_" + name]
+    return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["Wishlist_" + name]
 }
 
 def getExtOrIntegerDefault(name) {
-  return getExtOrDefault(name).toInteger()
+    return getExtOrDefault(name).toInteger()
 }
 
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
-apply plugin: "com.facebook.react"
+if (project == rootProject) {
+    apply from: "spotless.gradle"
+} else {
+    apply plugin: "com.facebook.react"
+}
 
 android {
-  compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
+    compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
 
-  defaultConfig {
-    minSdkVersion getExtOrIntegerDefault("minSdkVersion")
-    targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
-  }
+    defaultConfig {
+        minSdkVersion getExtOrIntegerDefault("minSdkVersion")
+        targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
+    }
 
-  compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
-  }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
-  buildFeatures {
-    prefab true
-  }
+    buildFeatures {
+        prefab true
+    }
 }
 
 def kotlin_version = getExtOrDefault("kotlinVersion")
 
 
 dependencies {
-  implementation "com.facebook.react:react-android"
-  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "com.facebook.react:react-android"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 
 preBuild.dependsOn(":react-native-worklets:assembleDebug")

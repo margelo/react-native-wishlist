@@ -51,8 +51,8 @@ jobs:
     - name: Install node_modules (example/)
       run: yarn install --frozen-lockfile --cwd example
 
-    - name: Run Prettier
-      run: yarn prettier
+    - name: Check code formatting
+      run: yarn format:check
 
     - name: Run ESLint
       run: yarn lint -f @jamesacarr/github-actions
