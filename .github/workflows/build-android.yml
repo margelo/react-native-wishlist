@@ -1,0 +1,42 @@
+name: Build Android
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/build-android.yml'
+      - 'android/**'
+      - 'example/android/**'
+  pull_request:
+    paths:
+      - '.github/workflows/build-android.yml'
+      - 'android/**'
+      - 'example/android/**'
+
+jobs:
+  build:
+    name: Build Android Example App
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: example/android
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Restore node_modules from cache
+        uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Install node_modules for example/
+        run: yarn install --frozen-lockfile --cwd ..
+
+      - name: Build App
+        run: ./gradlew assembleDebug
