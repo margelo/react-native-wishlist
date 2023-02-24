@@ -1,8 +1,8 @@
-#import "WorkaroundManagers.h"
+#import "MGWishlistManager.h"
+
 #import <React/RCTBridge+Private.h>
 #import <React/RCTBridge.h>
 #import <React/RCTComponentViewFactory.h>
-#import <React/RCTInitializing.h>
 #import <React/RCTScheduler.h>
 #import <React/RCTSurfacePresenter.h>
 #import <React/RCTSurfacePresenterStub.h>
@@ -15,29 +15,26 @@
 #import "MGWishListComponent.h"
 #include "WishlistJsRuntime.h"
 
-using EventListener = facebook::react::EventListener;
-using RawEvent = facebook::react::RawEvent;
+using namespace facebook::react;
 using namespace Wishlist;
 
-@interface Workaround : NSObject <RCTBridgeModule, RCTInvalidating, RCTInitializing, RCTEventDispatcherObserver>
+@interface MGWishlistManager () <RCTEventDispatcherObserver>
 
 @property (nonatomic, weak) RCTBridge *bridge;
 
 @end
 
-@implementation Workaround {
+@implementation MGWishlistManager {
   __weak RCTSurfacePresenter *_surfacePresenter;
   std::shared_ptr<EventListener> _eventListener;
-  dispatch_queue_t wishlistQueue;
+  std::shared_ptr<RNWorklet::DispatchQueue> _wishlistQueue;
 }
 
-RCT_EXPORT_MODULE(Workaround);
+RCT_EXPORT_MODULE(WishlistManager);
 
 - (void)setBridge:(RCTBridge *)bridge
 {
-  dispatch_queue_attr_t qos =
-      dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, -1);
-  wishlistQueue = dispatch_queue_create("wishlistqueue", qos);
+  _wishlistQueue = std::make_shared<RNWorklet::DispatchQueue>("wishlistqueue");
   _bridge = bridge;
   _surfacePresenter = _bridge.surfacePresenter;
   __weak __typeof(self) weakSelf = self;
@@ -58,20 +55,13 @@ RCT_EXPORT_MODULE(Workaround);
 
   WishlistJsRuntime::getInstance().initialize(
       jsRuntime,
-      [=](std::function<void()> &&f) {
-        __block auto retainedWork = std::move(f);
-        dispatch_async(wishlistQueue, ^{
-          retainedWork();
-        });
-      },
-      [=](std::function<void()> &&f) { callInvoker->invokeAsync(std::move(f)); });
+      [=](std::function<void()> &&f) { callInvoker->invokeAsync(std::move(f)); },
+      [=](std::function<void()> &&f) { _wishlistQueue->dispatch(std::move(f)); });
 }
 
 - (void)eventDispatcherWillDispatchEvent:(id<RCTEvent>)event
 {
-  dispatch_async(wishlistQueue, ^{
-    [self handlePaperEvent:event];
-  });
+  [self handlePaperEvent:event];
 }
 
 - (bool)handleFabricEvent:(const RawEvent &)event
@@ -134,6 +124,11 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 {
   // This is only used to force the native module to load and setBridge to be called.
   return @true;
+}
+
+- (std::shared_ptr<TurboModule>)getTurboModule:(const ObjCTurboModule::InitParams &)params
+{
+  return std::make_shared<NativeWishlistManagerSpecJSI>(params);
 }
 
 @end

@@ -20,11 +20,11 @@ import InflatorRepository, {
   ComponentPool,
   InflateMethod,
 } from './InflatorRepository';
-import NativeTemplateContainer from './NativeViews/NativeTemplateContainer';
-import NativeTemplateInterceptor from './NativeViews/NativeTemplateInterceptor';
+import NativeTemplateContainer from './Specs/NativeTemplateContainer';
+import NativeTemplateInterceptor from './Specs/NativeTemplateInterceptor';
 import NativeWishList, {
   Commands as WishlistCommands,
-} from './NativeViews/WishlistNativeComponent';
+} from './Specs/NativeWishlist';
 import { TemplateContext } from './TemplateContext';
 import { generateId } from './Utils';
 import { useWishlistContext, WishlistContext } from './WishlistContext';

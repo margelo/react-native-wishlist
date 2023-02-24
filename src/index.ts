@@ -1,6 +1,6 @@
-import { NativeModules } from 'react-native';
+import WishListManager from './Specs/NativeWishlistManager';
 
-NativeModules.Workaround.install();
+WishListManager.install();
 
 export { useTemplateValue, TemplateValue } from './TemplateValue';
 export { createTemplateComponent } from './createTemplateComponent';

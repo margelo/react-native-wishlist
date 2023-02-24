@@ -1,6 +1,5 @@
 #include "ItemProvider.h"
 
-#include <React/RCTLog.h>
 #include <react/renderer/uimanager/UIManager.h>
 #include <react/renderer/uimanager/primitives.h>
 #include "WishlistJsRuntime.h"
@@ -10,8 +9,7 @@ namespace Wishlist {
 struct
 
     WishItem
-    WorkletItemProvider::provide(int index)
-{
+    WorkletItemProvider::provide(int index) {
   WishItem wishItem;
 
   auto &rt = WishlistJsRuntime::getInstance().getRuntime();
@@ -23,9 +21,14 @@ struct
 
   jsi::Value returnedValue;
   try {
-    returnedValue = inflateItem.call(rt, jsi::String::createFromUtf8(rt, tag), jsi::Value(index), cp->prepareProxy(rt));
+    returnedValue = inflateItem.call(
+        rt,
+        jsi::String::createFromUtf8(rt, tag),
+        jsi::Value(index),
+        cp->prepareProxy(rt));
   } catch (std::exception &error) {
-    RCTLogError(@"%@", [NSString stringWithUTF8String:error.what()]);
+    // TODO: Redbox from c++
+    // RCTLogError(@"%@", [NSString stringWithUTF8String:error.what()]);
     return wishItem;
   }
 
@@ -41,7 +44,8 @@ struct
   auto affected = std::vector<const LayoutableShadowNode *>();
   this->lc.affectedNodes = &affected;
   // better use layoutTree instead of measure (will be persistant)
-  std::shared_ptr<YogaLayoutableShadowNode> ysn = std::static_pointer_cast<YogaLayoutableShadowNode>(sn->clone({}));
+  std::shared_ptr<YogaLayoutableShadowNode> ysn =
+      std::static_pointer_cast<YogaLayoutableShadowNode>(sn->clone({}));
   facebook::react::Size sz = ysn->measure(this->lc, this->lcc);
 
   wishItem.sn = std::static_pointer_cast<ShadowNode>(ysn);

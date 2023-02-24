@@ -19,7 +19,7 @@ void WishlistJsRuntime::initialize(
     std::function<void(std::function<void()> &&)> workletCallInvoker) {
   workletContext_ = std::make_shared<RNWorklet::JsiWorkletContext>();
   workletContext_->initialize(
-      "wishlist", runtime, workletCallInvoker, jsCallInvoker);
+      "wishlist", runtime, jsCallInvoker, workletCallInvoker);
   workletContext_->addDecorator(std::make_shared<Decorator>());
 
   runtime->global().setProperty(
@@ -34,21 +34,23 @@ jsi::Runtime &WishlistJsRuntime::getRuntime() const {
 
 void WishlistJsRuntime::accessRuntime(
     std::function<void(jsi::Runtime &)> &&f) const {
-  workletContext_->invokeOnWorkletThread([=, ff = std::move(f)]() {
-    auto &rt = workletContext_->getWorkletRuntime();
-    ff(rt);
-  });
+  workletContext_->invokeOnWorkletThread(
+      [=, ff = std::move(f)](
+          RNWorklet::JsiWorkletContext *context, jsi::Runtime &runtime) {
+        ff(runtime);
+      });
 }
 
 void WishlistJsRuntime::accessRuntimeSync(
     std::function<void(jsi::Runtime &)> &&f) const {
   static std::mutex mutex;
   mutex.lock();
-  workletContext_->invokeOnWorkletThread([=, ff = std::move(f)]() {
-    auto &rt = workletContext_->getWorkletRuntime();
-    ff(rt);
-    mutex.unlock();
-  });
+  workletContext_->invokeOnWorkletThread(
+      [=, ff = std::move(f)](
+          RNWorklet::JsiWorkletContext *context, jsi::Runtime &runtime) {
+        ff(runtime);
+        mutex.unlock();
+      });
   mutex.lock();
   mutex.unlock();
 }

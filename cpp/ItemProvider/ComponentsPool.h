@@ -6,7 +6,6 @@
 #include <memory>
 #include <sstream>
 #include "ShadowNodeCopyMachine.h"
-#include "decorator.h"
 
 using namespace facebook::react;
 using namespace jsi;

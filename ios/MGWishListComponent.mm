@@ -11,6 +11,7 @@
 #include <react/renderer/components/wishlist/ShadowNodes.h>
 #import "MGDIImpl.hpp"
 #import "MGScrollViewOrchestrator.h"
+#import "MGUIScheduleriOS.hpp"
 #import "MGWishlistComponentDescriptor.h"
 #import "RCTFabricComponentsPlugins.h"
 

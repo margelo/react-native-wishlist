@@ -27,7 +27,7 @@ struct MGDI {
     virtual std::shared_ptr<MGViewportCarer> getViewportCarer() = 0;
     virtual std::shared_ptr<MGUIScheduler> getUIScheduler() = 0;
     virtual std::shared_ptr<MGBoundingBoxObserver> getBoundingBoxObserver() = 0;
-    
+
     virtual ~MGDI(){}
 };
 

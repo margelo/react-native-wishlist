@@ -1,6 +1,8 @@
 #import "AppDelegate.h"
 
+#import <React/CoreModulesPlugins.h>
 #import <React/RCTBundleURLProvider.h>
+#import "MGWishlistManager.h"
 
 @implementation AppDelegate
 
@@ -31,6 +33,14 @@
 - (BOOL)concurrentRootEnabled
 {
   return true;
+}
+
+- (Class)getModuleClassFromName:(const char *)name
+{
+  if (strcmp(name, "WishlistManager") == 0) {
+    return MGWishlistManager.class;
+  }
+  return RCTCoreModulesClassProvider(name);
 }
 
 @end

@@ -14,7 +14,7 @@ using namespace facebook;
 MGDataBindingImpl::MGDataBindingImpl(
     std::string wishlistId,
     std::weak_ptr<MGDI> _di)
-    : _wishlistId(wishlistId), di(_di) {
+    : di(_di), _wishlistId(wishlistId) {
   registerBindings();
 }
 

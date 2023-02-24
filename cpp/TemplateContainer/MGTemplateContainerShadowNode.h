@@ -4,7 +4,7 @@
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
 #include <react/renderer/components/wishlist/EventEmitters.h>
 #include <react/renderer/components/wishlist/Props.h>
-#include "LayoutContext.h"
+#include <react/renderer/core/LayoutContext.h>
 #include "MGTemplateContainerState.h"
 
 namespace facebook {
