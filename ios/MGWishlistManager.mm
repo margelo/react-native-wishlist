@@ -12,6 +12,7 @@
 #include <react/renderer/components/view/ViewEventEmitter.h>
 #include <react/renderer/core/EventListener.h>
 #include "MGObjCJSIUtils.h"
+#include "MGUIManagerHolder.h"
 #import "MGWishListComponent.h"
 #include "WishlistJsRuntime.h"
 
@@ -57,6 +58,8 @@ RCT_EXPORT_MODULE(WishlistManager);
       jsRuntime,
       [=](std::function<void()> &&f) { callInvoker->invokeAsync(std::move(f)); },
       [=](std::function<void()> &&f) { _wishlistQueue->dispatch(std::move(f)); });
+
+  MGUIManagerHolder::getInstance().setUIManager(_surfacePresenter.scheduler.uiManager);
 }
 
 - (void)eventDispatcherWillDispatchEvent:(id<RCTEvent>)event

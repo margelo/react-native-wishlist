@@ -3,6 +3,7 @@
 #include <ReactCommon/CallInvokerHolder.h>
 #include <fbjni/fbjni.h>
 #include <react-native-worklets/DispatchQueue.h>
+#include <react/fabric/JFabricUIManager.h>
 
 using namespace facebook;
 
@@ -22,7 +23,8 @@ class WishlistManagerModule : public jni::HybridClass<WishlistManagerModule> {
 
   void nativeInstall(
       jlong jsiRuntimeRef,
-      jni::alias_ref<react::CallInvokerHolder::javaobject> jsCallInvokerHolder);
+      jni::alias_ref<react::CallInvokerHolder::javaobject> jsCallInvokerHolder,
+      jni::alias_ref<react::JFabricUIManager::javaobject> fabricUIManager);
 
  private:
   friend HybridBase;

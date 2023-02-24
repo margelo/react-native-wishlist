@@ -9,6 +9,8 @@
 #define MGDI_hpp
 
 #include <stdio.h>
+#include <react/renderer/uimanager/UIManager.h>
+
 #include "MGAnimationSight.hpp"
 #include "MGBoundingBoxObserver.hpp"
 #include "MGDataBinding.hpp"
