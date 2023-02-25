@@ -2,7 +2,7 @@
 
 #include <ReactCommon/CallInvokerHolder.h>
 #include <fbjni/fbjni.h>
-#include <react-native-worklets/DispatchQueue.h>
+#include <react-native-worklets/WKTDispatchQueue.h>
 
 using namespace facebook;
 
