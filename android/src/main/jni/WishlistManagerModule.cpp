@@ -8,6 +8,7 @@
 #include "WishlistManagerModule.hpp"
 
 #include <fbjni/fbjni.h>
+#include "MGUIManagerHolder.h"
 #include "WishlistJsRuntime.h"
 
 using namespace facebook;
@@ -23,7 +24,8 @@ WishlistManagerModule::WishlistManagerModule() {}
 
 void WishlistManagerModule::nativeInstall(
     jlong jsiRuntimeRef,
-    jni::alias_ref<react::CallInvokerHolder::javaobject> jsCallInvokerHolder) {
+    jni::alias_ref<react::CallInvokerHolder::javaobject> jsCallInvokerHolder,
+    jni::alias_ref<react::JFabricUIManager::javaobject> fabricUIManager) {
   auto jsiRuntime{reinterpret_cast<jsi::Runtime *>(jsiRuntimeRef)};
   auto jsCallInvoker = jsCallInvokerHolder->cthis()->getCallInvoker();
 
@@ -37,6 +39,10 @@ void WishlistManagerModule::nativeInstall(
       [=](std::function<void()> &&f) {
         _wishlistQueue->dispatch(std::move(f));
       });
+
+  auto uiManager =
+      fabricUIManager->getBinding()->getScheduler()->getUIManager();
+  MGUIManagerHolder::getInstance().setUIManager(std::move(uiManager));
 }
 
 void WishlistManagerModule::registerNatives() {

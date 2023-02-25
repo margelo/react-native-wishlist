@@ -63,17 +63,21 @@ target_link_libraries(
   ${PACKAGE_NAME}
   fbjni::fbjni
   react-native-worklets::rnworklets
+  ReactAndroid::fabricjni
   ReactAndroid::folly_runtime
   ReactAndroid::glog
   ReactAndroid::jsi
   ReactAndroid::react_codegen_rncore
   ReactAndroid::react_debug
   ReactAndroid::react_nativemodule_core
+  ReactAndroid::react_render_animations
   ReactAndroid::react_render_core
   ReactAndroid::react_render_debug
   ReactAndroid::react_render_graphics
   ReactAndroid::react_render_mapbuffer
   ReactAndroid::react_render_mounting
+  ReactAndroid::react_render_scheduler
+  ReactAndroid::react_render_uimanager
   ReactAndroid::reactnativejni
   ReactAndroid::rrc_view
   ReactAndroid::runtimeexecutor

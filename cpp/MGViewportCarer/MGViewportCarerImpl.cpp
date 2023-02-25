@@ -1,12 +1,9 @@
 #include "MGViewportCarerImpl.h"
+#include "MGUIManagerHolder.h"
 #include "MGWishlistShadowNode.h"
 #include "WishlistJsRuntime.h"
 
 using namespace facebook::react;
-
-#ifdef ANDROID
-ShadowTreeRegistry *KeyClassHolder::shadowTreeRegistry = nullptr;
-#endif
 
 void MGViewportCarerImpl::setDI(std::weak_ptr<MGDI> _di) {
   this->di = _di;
@@ -201,8 +198,10 @@ void MGViewportCarerImpl::pushChildren() {
     return;
   }
 
-  KeyClassHolder::shadowTreeRegistry->visit(
-      surfaceId, [&](const ShadowTree &st) {
+  MGUIManagerHolder::getInstance()
+      .getUIManager()
+      ->getShadowTreeRegistry()
+      .visit(surfaceId, [&](const ShadowTree &st) {
         ShadowTreeCommitTransaction transaction =
             [&](RootShadowNode const &oldRootShadowNode)
             -> std::shared_ptr<RootShadowNode> {
