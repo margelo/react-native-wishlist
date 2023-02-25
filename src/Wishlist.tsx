@@ -242,7 +242,6 @@ function InnerComponent({
 
   return (
     <NativeTemplateInterceptor
-      inflatorId={inflatorId}
       style={style}
       collapsable={false}
       removeClippedSubviews={false}

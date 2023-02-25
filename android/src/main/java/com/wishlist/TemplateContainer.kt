@@ -7,4 +7,5 @@ class TemplateContainer(reactContext: Context) : ReactViewGroup(reactContext) {
   var inflatorId: String? = null
   var wishlistId: String? = null
   var names: List<String>? = null
+  var wishlist: Wishlist? = null
 }
