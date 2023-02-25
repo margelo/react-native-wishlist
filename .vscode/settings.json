@@ -63,6 +63,7 @@
     "csetjmp": "cpp",
     "csignal": "cpp",
     "cstdarg": "cpp",
-    "*.ipp": "cpp"
+    "*.ipp": "cpp",
+    "iostream": "cpp"
   }
 }

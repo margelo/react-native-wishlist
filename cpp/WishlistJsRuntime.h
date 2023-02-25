@@ -2,8 +2,8 @@
 
 #include <ReactCommon/CallInvoker.h>
 #include <jsi/jsi.h>
-#include <react-native-worklets/JsiBaseDecorator.h>
-#include <react-native-worklets/JsiWorkletContext.h>
+#include <react-native-worklets/WKTJsiBaseDecorator.h>
+#include <react-native-worklets/WKTJsiWorkletContext.h>
 #include <stdio.h>
 #include <memory>
 

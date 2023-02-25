@@ -123,7 +123,7 @@
     "react-native": "^0.71.3",
     "react-native-gesture-handler": "^2.9.0",
     "react-native-builder-bob": "^0.20.0",
-    "react-native-worklets": "https://github.com/chrfalch/react-native-worklets#main",
+    "react-native-worklets": "janicduplessis/react-native-worklets#react-native-worklets-v0.1.0-alpha.1-gitpkg",
     "release-it": "^15.0.0",
     "typescript": "^4.5.2"
   },
