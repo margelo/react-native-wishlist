@@ -2,8 +2,7 @@ package com.wishlist
 
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.module.annotations.ReactModule
-import com.facebook.react.uimanager.ThemedReactContext
-import com.facebook.react.uimanager.ViewGroupManager
+import com.facebook.react.uimanager.*
 import com.facebook.react.uimanager.annotations.ReactProp
 import com.facebook.react.viewmanagers.MGTemplateContainerManagerDelegate
 import com.facebook.react.viewmanagers.MGTemplateContainerManagerInterface
@@ -21,6 +20,20 @@ class TemplateContainerViewManager :
       TemplateContainer(reactContext)
 
   override fun getDelegate() = MGTemplateContainerManagerDelegate(this)
+
+  override fun updateState(
+      view: TemplateContainer,
+      props: ReactStylesDiffMap?,
+      stateWrapper: StateWrapper?
+  ): Any? {
+    view.fabricViewStateManager.setStateWrapper(stateWrapper)
+    return null
+  }
+
+  override fun onAfterUpdateTransaction(view: TemplateContainer) {
+    super.onAfterUpdateTransaction(view)
+    view.updateWishlist()
+  }
 
   @ReactProp(name = "inflatorId")
   override fun setInflatorId(view: TemplateContainer, value: String?) {

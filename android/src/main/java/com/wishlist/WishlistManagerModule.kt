@@ -17,7 +17,7 @@ class WishlistManagerModule(reactContext: ReactApplicationContext) :
     const val NAME = "WishlistManager"
 
     init {
-      SoLoader.loadLibrary("react_codegen_wishlist")
+      WishlistSoLoader.staticInit()
     }
   }
 

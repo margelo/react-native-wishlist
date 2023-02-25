@@ -64,6 +64,7 @@
     "csignal": "cpp",
     "cstdarg": "cpp",
     "*.ipp": "cpp",
-    "iostream": "cpp"
+    "iostream": "cpp",
+    "string_view": "cpp"
   }
 }
