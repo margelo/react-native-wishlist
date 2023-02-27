@@ -8,13 +8,13 @@
 #ifndef MGBindingProvider_hpp
 #define MGBindingProvider_hpp
 
-#include <stdio.h>
 #include <jsi/jsi.h>
+#include <stdio.h>
 
 using namespace facebook;
 
 struct MGBindingProvider {
-    virtual jsi::Value getBinding(jsi::Runtime & rt) = 0;
+  virtual jsi::Value getBinding(jsi::Runtime &rt) = 0;
 };
 
 #endif /* MGBindingProvider_hpp */

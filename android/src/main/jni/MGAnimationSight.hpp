@@ -10,12 +10,10 @@
 
 #include <stdio.h>
 
-
-
 struct MGAnimationSight {
-    virtual float getOffsetIfItemIsAlreadyRendered(int index) = 0;
-    virtual bool isTargetItemLocatedBelow(int targetItem) = 0;
-    static float NOT_FOUND;
+  virtual float getOffsetIfItemIsAlreadyRendered(int index) = 0;
+  virtual bool isTargetItemLocatedBelow(int targetItem) = 0;
+  static float NOT_FOUND;
 };
 
 #endif /* MGItemSight_hpp */

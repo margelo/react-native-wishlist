@@ -1,38 +1,24 @@
 package com.wishlist
 
-import android.widget.ScrollView
 import com.facebook.jni.HybridData
 import com.facebook.proguard.annotations.DoNotStrip
 
-class Orchestrator(
-    private val scrollView: ScrollView,
-    private val inflatorId: String,
-    private val wishlistId: String
-) {
+class Orchestrator(inflatorId: String, wishlistId: String, viewportCarerRef: Int) {
   companion object {
     init {
       WishlistSoLoader.staticInit()
     }
   }
 
-  @field:DoNotStrip private val mHybridData = initHybrid()
+  @field:DoNotStrip private val mHybridData = initHybrid(inflatorId, wishlistId, viewportCarerRef)
 
-  fun runWithTemplates(templatesRef: Int, names: List<String>, initialIndex: Int) {
-    initialRenderAsync(
-        scrollView.width.toFloat(),
-        scrollView.height.toFloat(),
-        500000f,
-        initialIndex,
-        templatesRef,
-        names,
-        inflatorId)
-  }
+  private external fun initHybrid(
+      inflatorId: String,
+      wishlistId: String,
+      viewportCarerRef: Int
+  ): HybridData
 
-  fun notifyAboutNewTemplates(templatesRef: Int, names: List<String>) {}
-
-  private external fun initHybrid(): HybridData
-
-  external fun initialRenderAsync(
+  external fun renderAsync(
       width: Float,
       height: Float,
       initialOffset: Float,

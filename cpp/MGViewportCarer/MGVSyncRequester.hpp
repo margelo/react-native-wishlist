@@ -11,7 +11,7 @@
 #include <stdio.h>
 
 struct MGVSyncRequester {
-    virtual void requestVSync() = 0;
+  virtual void requestVSync() = 0;
 };
 
 #endif /* MGVsyncRequester_hpp */

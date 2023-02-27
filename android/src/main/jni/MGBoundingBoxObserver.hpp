@@ -12,7 +12,8 @@
 #include <vector>
 
 struct MGBoundingBoxObserver {
-     virtual void boundingBoxDidChange(std::pair<float, float> TopAndBottomEdge) = 0;
+  virtual void boundingBoxDidChange(
+      std::pair<float, float> TopAndBottomEdge) = 0;
 };
 
 #endif /* MGBoundingBoxObserver_hpp */

@@ -11,23 +11,23 @@
 #include <stdio.h>
 #include <vector>
 #include "MGAnimationSight.hpp"
-#include "MGPushChildrenListener.hpp"
 #include "MGDI.hpp"
+#include "MGPushChildrenListener.hpp"
 
 struct MGWindowKeeper : MGAnimationSight, MGPushChildrenListener {
-    std::vector<Item> items;
-    std::weak_ptr<MGDI> di;
-    
-    MGWindowKeeper(std::weak_ptr<MGDI> _di);
-    
+  std::vector<Item> items;
+  std::weak_ptr<MGDI> di;
+
+  MGWindowKeeper(std::weak_ptr<MGDI> _di);
+
 #pragma MGAnimationSight
-    
-    virtual float getOffsetIfItemIsAlreadyRendered(int index);
-    virtual bool isTargetItemLocatedBelow(int targetItem);
-    
+
+  virtual float getOffsetIfItemIsAlreadyRendered(int index);
+  virtual bool isTargetItemLocatedBelow(int targetItem);
+
 #pragma MGPushChildrenListener
 
-    virtual void didPushChildren(std::vector<Item> newWindow);
+  virtual void didPushChildren(std::vector<Item> newWindow);
 };
 
 #endif /* MGWindowKeeper_hpp */

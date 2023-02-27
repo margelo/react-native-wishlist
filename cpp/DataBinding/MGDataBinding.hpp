@@ -9,13 +9,14 @@
 #define MGDataBinding_hpp
 
 #include <stdio.h>
+#include <memory>
 #include <set>
 #include <string>
-#include <memory>
 
 struct MGDataBinding {
-    virtual std::set<int> applyChangesAndGetDirtyIndices(std::pair<int, int> windowIndexRange) = 0;
-    virtual ~MGDataBinding() {}
+  virtual std::set<int> applyChangesAndGetDirtyIndices(
+      std::pair<int, int> windowIndexRange) = 0;
+  virtual ~MGDataBinding() {}
 };
 
 #endif /* MGDataBinding_hpp */

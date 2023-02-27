@@ -1,6 +1,8 @@
 #include "MGTemplateContainerState.h"
 
-#include <cstdint>
+#ifdef ANDROID
+#include "JNIStateRegistry.h"
+#endif
 
 namespace facebook::react {
 
@@ -10,7 +12,9 @@ const std::vector<std::shared_ptr<ShadowNode const>>
 }
 
 folly::dynamic MGTemplateContainerState::getDynamic() const {
-  return folly::dynamic::object("templates", (std::uintptr_t)&templates_);
+  auto templatesRef =
+      Wishlist::JNIStateRegistry::getInstance().addValue((void *)&templates_);
+  return folly::dynamic::object("templates", templatesRef);
 };
 
 } // namespace facebook::react

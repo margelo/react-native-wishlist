@@ -12,7 +12,7 @@
 #include <functional>
 
 struct MGUIScheduler {
-    virtual void scheduleOnUI(std::function<void()> && f) = 0;
+  virtual void scheduleOnUI(std::function<void()> &&f) = 0;
 };
 
 #endif /* MGUIScheduler_hpp */

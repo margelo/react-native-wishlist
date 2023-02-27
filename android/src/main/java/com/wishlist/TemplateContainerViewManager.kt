@@ -27,6 +27,7 @@ class TemplateContainerViewManager :
       stateWrapper: StateWrapper?
   ): Any? {
     view.fabricViewStateManager.setStateWrapper(stateWrapper)
+    view.updateWishlist()
     return null
   }
 

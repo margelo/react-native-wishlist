@@ -1,5 +1,9 @@
 #include "MGWishlistState.h"
 
+#ifdef ANDROID
+#include "JNIStateRegistry.h"
+#endif
+
 namespace facebook {
 namespace react {
 
@@ -16,7 +20,9 @@ MGWishlistState::MGWishlistState(
     folly::dynamic data){};
 
 folly::dynamic MGWishlistState::getDynamic() const {
-  return folly::dynamic::object("contentOffsetLeft", 5);
+  auto viewportCarerRef = Wishlist::JNIStateRegistry::getInstance().addValue(
+      (void *)&viewportCarer);
+  return folly::dynamic::object("viewportCarer", viewportCarerRef);
 };
 
 MapBuffer MGWishlistState::getMapBuffer() const {

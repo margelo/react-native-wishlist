@@ -9,19 +9,21 @@
 #define MGOrchestratorCPPAdapter_hpp
 
 #include <stdio.h>
-#include "MGVSyncRequester.hpp"
 #include "MGBoundingBoxObserver.hpp"
+#include "MGVSyncRequester.hpp"
 
 struct MGOrchestratorCppAdapter : MGVSyncRequester, MGBoundingBoxObserver {
-    std::function<void(float, float)> onBoundingBoxDidChange;
-    std::function<void()> onRequestVSync;
-    
-    MGOrchestratorCppAdapter(std::function<void(float, float)> onBoundingBoxDidChange,
-                             std::function<void()> onRequestVSync);
-    
-    virtual void boundingBoxDidChange(std::pair<float, float> topAndBottomEdges) override;
+  std::function<void(float, float)> onBoundingBoxDidChange;
+  std::function<void()> onRequestVSync;
 
-    virtual void requestVSync() override;
+  MGOrchestratorCppAdapter(
+      std::function<void(float, float)> onBoundingBoxDidChange,
+      std::function<void()> onRequestVSync);
+
+  virtual void boundingBoxDidChange(
+      std::pair<float, float> topAndBottomEdges) override;
+
+  virtual void requestVSync() override;
 };
 
 #endif /* MGOrchestratorCPPAdapter_hpp */
