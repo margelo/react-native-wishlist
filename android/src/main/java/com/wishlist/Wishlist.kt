@@ -1,18 +1,15 @@
 package com.wishlist
 
 import android.content.Context
-import android.widget.ScrollView
 import com.facebook.react.uimanager.FabricViewStateManager
+import com.facebook.react.views.scroll.ReactScrollView
 
 class Wishlist(reactContext: Context) :
-    ScrollView(reactContext), FabricViewStateManager.HasFabricViewStateManager {
+    ReactScrollView(reactContext), FabricViewStateManager.HasFabricViewStateManager {
   var inflatorId: String? = null
   var wishlistId: String? = null
   var initialIndex: Int = 0
   private var orchestrator: Orchestrator? = null
-  private val fabricViewStateManager: FabricViewStateManager = FabricViewStateManager()
-
-  override fun getFabricViewStateManager() = fabricViewStateManager
 
   fun setTemplates(templatesRef: Int, names: List<String>) {
     var orchestrator = this.orchestrator
@@ -21,8 +18,9 @@ class Wishlist(reactContext: Context) :
           Orchestrator(
               inflatorId!!, wishlistId!!, fabricViewStateManager.stateData!!.getInt("viewportCarer"))
     }
+    // TODO: width / height
     orchestrator.renderAsync(
-        width.toFloat(), height.toFloat(), 500000f, initialIndex, templatesRef, names, inflatorId!!)
+        300f, 600f, 500000f, initialIndex, templatesRef, names, inflatorId!!)
   }
 
   fun scrollToItem(index: Int, animated: Boolean) {}

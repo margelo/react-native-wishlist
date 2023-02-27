@@ -3,7 +3,7 @@
 #include <fbjni/fbjni.h>
 #include "JNIStateRegistry.h"
 #include "MGUIManagerHolder.h"
-#include "MGUISchedulerAndroid.hpp"
+#include "UISchedulerAndroid.h"
 #include "WishlistJsRuntime.h"
 
 using namespace facebook;
@@ -41,7 +41,7 @@ Orchestrator::Orchestrator(
   di_->setDataBindingImpl(
       std::make_shared<MGDataBindingImpl>(wishlistId_, di_->getWeak()));
   di_->setWindowKeeper(std::make_shared<MGWindowKeeper>(di_->getWeak()));
-  di_->setUIScheduler(std::make_shared<MGUISchedulerAndroid>());
+  di_->setUIScheduler(std::make_shared<UISchedulerAndroid>());
 }
 
 void Orchestrator::renderAsync(
@@ -56,12 +56,12 @@ void Orchestrator::renderAsync(
       *reinterpret_cast<std::vector<std::shared_ptr<ShadowNode const>> *>(
           JNIStateRegistry::getInstance().getValue(templatesRef));
   if (!alreadyRendered_ && namesList->size() > 0 &&
-          namesList->size() == templates.size()) {
+      namesList->size() == templates.size()) {
     alreadyRendered_ = true;
 
     std::vector<std::string> names;
     for (const auto &name : *namesList) {
-        names.push_back(name->toStdString());
+      names.push_back(name->toStdString());
     }
 
     di_->getViewportCarer()->initialRenderAsync(
