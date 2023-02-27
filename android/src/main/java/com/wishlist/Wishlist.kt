@@ -20,7 +20,7 @@ class Wishlist(reactContext: Context) :
     }
     // TODO: width / height
     orchestrator.renderAsync(
-        300f, 600f, 500000f, initialIndex, templatesRef, names, inflatorId!!)
+        300f, 600f, 0f, initialIndex, templatesRef, names, inflatorId!!)
   }
 
   fun scrollToItem(index: Int, animated: Boolean) {}

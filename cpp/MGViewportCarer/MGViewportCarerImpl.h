@@ -35,26 +35,31 @@ struct MGViewportCarerImpl : MGViewportCarer {
   void setInitialValues(
       std::shared_ptr<ShadowNode> wishListNode,
       LayoutContext lc);
+
   void setDI(std::weak_ptr<MGDI> _di);
 
-  virtual void initialRenderAsync(
+  void initialRenderAsync(
       MGDims dimensions,
       float intialOffset,
       int originItem,
       std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
       std::vector<std::string> names,
-      std::string inflatorId);
+      std::string inflatorId) override;
 
-  virtual void didScrollAsync(
+  void didScrollAsync(
       MGDims dimentions,
       std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
       std::vector<std::string> names,
       float newOffset,
-      std::string inflatorId);
+      std::string inflatorId) override;
 
+ private:
   void updateWindow();
 
   std::shared_ptr<ShadowNode> getOffseter(float offset);
+
+  std::shared_ptr<ShadowNode> getContentContainer(
+      const ShadowNode::SharedListOfShared &children);
 
   void pushChildren();
 

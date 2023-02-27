@@ -9,15 +9,19 @@ namespace react {
 
 MGWishlistState::~MGWishlistState() {}
 
-#ifdef ANDROID
+MGWishlistState::MGWishlistState()
+    : initialised(false),
+      viewportCarer(std::make_shared<MGViewportCarerImpl>()),
+      contentBoundingRect({}){};
 
-MGWishlistState::MGWishlistState() {
-  this->viewportCarer = std::make_shared<MGViewportCarerImpl>();
-};
+#ifdef ANDROID
 
 MGWishlistState::MGWishlistState(
     MGWishlistState const &previousState,
-    folly::dynamic data){};
+    folly::dynamic data)
+    : initialised(false),
+      viewportCarer(previousState.viewportCarer),
+      contentBoundingRect({}){};
 
 folly::dynamic MGWishlistState::getDynamic() const {
   auto viewportCarerRef = Wishlist::JNIStateRegistry::getInstance().addValue(
