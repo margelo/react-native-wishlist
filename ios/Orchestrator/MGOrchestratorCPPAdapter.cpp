@@ -7,6 +7,8 @@
 
 #include "MGOrchestratorCPPAdapter.hpp"
 
+namespace Wishlist {
+
 MGOrchestratorCppAdapter::MGOrchestratorCppAdapter(
     std::function<void(float, float)> _onBoundingBoxDidChange,
     std::function<void()> _onRequestVSync)
@@ -21,3 +23,5 @@ void MGOrchestratorCppAdapter::boundingBoxDidChange(
 void MGOrchestratorCppAdapter::requestVSync() {
   onRequestVSync();
 }
+
+}; // namespace Wishlist

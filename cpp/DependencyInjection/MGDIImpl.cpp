@@ -6,7 +6,10 @@
 //
 
 #include "MGDIImpl.hpp"
+
 #include <iostream>
+
+namespace Wishlist {
 
 std::shared_ptr<MGAnimationSight> MGDIImpl::getAnimationsSight() {
   return std::static_pointer_cast<MGAnimationSight>(this->windowKeeper);
@@ -36,6 +39,10 @@ std::shared_ptr<MGBoundingBoxObserver> MGDIImpl::getBoundingBoxObserver() {
   return orchestratorAdapter;
 }
 
+std::shared_ptr<MGErrorHandler> MGDIImpl::getErrorHandler() {
+  return errorHandler;
+}
+
 void MGDIImpl::setWindowKeeper(std::shared_ptr<MGWindowKeeper> wk) {
   this->windowKeeper = wk;
 }
@@ -59,6 +66,10 @@ void MGDIImpl::setUIScheduler(std::shared_ptr<MGUIScheduler> uiScheduler) {
   this->uiScheduler = uiScheduler;
 }
 
+void MGDIImpl::setErrorHandler(std::shared_ptr<MGErrorHandler> errorHandler) {
+  this->errorHandler = errorHandler;
+}
+
 std::weak_ptr<MGDI> MGDIImpl::getWeak() {
   return std::static_pointer_cast<MGDI>(shared_from_this());
 }
@@ -66,3 +77,5 @@ std::weak_ptr<MGDI> MGDIImpl::getWeak() {
 MGDIImpl::~MGDIImpl() {
   std::cout << "sdfs" << std::endl;
 }
+
+}; // namespace Wishlist

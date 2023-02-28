@@ -8,7 +8,8 @@
 #include "MGDataBindingImpl.hpp"
 #include "WishlistJsRuntime.h"
 
-using namespace Wishlist;
+namespace Wishlist {
+
 using namespace facebook;
 
 MGDataBindingImpl::MGDataBindingImpl(
@@ -102,3 +103,5 @@ void MGDataBindingImpl::unregisterBindings() {
 MGDataBindingImpl::~MGDataBindingImpl() {
   unregisterBindings();
 }
+
+}; // namespace Wishlist

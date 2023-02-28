@@ -5,14 +5,15 @@
 //  Created by Szymon on 13/01/2023.
 //
 
-#ifndef MGWindowKeeper_hpp
-#define MGWindowKeeper_hpp
+#pragma once
 
 #include <stdio.h>
 #include <vector>
 #include "MGAnimationSight.hpp"
 #include "MGDI.hpp"
 #include "MGPushChildrenListener.hpp"
+
+namespace Wishlist {
 
 struct MGWindowKeeper final : MGAnimationSight, MGPushChildrenListener {
   std::vector<Item> items;
@@ -22,12 +23,12 @@ struct MGWindowKeeper final : MGAnimationSight, MGPushChildrenListener {
 
 #pragma mark MGAnimationSight
 
-  virtual float getOffsetIfItemIsAlreadyRendered(int index);
-  virtual bool isTargetItemLocatedBelow(int targetItem);
+  float getOffsetIfItemIsAlreadyRendered(int index) override;
+  bool isTargetItemLocatedBelow(int targetItem) override;
 
 #pragma mark MGPushChildrenListener
 
-  virtual void didPushChildren(std::vector<Item> newWindow);
+  void didPushChildren(std::vector<Item> newWindow) override;
 };
 
-#endif /* MGWindowKeeper_hpp */
+}; // namespace Wishlist

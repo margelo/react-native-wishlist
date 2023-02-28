@@ -1,6 +1,7 @@
 #include "Orchestrator.hpp"
 
 #include <fbjni/fbjni.h>
+#include "ErrorHandlerAndroid.h"
 #include "JNIStateRegistry.h"
 #include "MGUIManagerHolder.h"
 #include "UISchedulerAndroid.h"
@@ -42,6 +43,7 @@ Orchestrator::Orchestrator(
       std::make_shared<MGDataBindingImpl>(wishlistId_, di_->getWeak()));
   di_->setWindowKeeper(std::make_shared<MGWindowKeeper>(di_->getWeak()));
   di_->setUIScheduler(std::make_shared<UISchedulerAndroid>());
+  di_->setErrorHandler(std::make_shared<ErrorHandlerAndroid>());
 }
 
 void Orchestrator::renderAsync(

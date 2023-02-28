@@ -7,4 +7,8 @@
 
 #include "MGAnimationSight.hpp"
 
+namespace Wishlist {
+
 float MGAnimationSight::NOT_FOUND = -1;
+
+}; // namespace Wishlist

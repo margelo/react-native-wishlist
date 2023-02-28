@@ -7,6 +7,8 @@
 
 #include "MGWindowKeeper.hpp"
 
+namespace Wishlist {
+
 MGWindowKeeper::MGWindowKeeper(std::weak_ptr<MGDI> _di) : di(_di) {}
 
 float MGWindowKeeper::getOffsetIfItemIsAlreadyRendered(int index) {
@@ -25,10 +27,12 @@ bool MGWindowKeeper::isTargetItemLocatedBelow(int targetItem) {
 void MGWindowKeeper::didPushChildren(std::vector<Item> newWindow) {
   this->items = newWindow;
   std::shared_ptr<MGDI> retainedDI = di.lock();
-  if (retainedDI != nullptr) {
+  if (retainedDI != nullptr && newWindow.size() > 0) {
     float topEdge = newWindow[0].offset;
     float bottomEdge = newWindow.back().offset + newWindow.back().height;
     retainedDI->getBoundingBoxObserver()->boundingBoxDidChange(
         {topEdge, bottomEdge});
   }
 }
+
+}; // namespace Wishlist

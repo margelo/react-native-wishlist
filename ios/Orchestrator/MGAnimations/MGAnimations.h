@@ -1,8 +1,11 @@
-#import <Foundation/Foundation.h>
-#import <memory>
 #import "MGAnimationSight.hpp"
 
+#import <Foundation/Foundation.h>
+#import <memory>
+
 NS_ASSUME_NONNULL_BEGIN
+
+using namespace Wishlist;
 
 @protocol MGScrollAnimation <NSObject>
 

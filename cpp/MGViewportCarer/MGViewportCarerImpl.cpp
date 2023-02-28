@@ -32,7 +32,7 @@ void MGViewportCarerImpl::initialRenderAsync(
 
     itemProvider = std::static_pointer_cast<ItemProvider>(
         std::make_shared<WorkletItemProvider>(
-            dimensions.width, lc, inflatorId));
+            di, dimensions.width, lc, inflatorId));
     itemProvider->setComponentsPool(componentsPool);
 
     this->surfaceId = wishListNode->getFamily().getSurfaceId();
@@ -61,7 +61,7 @@ void MGViewportCarerImpl::didScrollAsync(
 
       itemProvider = std::static_pointer_cast<ItemProvider>(
           std::make_shared<WorkletItemProvider>(
-              dimensions.width, lc, inflatorId));
+              di, dimensions.width, lc, inflatorId));
       itemProvider->setComponentsPool(componentsPool);
       windowWidth = dimensions.width;
       this->inflatorId = inflatorId;
@@ -95,7 +95,7 @@ void MGViewportCarerImpl::updateWindow() {
 
     if (item.offset > topEdge) {
       WishItem wishItem = itemProvider->provide(item.index - 1);
-      if (wishItem.sn.get() == nullptr) {
+      if (wishItem.sn == nullptr) {
         break;
       }
       wishItem.offset = item.offset - wishItem.height;

@@ -5,13 +5,14 @@
 //  Created by Szymon on 13/01/2023.
 //
 
-#ifndef MGVsyncRequester_hpp
-#define MGVsyncRequester_hpp
+#pragma once
 
 #include <stdio.h>
+
+namespace Wishlist {
 
 struct MGVSyncRequester {
   virtual void requestVSync() = 0;
 };
 
-#endif /* MGVsyncRequester_hpp */
+}; // namespace Wishlist

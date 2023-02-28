@@ -5,14 +5,15 @@
 //  Created by Szymon on 16/01/2023.
 //
 
-#ifndef MGDataBindingImpl_hpp
-#define MGDataBindingImpl_hpp
+#pragma once
 
 #include <stdio.h>
 #include <memory>
 #include <set>
 #include "MGDI.hpp"
 #include "MGDataBinding.hpp"
+
+namespace Wishlist {
 
 struct MGDataBindingImpl : MGDataBinding {
   std::weak_ptr<MGDI> di;
@@ -29,4 +30,4 @@ struct MGDataBindingImpl : MGDataBinding {
   virtual ~MGDataBindingImpl();
 };
 
-#endif /* MGDataBindingImpl_hpp */
+}; // namespace Wishlist

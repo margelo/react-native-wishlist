@@ -9,6 +9,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+using namespace Wishlist;
+
 @interface PanEvent : NSObject
 
 @property (nonatomic, assign) UIGestureRecognizerState state;

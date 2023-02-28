@@ -5,11 +5,12 @@
 //  Created by Szymon on 13/01/2023.
 //
 
-#ifndef MGBindingProvider_hpp
-#define MGBindingProvider_hpp
+#pragma once
 
 #include <jsi/jsi.h>
 #include <stdio.h>
+
+namespace Wishlist {
 
 using namespace facebook;
 
@@ -17,4 +18,4 @@ struct MGBindingProvider {
   virtual jsi::Value getBinding(jsi::Runtime &rt) = 0;
 };
 
-#endif /* MGBindingProvider_hpp */
+}; // namespace Wishlist

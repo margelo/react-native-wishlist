@@ -10,6 +10,7 @@
 #include <react/renderer/components/wishlist/Props.h>
 #include <react/renderer/components/wishlist/ShadowNodes.h>
 #import "MGDIImpl.hpp"
+#import "MGErrorHandlerIOS.h"
 #import "MGScrollViewOrchestrator.h"
 #import "MGUIScheduleriOS.hpp"
 #import "MGWishlistComponentDescriptor.h"
@@ -110,6 +111,7 @@ using namespace facebook::react;
     di->setDataBindingImpl(std::make_shared<MGDataBindingImpl>(_wishlistId, di->getWeak()));
     di->setWindowKeeper(std::make_shared<MGWindowKeeper>(di->getWeak()));
     di->setUIScheduler(std::make_shared<MGUIScheduleriOS>());
+    di->setErrorHandler(std::make_shared<MGErrorHandlerIOS>());
 
     [_orchestrator runWithTemplates:templates names:names initialIndex:_initialIndex];
 

@@ -19,7 +19,10 @@ void WishlistJsRuntime::initialize(
     std::function<void(std::function<void()> &&)> workletCallInvoker) {
   workletContext_ = std::make_shared<RNWorklet::JsiWorkletContext>();
   workletContext_->initialize(
-      "wishlist", runtime, jsCallInvoker, workletCallInvoker);
+      "wishlist",
+      runtime,
+      std::move(jsCallInvoker),
+      std::move(workletCallInvoker));
   workletContext_->addDecorator(std::make_shared<Decorator>());
 
   runtime->global().setProperty(

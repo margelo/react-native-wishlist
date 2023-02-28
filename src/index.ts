@@ -1,5 +1,7 @@
 import WishListManager from './Specs/NativeWishlistManager';
 
+console.log('install');
+
 WishListManager.install();
 
 export { useTemplateValue, TemplateValue } from './TemplateValue';
