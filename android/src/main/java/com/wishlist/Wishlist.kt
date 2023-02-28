@@ -16,7 +16,8 @@ class Wishlist(reactContext: Context) :
     if (orchestrator == null) {
       orchestrator =
           Orchestrator(
-              inflatorId!!, wishlistId!!, fabricViewStateManager.stateData!!.getInt("viewportCarer"))
+              wishlistId!!, fabricViewStateManager.stateData!!.getInt("viewportCarer"))
+      this.orchestrator = orchestrator
     }
     // TODO: width / height
     orchestrator.renderAsync(
@@ -24,4 +25,10 @@ class Wishlist(reactContext: Context) :
   }
 
   fun scrollToItem(index: Int, animated: Boolean) {}
+
+  override fun onScrollChanged(x: Int, y: Int, oldX: Int, oldY: Int) {
+    super.onScrollChanged(x, y, oldX, oldY)
+
+    orchestrator?.didScrollAsync(300f, 600f, y.toFloat(), inflatorId!!)
+  }
 }

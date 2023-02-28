@@ -11,21 +11,24 @@ using namespace facebook;
 
 namespace Wishlist {
 
-jni::local_ref<Orchestrator::jhybriddata> Orchestrator::initHybrid(
-    jni::alias_ref<jclass>,
-    std::string inflatorId,
-    std::string wishlistId,
-    int viewportCarerRef) {
-  return makeCxxInstance(inflatorId, wishlistId, viewportCarerRef);
+static inline std::vector<std::string> jListToVector(
+    alias_ref<jni::JList<jni::JString>> jList) {
+  std::vector<std::string> res;
+  for (const auto &val : *jList) {
+    res.push_back(val->toStdString());
+  }
+  return res;
 }
 
-Orchestrator::Orchestrator(
-    const std::string &inflatorId,
-    const std::string &wishlistId,
-    int viewportCarerRef)
-    : alreadyRendered_(false),
-      inflatorId_(inflatorId),
-      wishlistId_(wishlistId) {
+jni::local_ref<Orchestrator::jhybriddata> Orchestrator::initHybrid(
+    jni::alias_ref<jclass>,
+    std::string wishlistId,
+    int viewportCarerRef) {
+  return makeCxxInstance(wishlistId, viewportCarerRef);
+}
+
+Orchestrator::Orchestrator(const std::string &wishlistId, int viewportCarerRef)
+    : alreadyRendered_(false) {
   auto viewportCarer =
       *reinterpret_cast<std::shared_ptr<MGViewportCarerImpl> *>(
           JNIStateRegistry::getInstance().getValue(viewportCarerRef));
@@ -40,7 +43,7 @@ Orchestrator::Orchestrator(
         // TODO:
       }));
   di_->setDataBindingImpl(
-      std::make_shared<MGDataBindingImpl>(wishlistId_, di_->getWeak()));
+      std::make_shared<MGDataBindingImpl>(wishlistId, di_->getWeak()));
   di_->setWindowKeeper(std::make_shared<MGWindowKeeper>(di_->getWeak()));
   di_->setUIScheduler(std::make_shared<UISchedulerAndroid>());
   di_->setErrorHandler(std::make_shared<ErrorHandlerAndroid>());
@@ -61,26 +64,40 @@ void Orchestrator::renderAsync(
       namesList->size() == templates.size()) {
     alreadyRendered_ = true;
 
-    std::vector<std::string> names;
-    for (const auto &name : *namesList) {
-      names.push_back(name->toStdString());
-    }
-
     di_->getViewportCarer()->initialRenderAsync(
         {width, height},
         initialOffset,
         originItem,
         templates,
-        names,
+        jListToVector(namesList),
         inflatorId);
   } else {
+    // TODO:
   }
+}
+
+void Orchestrator::didScrollAsync(
+    float width,
+    float height,
+    float contentOffset,
+    std::string inflatorId) {
+    // TODO: These do not seem to be needed.
+    auto templates = std::vector<std::shared_ptr<facebook::react::ShadowNode const>>();
+    auto names = std::vector<std::string>();
+
+  di_->getViewportCarer()->didScrollAsync(
+      {width, height},
+      templates,
+      names,
+      contentOffset,
+      inflatorId);
 }
 
 void Orchestrator::registerNatives() {
   registerHybrid(
       {makeNativeMethod("initHybrid", Orchestrator::initHybrid),
-       makeNativeMethod("renderAsync", Orchestrator::renderAsync)});
+       makeNativeMethod("renderAsync", Orchestrator::renderAsync),
+       makeNativeMethod("didScrollAsync", Orchestrator::didScrollAsync)});
 }
 
 } // namespace Wishlist

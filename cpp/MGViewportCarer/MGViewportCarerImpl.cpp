@@ -25,8 +25,6 @@ void MGViewportCarerImpl::initialRenderAsync(
     std::vector<std::string> names,
     std::string inflatorId) {
   WishlistJsRuntime::getInstance().accessRuntime([=](jsi::Runtime &rt) {
-    initialIndex = originItem;
-
     componentsPool->registeredViews = registeredViews;
     componentsPool->setNames(names);
 
@@ -54,7 +52,7 @@ void MGViewportCarerImpl::didScrollAsync(
     float newOffset,
     std::string inflatorId) {
   WishlistJsRuntime::getInstance().accessRuntime([=](jsi::Runtime &rt) {
-    if (dimensions.width != windowWidth or !names.empty() or
+    if (dimensions.width != windowWidth || !names.empty() ||
         inflatorId != this->inflatorId) {
       componentsPool->registeredViews = registeredViews;
       componentsPool->setNames(names);

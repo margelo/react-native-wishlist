@@ -18,7 +18,6 @@ struct MGViewportCarerImpl : MGViewportCarer {
   float windowHeight;
   float windowWidth;
   int surfaceId;
-  int initialIndex;
   std::string inflatorId;
 
   std::shared_ptr<ComponentsPool> componentsPool =
