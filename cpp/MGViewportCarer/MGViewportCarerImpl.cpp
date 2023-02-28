@@ -191,27 +191,6 @@ std::shared_ptr<ShadowNode> MGViewportCarerImpl::getOffseter(float offset) {
   return offseterTemplate->clone({newProps, nullptr, nullptr});
 }
 
-std::shared_ptr<ShadowNode> MGViewportCarerImpl::getContentContainer(
-    const ShadowNode::SharedListOfShared &children) {
-  std::shared_ptr<const YogaLayoutableShadowNode> contentContainerTemplate =
-      std::static_pointer_cast<const YogaLayoutableShadowNode>(
-          componentsPool->getNodeForType("__contentContainerComponent"));
-
-  auto &cd = contentContainerTemplate->getComponentDescriptor();
-  PropsParserContext propsParserContext{
-      surfaceId, *cd.getContextContainer().get()};
-
-  folly::dynamic props = folly::dynamic::object;
-  props["collapsable"] = false;
-
-  Props::Shared newProps = cd.cloneProps(
-      propsParserContext,
-      contentContainerTemplate->getProps(),
-      RawProps(props));
-
-  return contentContainerTemplate->clone({newProps, children, nullptr});
-}
-
 void MGViewportCarerImpl::pushChildren() {
   std::shared_ptr<ShadowNode> sWishList = wishListNode;
   if (sWishList == nullptr) {
@@ -240,13 +219,15 @@ void MGViewportCarerImpl::pushChildren() {
                       }
                     }
 
+                    auto contentContainer = sn.getChildren()[0]->clone(
+                        {nullptr, children, nullptr});
+
                     // That doesn't seem right as this method can be called on
                     // multiple threads another problem is that it can be called
                     // multiple times
                     wishlistChildren =
                         std::make_shared<ShadowNode::ListOfShared>(
-                            ShadowNode::ListOfShared{
-                                getContentContainer(children)});
+                            ShadowNode::ListOfShared{contentContainer});
 
                     return sn.clone(
                         ShadowNodeFragment{nullptr, wishlistChildren, nullptr});

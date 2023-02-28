@@ -57,9 +57,6 @@ struct MGViewportCarerImpl : MGViewportCarer {
 
   std::shared_ptr<ShadowNode> getOffseter(float offset);
 
-  std::shared_ptr<ShadowNode> getContentContainer(
-      const ShadowNode::SharedListOfShared &children);
-
   void pushChildren();
 
   void notifyAboutPushedChildren();

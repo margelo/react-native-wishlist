@@ -31,7 +31,6 @@ import { useWishlistContext, WishlistContext } from './WishlistContext';
 import type { WishlistData, WishlistDataInternal } from './WishlistData';
 
 const OffsetComponent = '__offsetComponent';
-const ContentContainerComponent = '__contentContainerComponent';
 
 type NestedTemplatesContextValue = {
   templates: { [key: string]: any };
@@ -44,7 +43,6 @@ const TemplatesRegistryContext =
 function getTemplatesFromChildren(children: React.ReactNode, width: number) {
   const nextTemplates: { [key: string]: React.ReactElement } = {
     [OffsetComponent]: <View style={[styles.offsetView, { width }]} />,
-    [ContentContainerComponent]: <View style={styles.contentContainer} />,
   };
   React.Children.forEach(children, (c) => {
     if ((c as any).type.displayName === 'WishListTemplate') {
@@ -256,7 +254,9 @@ function InnerComponent({
         onEndReached={rest?.onEndReached}
         onStartReached={rest?.onStartReached}
         initialIndex={rest.initialIndex ?? 0}
-      />
+      >
+        <View style={styles.contentContainer} />
+      </NativeWishList>
 
       <NativeTemplateContainer
         names={keys}
