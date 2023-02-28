@@ -27,7 +27,7 @@ ShadowNode::Shared ShadowNodeCopyMachine::copyShadowSubtree(
   auto const props = cd.cloneProps(
       propsParserContext,
       sn->getProps(),
-#if ANDROID
+#ifdef ANDROID
       sn->getProps()->rawProps
 #else
       {}
