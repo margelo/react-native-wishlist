@@ -35,7 +35,7 @@ class Wishlist(reactContext: Context) :
         )
       this.orchestrator = orchestrator
     }
-    // TODO: width / height
+
     orchestrator.renderAsync(
       width.toFloat(), height.toFloat(), 0f, initialIndex, templatesRef, names, inflatorId
     )
