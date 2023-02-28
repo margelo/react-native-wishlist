@@ -14,6 +14,7 @@
 #include "MGObjCJSIUtils.h"
 #include "MGUIManagerHolder.h"
 #import "MGWishListComponent.h"
+#import "MGWishlistQueue.h"
 #include "WishlistJsRuntime.h"
 
 using namespace facebook::react;
@@ -28,14 +29,13 @@ using namespace Wishlist;
 @implementation MGWishlistManager {
   __weak RCTSurfacePresenter *_surfacePresenter;
   std::shared_ptr<EventListener> _eventListener;
-  std::shared_ptr<RNWorklet::DispatchQueue> _wishlistQueue;
+  dispatch_queue_t _wishlistQueue;
 }
 
 RCT_EXPORT_MODULE(WishlistManager);
 
 - (void)setBridge:(RCTBridge *)bridge
 {
-  _wishlistQueue = std::make_shared<RNWorklet::DispatchQueue>("wishlistqueue");
   _bridge = bridge;
   _surfacePresenter = _bridge.surfacePresenter;
   __weak __typeof(self) weakSelf = self;
@@ -57,7 +57,12 @@ RCT_EXPORT_MODULE(WishlistManager);
   WishlistJsRuntime::getInstance().initialize(
       jsRuntime,
       [=](std::function<void()> &&f) { callInvoker->invokeAsync(std::move(f)); },
-      [=](std::function<void()> &&f) { _wishlistQueue->dispatch(std::move(f)); });
+      [=](std::function<void()> &&f) {
+        __block auto retainedWork = std::move(f);
+        MGExecuteOnWishlistQueue(^{
+          retainedWork();
+        });
+      });
 
   MGUIManagerHolder::getInstance().setUIManager(_surfacePresenter.scheduler.uiManager);
 }
