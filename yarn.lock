@@ -7814,9 +7814,9 @@ react-native-gradle-plugin@^0.71.15:
   resolved "https://registry.yarnpkg.com/react-native-gradle-plugin/-/react-native-gradle-plugin-0.71.15.tgz#9e6b506f30729fe8eb086981702f4e3c891d2b13"
   integrity sha512-7S3pAuPaQJlhax6EZ4JMsDNpj05TfuzX9gPgWLrFfAIWIFLuJ6aDQYAZy2TEI9QJALPoWrj8LWaqP/DGYh14pw==
 
-react-native-worklets@janicduplessis/react-native-worklets#react-native-worklets-v0.1.0-alpha.1-gitpkg:
-  version "0.1.0-alpha.1"
-  resolved "https://codeload.github.com/janicduplessis/react-native-worklets/tar.gz/7e9256ce9654b67a8fd376eb64eaa1e714deb0c4"
+react-native-worklets@janicduplessis/react-native-worklets#react-native-worklets-v0.1.0-alpha.2-gitpkg:
+  version "0.1.0-alpha.2"
+  resolved "https://codeload.github.com/janicduplessis/react-native-worklets/tar.gz/57acabf9150ad37f97b4cfd555115968f2c29ae7"
 
 react-native@^0.71.3:
   version "0.71.3"
