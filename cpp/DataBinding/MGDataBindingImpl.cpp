@@ -53,48 +53,50 @@ std::set<int> MGDataBindingImpl::applyChangesAndGetDirtyIndices(
 }
 
 void MGDataBindingImpl::registerBindings() {
-  auto &rt = WishlistJsRuntime::getInstance().getRuntime();
-  jsi::Object global = rt.global().getPropertyAsObject(rt, "global");
-  if (!global.hasProperty(rt, "wishlists")) {
-    global.setProperty(rt, "wishlists", jsi::Object(rt));
-  }
+  WishlistJsRuntime::getInstance().accessRuntime([=](jsi::Runtime &rt) {
+    jsi::Object global = rt.global().getPropertyAsObject(rt, "global");
+    if (!global.hasProperty(rt, "wishlists")) {
+      global.setProperty(rt, "wishlists", jsi::Object(rt));
+    }
 
-  jsi::Object wishlists = global.getPropertyAsObject(rt, "wishlists");
+    jsi::Object wishlists = global.getPropertyAsObject(rt, "wishlists");
 
-  jsi::Object binding(rt);
-  if (wishlists.getProperty(rt, _wishlistId.c_str()).isObject()) {
-    binding = wishlists.getProperty(rt, _wishlistId.c_str()).asObject(rt);
-  }
-  std::weak_ptr<MGDI> weakDi = di;
-  binding.setProperty(
-      rt,
-      "scheduleSyncUp",
-      jsi::Function::createFromHostFunction(
-          rt,
-          jsi::PropNameID::forAscii(rt, "scheduleSyncUp"),
-          1,
-          [=](jsi::Runtime &rt,
-              const jsi::Value &thisValue,
-              const jsi::Value *args,
-              size_t count) -> jsi::Value {
-            std::shared_ptr<MGDI> retainedDI = weakDi.lock();
-            if (retainedDI == nullptr) {
+    jsi::Object binding(rt);
+    if (wishlists.getProperty(rt, _wishlistId.c_str()).isObject()) {
+      binding = wishlists.getProperty(rt, _wishlistId.c_str()).asObject(rt);
+    }
+    std::weak_ptr<MGDI> weakDi = di;
+    binding.setProperty(
+        rt,
+        "scheduleSyncUp",
+        jsi::Function::createFromHostFunction(
+            rt,
+            jsi::PropNameID::forAscii(rt, "scheduleSyncUp"),
+            1,
+            [=](jsi::Runtime &rt,
+                const jsi::Value &thisValue,
+                const jsi::Value *args,
+                size_t count) -> jsi::Value {
+              std::shared_ptr<MGDI> retainedDI = weakDi.lock();
+              if (retainedDI == nullptr) {
+                return jsi::Value::undefined();
+              }
+              std::shared_ptr<MGVSyncRequester> vsr =
+                  retainedDI->getVSyncRequester();
+              vsr->requestVSync();
               return jsi::Value::undefined();
-            }
-            std::shared_ptr<MGVSyncRequester> vsr =
-                retainedDI->getVSyncRequester();
-            vsr->requestVSync();
-            return jsi::Value::undefined();
-          }));
+            }));
 
-  wishlists.setProperty(rt, _wishlistId.c_str(), binding);
+    wishlists.setProperty(rt, _wishlistId.c_str(), binding);
+  });
 }
 
 void MGDataBindingImpl::unregisterBindings() {
-  auto &rt = WishlistJsRuntime::getInstance().getRuntime();
-  jsi::Object global = rt.global().getPropertyAsObject(rt, "global");
-  jsi::Object wishlists = global.getPropertyAsObject(rt, "wishlists");
-  wishlists.setProperty(rt, _wishlistId.c_str(), jsi::Value::undefined());
+  WishlistJsRuntime::getInstance().accessRuntime([=](jsi::Runtime &rt) {
+    jsi::Object global = rt.global().getPropertyAsObject(rt, "global");
+    jsi::Object wishlists = global.getPropertyAsObject(rt, "wishlists");
+    wishlists.setProperty(rt, _wishlistId.c_str(), jsi::Value::undefined());
+  });
 }
 
 MGDataBindingImpl::~MGDataBindingImpl() {
