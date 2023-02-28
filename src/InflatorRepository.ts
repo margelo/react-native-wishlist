@@ -70,8 +70,6 @@ const maybeInit = () => {
     createRunInWishlistFn(() => {
       'worklet';
 
-      throw new Error('LALAL');
-
       const registry = new Map<string, InflateMethod>();
       const mappings = new Map<
         string,
@@ -183,9 +181,6 @@ const maybeInit = () => {
     })();
   }
 };
-
-console.log('maybeInit');
-maybeInit();
 
 export function getUIInflatorRegistry(): UIInflatorRegistry {
   'worklet';
