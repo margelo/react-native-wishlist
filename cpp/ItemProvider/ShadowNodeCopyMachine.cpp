@@ -26,7 +26,8 @@ std::shared_ptr<const ShadowNode> ShadowNodeCopyMachine::copyShadowSubtree(
       cd.createFamily(
           fragment,
           eventTarget); // TODO create handler on js side
-  auto const props = cd.cloneProps(propsParserContext, sn->getProps(), {});
+  auto const props = cd.cloneProps(
+      propsParserContext, sn->getProps(), sn->getProps()->rawProps);
   auto const state = cd.createInitialState(ShadowNodeFragment{props}, family);
 
   // prevent fabric from clearing EventTarget
