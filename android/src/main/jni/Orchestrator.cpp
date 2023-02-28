@@ -81,16 +81,13 @@ void Orchestrator::didScrollAsync(
     float height,
     float contentOffset,
     std::string inflatorId) {
-    // TODO: These do not seem to be needed.
-    auto templates = std::vector<std::shared_ptr<facebook::react::ShadowNode const>>();
-    auto names = std::vector<std::string>();
+  // TODO: These do not seem to be needed.
+  auto templates =
+      std::vector<std::shared_ptr<facebook::react::ShadowNode const>>();
+  auto names = std::vector<std::string>();
 
   di_->getViewportCarer()->didScrollAsync(
-      {width, height},
-      templates,
-      names,
-      contentOffset,
-      inflatorId);
+      {width, height}, templates, names, contentOffset, inflatorId);
 }
 
 void Orchestrator::registerNatives() {

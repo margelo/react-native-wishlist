@@ -25,7 +25,14 @@ ShadowNode::Shared ShadowNodeCopyMachine::copyShadowSubtree(
 
   auto const family = cd.createFamily(fragment, eventTarget);
   auto const props = cd.cloneProps(
-      propsParserContext, sn->getProps(), sn->getProps()->rawProps);
+      propsParserContext,
+      sn->getProps(),
+#if ANDROID
+      sn->getProps()->rawProps
+#else
+      {}
+#endif
+  );
   auto const state = cd.createInitialState(ShadowNodeFragment{props}, family);
 
   // prevent fabric from clearing EventTarget
