@@ -7,7 +7,7 @@ import com.facebook.react.uimanager.ViewManager
 
 class WishlistPackage : ReactPackage {
   override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> {
-    UIScheduler.scheduleOnUI(Runnable {  })
+    UIScheduler.scheduleOnUI(Runnable {})
     return listOf(WishlistManagerModule(reactContext))
   }
 

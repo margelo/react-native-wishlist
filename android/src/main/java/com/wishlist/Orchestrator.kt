@@ -12,10 +12,7 @@ class Orchestrator(wishlistId: String, viewportCarerRef: Int) {
 
   @field:DoNotStrip private val mHybridData = initHybrid(wishlistId, viewportCarerRef)
 
-  private external fun initHybrid(
-      wishlistId: String,
-      viewportCarerRef: Int
-  ): HybridData
+  private external fun initHybrid(wishlistId: String, viewportCarerRef: Int): HybridData
 
   external fun renderAsync(
       width: Float,
@@ -27,10 +24,5 @@ class Orchestrator(wishlistId: String, viewportCarerRef: Int) {
       inflatorId: String
   )
 
-  external fun didScrollAsync(
-    width: Float,
-    height: Float,
-    contentOffset: Float,
-    inflatorId: String
-  )
+  external fun didScrollAsync(width: Float, height: Float, contentOffset: Float, inflatorId: String)
 }

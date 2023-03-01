@@ -22,9 +22,9 @@ class WishlistViewManager : ViewGroupManager<Wishlist>(), MGWishlistManagerInter
   override fun getDelegate() = MGWishlistManagerDelegate(this)
 
   override fun updateState(
-    view: Wishlist,
-    props: ReactStylesDiffMap?,
-    stateWrapper: StateWrapper?
+      view: Wishlist,
+      props: ReactStylesDiffMap?,
+      stateWrapper: StateWrapper?
   ): Any? {
     view.fabricViewStateManager.setStateWrapper(stateWrapper)
     return null

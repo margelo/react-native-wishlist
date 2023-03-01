@@ -26,8 +26,7 @@ struct MGViewportCarerImpl : MGViewportCarer {
   std::deque<WishItem> window;
   std::shared_ptr<ShadowNode> wishListNode;
   LayoutContext lc;
-  ShadowNode::SharedListOfShared wishlistChildren =
-      std::make_shared<ShadowNode::ListOfShared>();
+  ShadowNode::SharedListOfShared wishlistChildren = nullptr;
 
   std::weak_ptr<MGDI> di;
 

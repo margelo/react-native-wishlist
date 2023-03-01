@@ -255,7 +255,7 @@ function InnerComponent({
         onStartReached={rest?.onStartReached}
         initialIndex={rest.initialIndex ?? 0}
       >
-        <View style={styles.contentContainer} />
+        <View style={styles.contentContainer} collapsable={false} />
       </NativeWishList>
 
       <NativeTemplateContainer

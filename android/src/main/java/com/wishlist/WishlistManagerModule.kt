@@ -8,7 +8,6 @@ import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.turbomodule.core.CallInvokerHolderImpl
 import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.common.UIManagerType
-import com.facebook.soloader.SoLoader
 
 @ReactModule(name = WishlistManagerModule.NAME)
 class WishlistManagerModule(reactContext: ReactApplicationContext) :

@@ -85,10 +85,10 @@ void MGViewportCarerImpl::updateWindow() {
   float topEdge = offset - windowHeight;
   float bottomEdge = offset + 2 * windowHeight;
 
-  assert(window.size() != 0);
+  assert(!window.empty());
 
   // Add above
-  while (1) {
+  while (true) {
     WishItem item = window.front();
 
     if (item.offset > topEdge) {
@@ -104,13 +104,13 @@ void MGViewportCarerImpl::updateWindow() {
   }
 
   // Add below
-  while (1) {
+  while (true) {
     WishItem item = window.back();
     float bottom = item.offset + item.height;
 
     if (bottom < bottomEdge) {
       WishItem wishItem = itemProvider->provide(item.index + 1);
-      if (wishItem.sn.get() == nullptr) {
+      if (wishItem.sn == nullptr) {
         break;
       }
       wishItem.offset = bottom;
@@ -123,7 +123,7 @@ void MGViewportCarerImpl::updateWindow() {
   std::vector<WishItem> itemsToRemove;
 
   // remove above
-  while (1) {
+  while (true) {
     WishItem item = window.front();
     float bottom = item.offset + item.height;
     if (bottom <= topEdge) {
@@ -136,7 +136,7 @@ void MGViewportCarerImpl::updateWindow() {
   }
 
   // remove below
-  while (1) {
+  while (true) {
     WishItem item = window.back();
     if (item.offset >= bottomEdge) {
       window.pop_back();
@@ -151,7 +151,7 @@ void MGViewportCarerImpl::updateWindow() {
   for (auto &item : window) {
     if (item.dirty) {
       WishItem wishItem = itemProvider->provide(item.index);
-      if (wishItem.sn.get() == nullptr) {
+      if (wishItem.sn == nullptr) {
         continue;
       }
       item.offset = offset;
@@ -219,7 +219,7 @@ void MGViewportCarerImpl::pushChildren() {
                       }
                     }
 
-                    auto contentContainer = sn.getChildren()[0]->clone(
+                    auto const contentContainer = sn.getChildren()[0]->clone(
                         {nullptr, children, nullptr});
 
                     // That doesn't seem right as this method can be called on
