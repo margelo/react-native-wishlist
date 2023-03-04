@@ -1,5 +1,6 @@
 #import "MGScrollViewOrchestrator.h"
 #include <set>
+#import "MGDIIOS.h"
 #include "WishlistJsRuntime.h"
 
 using namespace Wishlist;
@@ -19,7 +20,7 @@ using namespace Wishlist;
   std::vector<std::string> _pendingNames;
 
   // ViewportObserer
-  std::weak_ptr<MGDI> _di;
+  std::weak_ptr<MGDIIOS> _di;
   std::string _inflatorId;
   BOOL _needsVSync;
 
@@ -32,7 +33,7 @@ using namespace Wishlist;
 }
 
 - (instancetype)initWith:(UIScrollView *)scrollView
-                      di:(std::weak_ptr<MGDI>)di
+                      di:(std::weak_ptr<MGDIIOS>)di
               inflatorId:(std::string)inflatorId
               wishlistId:(std::string)wishlistId
 {

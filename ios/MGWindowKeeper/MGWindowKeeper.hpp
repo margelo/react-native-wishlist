@@ -10,16 +10,16 @@
 #include <stdio.h>
 #include <vector>
 #include "MGAnimationSight.hpp"
-#include "MGDI.hpp"
+#include "MGDIIOS.h"
 #include "MGPushChildrenListener.hpp"
 
 namespace Wishlist {
 
 struct MGWindowKeeper final : MGAnimationSight, MGPushChildrenListener {
   std::vector<Item> items;
-  std::weak_ptr<MGDI> di;
+  std::weak_ptr<MGDIIOS> di;
 
-  MGWindowKeeper(std::weak_ptr<MGDI> _di);
+  MGWindowKeeper(std::weak_ptr<MGDIIOS> _di);
 
 #pragma mark MGAnimationSight
 

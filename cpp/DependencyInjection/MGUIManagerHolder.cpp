@@ -13,7 +13,8 @@ std::shared_ptr<UIManager> MGUIManagerHolder::getUIManager() const {
   return uiManager_;
 }
 
-void MGUIManagerHolder::setUIManager(std::shared_ptr<UIManager> uiManager) {
+void MGUIManagerHolder::setUIManager(
+    const std::shared_ptr<UIManager> &uiManager) {
   uiManager_ = uiManager;
 }
 

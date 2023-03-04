@@ -3,7 +3,9 @@
 #include <fbjni/fbjni.h>
 #include "ErrorHandlerAndroid.h"
 #include "JNIStateRegistry.h"
+#include "MGDataBindingImpl.hpp"
 #include "MGUIManagerHolder.h"
+#include "MGViewportCarerImpl.h"
 #include "UISchedulerAndroid.h"
 #include "WishlistJsRuntime.h"
 
@@ -28,23 +30,17 @@ jni::local_ref<Orchestrator::jhybriddata> Orchestrator::initHybrid(
 }
 
 Orchestrator::Orchestrator(const std::string &wishlistId, int viewportCarerRef)
-    : alreadyRendered_(false) {
+    : alreadyRendered_(false), adapter_(std::make_shared<Adapter>()) {
   auto viewportCarer =
       *reinterpret_cast<std::shared_ptr<MGViewportCarerImpl> *>(
           JNIStateRegistry::getInstance().getValue(viewportCarerRef));
   di_ = std::make_shared<MGDIImpl>();
-  di_->setViewportCarerImpl(viewportCarer);
+  di_->setViewportCarer(viewportCarer);
   viewportCarer->setDI(di_);
-  di_->setOrchestratorCppAdaper(std::make_shared<MGOrchestratorCppAdapter>(
-      [=](float top, float bottom) {
-        // TODO:
-      },
-      [=]() {
-        // TODO:
-      }));
-  di_->setDataBindingImpl(
+  di_->setDataBinding(
       std::make_shared<MGDataBindingImpl>(wishlistId, di_->getWeak()));
-  di_->setWindowKeeper(std::make_shared<MGWindowKeeper>(di_->getWeak()));
+  di_->setPushChildrenListener(adapter_);
+  di_->setVSyncRequester(adapter_);
   di_->setUIScheduler(std::make_shared<UISchedulerAndroid>());
   di_->setErrorHandler(std::make_shared<ErrorHandlerAndroid>());
 }
@@ -89,6 +85,10 @@ void Orchestrator::didScrollAsync(
   di_->getViewportCarer()->didScrollAsync(
       {width, height}, templates, names, contentOffset, inflatorId);
 }
+
+void Orchestrator::Adapter::didPushChildren(std::vector<Item> newWindow) {}
+
+void Orchestrator::Adapter::requestVSync() {}
 
 void Orchestrator::registerNatives() {
   registerHybrid(
