@@ -37,9 +37,17 @@ class Orchestrator : public jni::HybridClass<Orchestrator> {
       std::string inflatorId);
 
  private:
+  void handleVSync();
+
   class Adapter final : public MGPushChildrenListener, public MGVSyncRequester {
+   public:
+    Adapter(std::function<void()> onRequestVSync);
+
+   private:
     void didPushChildren(std::vector<Item> newWindow) override;
     void requestVSync() override;
+
+    std::function<void()> onRequestVSync_;
   };
 
   friend HybridBase;
@@ -47,6 +55,10 @@ class Orchestrator : public jni::HybridClass<Orchestrator> {
   bool alreadyRendered_;
   std::shared_ptr<MGDIImpl> di_;
   std::shared_ptr<Adapter> adapter_;
+  float width_;
+  float height_;
+  float contentOffset_;
+  std::string inflatorId_;
 };
 
 } // namespace Wishlist

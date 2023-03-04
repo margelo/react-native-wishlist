@@ -30,7 +30,8 @@ jni::local_ref<Orchestrator::jhybriddata> Orchestrator::initHybrid(
 }
 
 Orchestrator::Orchestrator(const std::string &wishlistId, int viewportCarerRef)
-    : alreadyRendered_(false), adapter_(std::make_shared<Adapter>()) {
+    : alreadyRendered_(false) {
+    adapter_ = std::make_shared<Adapter>([this]() { handleVSync(); });
   auto viewportCarer =
       *reinterpret_cast<std::shared_ptr<MGViewportCarerImpl> *>(
           JNIStateRegistry::getInstance().getValue(viewportCarerRef));
@@ -59,6 +60,10 @@ void Orchestrator::renderAsync(
   if (!alreadyRendered_ && namesList->size() > 0 &&
       namesList->size() == templates.size()) {
     alreadyRendered_ = true;
+    width_ = width;
+    height_ = height;
+    contentOffset_ = initialOffset;
+    inflatorId_ = inflatorId;
 
     di_->getViewportCarer()->initialRenderAsync(
         {width, height},
@@ -77,18 +82,30 @@ void Orchestrator::didScrollAsync(
     float height,
     float contentOffset,
     std::string inflatorId) {
+  width_ = width;
+  height_ = height;
+  contentOffset_ = contentOffset;
+  inflatorId_ = inflatorId;
+  handleVSync();
+}
+
+void Orchestrator::handleVSync() {
   // TODO: These do not seem to be needed.
   auto templates =
       std::vector<std::shared_ptr<facebook::react::ShadowNode const>>();
   auto names = std::vector<std::string>();
-
   di_->getViewportCarer()->didScrollAsync(
-      {width, height}, templates, names, contentOffset, inflatorId);
+      {width_, height_}, templates, names, contentOffset_, inflatorId_);
 }
+
+Orchestrator::Adapter::Adapter(std::function<void()> onRequestVSync)
+    : onRequestVSync_(onRequestVSync) {}
 
 void Orchestrator::Adapter::didPushChildren(std::vector<Item> newWindow) {}
 
-void Orchestrator::Adapter::requestVSync() {}
+void Orchestrator::Adapter::requestVSync() {
+  onRequestVSync_();
+}
 
 void Orchestrator::registerNatives() {
   registerHybrid(
