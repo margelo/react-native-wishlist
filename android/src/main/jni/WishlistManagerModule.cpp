@@ -36,20 +36,16 @@ void WishlistManagerModule::nativeInstall(
 
         int tag = event.eventTarget->getTag();
         if (tag >= 0) {
-            return false;
+          return false;
         }
 
-        WishlistJsRuntime::getInstance().accessRuntime([this,
-                                                        event, tag](Runtime &rt) {
+        WishlistJsRuntime::getInstance().accessRuntime([this, event, tag](
+                                                           Runtime &rt) {
           try {
             auto handleEvent = rt.global()
                                    .getPropertyAsObject(rt, "global")
                                    .getPropertyAsFunction(rt, "handleEvent");
-            handleEvent.call(
-                rt,
-                event.type,
-                tag,
-                event.payloadFactory(rt));
+            handleEvent.call(rt, event.type, tag, event.payloadFactory(rt));
           } catch (std::exception &error) {
             errorHandler_->reportError(error.what());
           }

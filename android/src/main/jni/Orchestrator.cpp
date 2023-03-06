@@ -31,7 +31,7 @@ jni::local_ref<Orchestrator::jhybriddata> Orchestrator::initHybrid(
 
 Orchestrator::Orchestrator(const std::string &wishlistId, int viewportCarerRef)
     : alreadyRendered_(false) {
-    adapter_ = std::make_shared<Adapter>([this]() { handleVSync(); });
+  adapter_ = std::make_shared<Adapter>([this]() { handleVSync(); });
   auto viewportCarer =
       *reinterpret_cast<std::shared_ptr<MGViewportCarerImpl> *>(
           JNIStateRegistry::getInstance().getValue(viewportCarerRef));
