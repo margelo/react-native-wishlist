@@ -20,7 +20,7 @@ class MGWishlistComponentDescriptor
     // When we clone this shadow node we need to make sure to use the
     // latest children of the viewport observer, otherwise react might
     // set the children back to what was rendered.
-    auto const &wishlistChildren =
+    auto wishlistChildren =
         wishlistSourceShadowNode.getStateData().viewportCarer->wishlistChildren;
 
     auto shadowNode = std::make_shared<MGWishlistShadowNode>(

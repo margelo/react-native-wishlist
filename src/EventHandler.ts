@@ -10,8 +10,9 @@ const maybeInit = () => {
       global.handlers = {};
 
       global.handleEvent = (type: string, tag: number, event: any) => {
-        console.log('handleEvent', type, tag, event);
-        const callback = global.handlers[tag.toString() + type];
+        // Events are prefixed with top sometimes.
+        const key = tag.toString() + type.replace(/^topOn/, 'on');
+        const callback = global.handlers[key];
         if (callback) {
           callback(event);
         }

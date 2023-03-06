@@ -19,7 +19,7 @@ struct MGDataBindingImpl : MGDataBinding {
   std::weak_ptr<MGDI> di;
   std::string _wishlistId;
 
-  MGDataBindingImpl(std::string wishlistId, std::weak_ptr<MGDI> _di);
+  MGDataBindingImpl(const std::string &wishlistId, const std::weak_ptr<MGDI> &di);
 
   virtual std::set<int> applyChangesAndGetDirtyIndices(
       std::pair<int, int> windowIndexRange);

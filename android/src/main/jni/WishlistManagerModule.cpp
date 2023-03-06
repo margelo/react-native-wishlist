@@ -35,6 +35,9 @@ void WishlistManagerModule::nativeInstall(
         }
 
         int tag = event.eventTarget->getTag();
+        if (tag >= 0) {
+            return false;
+        }
 
         WishlistJsRuntime::getInstance().accessRuntime([this,
                                                         event, tag](Runtime &rt) {
@@ -52,7 +55,7 @@ void WishlistManagerModule::nativeInstall(
           }
         });
 
-        return false;
+        return true;
       });
   scheduler_->addEventListener(eventListener_);
 

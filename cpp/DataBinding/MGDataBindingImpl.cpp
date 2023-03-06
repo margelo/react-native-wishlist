@@ -13,9 +13,9 @@ namespace Wishlist {
 using namespace facebook;
 
 MGDataBindingImpl::MGDataBindingImpl(
-    std::string wishlistId,
-    std::weak_ptr<MGDI> _di)
-    : di(_di), _wishlistId(wishlistId) {
+    const std::string &wishlistId,
+    const std::weak_ptr<MGDI> &di)
+    : di(di), _wishlistId(wishlistId) {
   registerBindings();
 }
 
@@ -23,7 +23,7 @@ std::set<int> MGDataBindingImpl::applyChangesAndGetDirtyIndices(
     std::pair<int, int> windowIndexRange) {
   std::shared_ptr retainedDI = di.lock();
   if (retainedDI == nullptr) {
-    return std::set<int>();
+    return {};
   }
 
   auto &rt = WishlistJsRuntime::getInstance().getRuntime();
@@ -45,12 +45,12 @@ std::set<int> MGDataBindingImpl::applyChangesAndGetDirtyIndices(
                                   .asArray(rt);
     std::set<int> res;
     for (int i = 0; i < dirtyIndices.size(rt); ++i) {
-      int dirtyIndex = dirtyIndices.getValueAtIndex(rt, i).asNumber();
+      int dirtyIndex = (int)dirtyIndices.getValueAtIndex(rt, i).asNumber();
       res.insert(dirtyIndex);
     }
     return res;
   }
-  return std::set<int>();
+  return {};
 }
 
 void MGDataBindingImpl::registerBindings() {
