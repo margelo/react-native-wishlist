@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <functional>
 #include <stdio.h>
 #include "MGBoundingBoxObserver.hpp"
 #include "MGVSyncRequester.hpp"

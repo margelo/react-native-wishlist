@@ -2,10 +2,11 @@ package com.wishlist
 
 import android.content.Context
 import com.facebook.react.uimanager.FabricViewStateManager
+import com.facebook.react.uimanager.PixelUtil
 import com.facebook.react.views.scroll.ReactScrollView
 
 class Wishlist(reactContext: Context) :
-    ReactScrollView(reactContext), FabricViewStateManager.HasFabricViewStateManager {
+  ReactScrollView(reactContext), FabricViewStateManager.HasFabricViewStateManager {
   var inflatorId: String? = null
   var wishlistId: String? = null
   var initialIndex: Int = 0
@@ -30,12 +31,19 @@ class Wishlist(reactContext: Context) :
     var orchestrator = this.orchestrator
     if (orchestrator == null) {
       orchestrator =
-          Orchestrator(wishlistId!!, fabricViewStateManager.stateData!!.getInt("viewportCarer"))
+        Orchestrator(wishlistId!!, fabricViewStateManager.stateData!!.getInt("viewportCarer"))
       this.orchestrator = orchestrator
     }
 
     orchestrator.renderAsync(
-        width.toFloat(), height.toFloat(), 0f, initialIndex, templatesRef, names, inflatorId)
+      PixelUtil.toDIPFromPixel(width.toFloat()),
+      PixelUtil.toDIPFromPixel(height.toFloat()),
+      0f,
+      initialIndex,
+      templatesRef,
+      names,
+      inflatorId
+    )
   }
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -47,7 +55,12 @@ class Wishlist(reactContext: Context) :
   override fun onScrollChanged(x: Int, y: Int, oldX: Int, oldY: Int) {
     super.onScrollChanged(x, y, oldX, oldY)
 
-    orchestrator?.didScrollAsync(width.toFloat(), height.toFloat(), y.toFloat(), inflatorId!!)
+    orchestrator?.didScrollAsync(
+      PixelUtil.toDIPFromPixel(width.toFloat()),
+      PixelUtil.toDIPFromPixel(height.toFloat()),
+      PixelUtil.toDIPFromPixel(y.toFloat()),
+      inflatorId!!
+    )
   }
 
   fun scrollToItem(index: Int, animated: Boolean) {}
