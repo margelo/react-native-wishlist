@@ -18,21 +18,22 @@ struct MGDims {
   float height;
 };
 
-struct MGViewportCarer {
+class MGViewportCarer {
+ public:
   virtual void initialRenderAsync(
       MGDims dimensions,
-      float intialOffset,
+      float initialOffset,
       int originItem,
-      std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
-      std::vector<std::string> names,
-      std::string inflatorId) = 0;
+      const std::vector<std::shared_ptr<ShadowNode const>> &registeredViews,
+      const std::vector<std::string> &names,
+      const std::string &inflatorId) = 0;
 
   virtual void didScrollAsync(
-      MGDims dimentions,
-      std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
-      std::vector<std::string> names,
+      MGDims dimensions,
+      const std::vector<std::shared_ptr<ShadowNode const>> &registeredViews,
+      const std::vector<std::string> &names,
       float newOffset,
-      std::string inflatorId) = 0;
+      const std::string &inflatorId) = 0;
 
   virtual ~MGViewportCarer() {}
 };

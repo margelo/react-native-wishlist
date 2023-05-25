@@ -12,16 +12,18 @@ MGWishlistState::~MGWishlistState() {}
 MGWishlistState::MGWishlistState()
     : initialised(false),
       viewportCarer(std::make_shared<MGViewportCarerImpl>()),
-      contentBoundingRect({}){};
+      contentBoundingRect({}),
+      wishlistChildren(nullptr){};
 
 #ifdef ANDROID
 
 MGWishlistState::MGWishlistState(
     MGWishlistState const &previousState,
     folly::dynamic data)
-    : initialised(false),
+    : initialised(previousState.initialised),
       viewportCarer(previousState.viewportCarer),
-      contentBoundingRect({}){};
+      contentBoundingRect(previousState.contentBoundingRect),
+      wishlistChildren(previousState.wishlistChildren){};
 
 folly::dynamic MGWishlistState::getDynamic() const {
   auto viewportCarerRef = Wishlist::JNIStateRegistry::getInstance().addValue(

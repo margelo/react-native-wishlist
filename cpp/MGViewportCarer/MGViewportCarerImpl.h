@@ -1,55 +1,41 @@
 #pragma once
 
+#include <react/renderer/uimanager/UIManager.h>
 #include <stdio.h>
 #include <deque>
 #include <iostream>
 #include <set>
 #include "ItemProvider.h"
-// Temporary solution only for PoC
-#include <react/renderer/uimanager/UIManager.h>
 #include "MGDI.hpp"
 #include "MGViewportCarer.hpp"
 
 using namespace Wishlist;
 // TODO make this class testable by injecting componentsPool and itemProvider
 // or their factories
-struct MGViewportCarerImpl : MGViewportCarer {
-  float offset;
-  float windowHeight;
-  float windowWidth;
-  int surfaceId;
-  std::string inflatorId;
-
-  std::shared_ptr<ComponentsPool> componentsPool =
-      std::make_shared<ComponentsPool>();
-  std::shared_ptr<ItemProvider> itemProvider;
-  std::deque<WishItem> window;
-  std::shared_ptr<ShadowNode> wishListNode;
-  LayoutContext lc;
-  ShadowNode::SharedListOfShared wishlistChildren = nullptr;
-
-  std::weak_ptr<MGDI> di;
-
+class MGViewportCarerImpl : public MGViewportCarer {
+ public:
   void setInitialValues(
-      std::shared_ptr<ShadowNode> wishListNode,
-      LayoutContext lc);
+      const std::shared_ptr<ShadowNode> &wishListNode,
+      const LayoutContext &lc);
 
-  void setDI(std::weak_ptr<MGDI> _di);
+  void setDI(const std::weak_ptr<MGDI> &_di);
+
+  ShadowNode::SharedListOfShared getWishlistChildren() const;
 
   void initialRenderAsync(
       MGDims dimensions,
-      float intialOffset,
+      float initialOffset,
       int originItem,
-      std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
-      std::vector<std::string> names,
-      std::string inflatorId) override;
+      const std::vector<std::shared_ptr<ShadowNode const>> &registeredViews,
+      const std::vector<std::string> &names,
+      const std::string &inflatorId) override;
 
   void didScrollAsync(
-      MGDims dimentions,
-      std::vector<std::shared_ptr<ShadowNode const>> registeredViews,
-      std::vector<std::string> names,
+      MGDims dimensions,
+      const std::vector<std::shared_ptr<ShadowNode const>> &registeredViews,
+      const std::vector<std::string> &names,
       float newOffset,
-      std::string inflatorId) override;
+      const std::string &inflatorId) override;
 
  private:
   void updateWindow();
@@ -59,4 +45,18 @@ struct MGViewportCarerImpl : MGViewportCarer {
   void pushChildren();
 
   void notifyAboutPushedChildren();
+
+  float offset_;
+  float windowHeight_;
+  float windowWidth_;
+  int surfaceId_;
+  std::string inflatorId_;
+  std::shared_ptr<ComponentsPool> componentsPool_ =
+      std::make_shared<ComponentsPool>();
+  std::shared_ptr<ItemProvider> itemProvider_;
+  std::deque<WishItem> window_;
+  std::shared_ptr<ShadowNode> wishListNode_;
+  LayoutContext lc_;
+  std::weak_ptr<MGDI> di_;
+  ShadowNode::SharedListOfShared wishlistChildren_ = nullptr;
 };
