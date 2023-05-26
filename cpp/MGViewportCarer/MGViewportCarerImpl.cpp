@@ -1,5 +1,6 @@
 #include "MGViewportCarerImpl.h"
 
+#include "MGContentContainerShadowNode.h"
 #include "MGUIManagerHolder.h"
 #include "MGWishlistShadowNode.h"
 #include "WishlistJsRuntime.h"
@@ -15,10 +16,6 @@ void MGViewportCarerImpl::setInitialValues(
     const LayoutContext &lc) {
   wishListNode_ = wishListNode;
   lc_ = lc;
-}
-
-ShadowNode::SharedListOfShared MGViewportCarerImpl::getWishlistChildren() const {
-  return wishlistChildren_;
 }
 
 void MGViewportCarerImpl::initialRenderAsync(
@@ -223,18 +220,18 @@ void MGViewportCarerImpl::pushChildren() {
                       }
                     }
 
-                    auto const contentContainer = sn.getChildren()[0]->clone(
-                        {nullptr, children, nullptr});
+                    auto contentContainer =
+                        std::static_pointer_cast<MGContentContainerShadowNode>(
+                            sn.getChildren()[0]->clone(
+                                {nullptr, children, nullptr}));
+                    contentContainer->setWishlistChildren(children);
 
-                    // That doesn't seem right as this method can be called on
-                    // multiple threads another problem is that it can be called
-                    // multiple times
-                    wishlistChildren_ =
+                    auto wishlistChildren =
                         std::make_shared<ShadowNode::ListOfShared>(
                             ShadowNode::ListOfShared{contentContainer});
 
-                    return sn.clone(ShadowNodeFragment{
-                        nullptr, wishlistChildren_, nullptr});
+                    return sn.clone(
+                        ShadowNodeFragment{nullptr, wishlistChildren, nullptr});
                   }));
         };
         st.commit(transaction);

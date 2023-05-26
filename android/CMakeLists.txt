@@ -37,6 +37,7 @@ target_include_directories(
   ${PACKAGE_NAME}
   PUBLIC
   "${SRC_DIR}/main/jni"
+  "${COMMON_SRC_DIR}/ContentContainer"
   "${COMMON_SRC_DIR}/DataBinding"
   "${COMMON_SRC_DIR}/DependencyInjection"
   "${COMMON_SRC_DIR}/ItemProvider"

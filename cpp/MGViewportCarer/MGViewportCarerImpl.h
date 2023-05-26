@@ -20,8 +20,6 @@ class MGViewportCarerImpl : public MGViewportCarer {
 
   void setDI(const std::weak_ptr<MGDI> &_di);
 
-  ShadowNode::SharedListOfShared getWishlistChildren() const;
-
   void initialRenderAsync(
       MGDims dimensions,
       float initialOffset,
@@ -58,5 +56,4 @@ class MGViewportCarerImpl : public MGViewportCarer {
   std::shared_ptr<ShadowNode> wishListNode_;
   LayoutContext lc_;
   std::weak_ptr<MGDI> di_;
-  ShadowNode::SharedListOfShared wishlistChildren_ = nullptr;
 };

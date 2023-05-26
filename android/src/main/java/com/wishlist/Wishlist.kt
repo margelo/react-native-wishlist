@@ -16,7 +16,7 @@ class Wishlist(reactContext: Context) :
   private var names: List<String>? = null
   private var didInitialRender = false
   private var didInitialScroll = false
-  private val initialOffset = 10000f
+  private val initialOffset = 100000f
 
   fun setTemplates(templatesRef: Int, names: List<String>) {
     this.templatesRef = templatesRef

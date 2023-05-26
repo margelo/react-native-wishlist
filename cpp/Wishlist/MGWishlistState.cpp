@@ -7,13 +7,10 @@
 namespace facebook {
 namespace react {
 
-MGWishlistState::~MGWishlistState() {}
-
 MGWishlistState::MGWishlistState()
     : initialised(false),
       viewportCarer(std::make_shared<MGViewportCarerImpl>()),
-      contentBoundingRect({}),
-      wishlistChildren(nullptr){};
+      contentBoundingRect({}){};
 
 #ifdef ANDROID
 
@@ -22,8 +19,7 @@ MGWishlistState::MGWishlistState(
     folly::dynamic data)
     : initialised(previousState.initialised),
       viewportCarer(previousState.viewportCarer),
-      contentBoundingRect(previousState.contentBoundingRect),
-      wishlistChildren(previousState.wishlistChildren){};
+      contentBoundingRect(previousState.contentBoundingRect){};
 
 folly::dynamic MGWishlistState::getDynamic() const {
   auto viewportCarerRef = Wishlist::JNIStateRegistry::getInstance().addValue(

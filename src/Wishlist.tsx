@@ -20,6 +20,7 @@ import InflatorRepository, {
   ComponentPool,
   InflateMethod,
 } from './InflatorRepository';
+import NativeContentContainer from './Specs/NativeContentContainer';
 import NativeTemplateContainer from './Specs/NativeTemplateContainer';
 import NativeTemplateInterceptor from './Specs/NativeTemplateInterceptor';
 import NativeWishList, {
@@ -255,7 +256,7 @@ function InnerComponent({
         onStartReached={rest?.onStartReached}
         initialIndex={rest.initialIndex ?? 0}
       >
-        <View style={styles.contentContainer} collapsable={false} />
+        <NativeContentContainer collapsable={false} />
       </NativeWishList>
 
       <NativeTemplateContainer

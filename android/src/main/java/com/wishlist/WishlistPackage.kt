@@ -12,6 +12,9 @@ class WishlistPackage : ReactPackage {
 
   override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> {
     return listOf(
-        WishlistViewManager(), TemplateContainerViewManager(), TemplateInterceptorViewManager())
+        WishlistViewManager(),
+        TemplateContainerViewManager(),
+        TemplateInterceptorViewManager(),
+        ContentContainerViewManager())
   }
 }
