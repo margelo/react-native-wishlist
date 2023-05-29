@@ -1,3 +1,29 @@
+diff --git a/node_modules/react-native-gesture-handler/android/src/main/java/com/swmansion/gesturehandler/core/GestureHandler.kt b/node_modules/react-native-gesture-handler/android/src/main/java/com/swmansion/gesturehandler/core/GestureHandler.kt
+index 2c5f4b3..2b3dfbf 100644
+--- a/node_modules/react-native-gesture-handler/android/src/main/java/com/swmansion/gesturehandler/core/GestureHandler.kt
++++ b/node_modules/react-native-gesture-handler/android/src/main/java/com/swmansion/gesturehandler/core/GestureHandler.kt
+@@ -748,6 +748,7 @@ open class GestureHandler<ConcreteGestureHandlerT : GestureHandler<ConcreteGestu
+     const val ACTION_TYPE_NATIVE_ANIMATED_EVENT = 2
+     const val ACTION_TYPE_JS_FUNCTION_OLD_API = 3
+     const val ACTION_TYPE_JS_FUNCTION_NEW_API = 4
++    const val ACTION_TYPE_DIRECT_EVENT = 5
+     private const val MAX_POINTERS_COUNT = 12
+     private lateinit var pointerProps: Array<PointerProperties?>
+     private lateinit var pointerCoords: Array<PointerCoords?>
+diff --git a/node_modules/react-native-gesture-handler/android/src/main/java/com/swmansion/gesturehandler/react/RNGestureHandlerModule.kt b/node_modules/react-native-gesture-handler/android/src/main/java/com/swmansion/gesturehandler/react/RNGestureHandlerModule.kt
+index 98208b5..a202e26 100644
+--- a/node_modules/react-native-gesture-handler/android/src/main/java/com/swmansion/gesturehandler/react/RNGestureHandlerModule.kt
++++ b/node_modules/react-native-gesture-handler/android/src/main/java/com/swmansion/gesturehandler/react/RNGestureHandlerModule.kt
+@@ -589,6 +589,9 @@ class RNGestureHandlerModule(reactContext: ReactApplicationContext?) :
+       // JS function or Animated.event with useNativeDriver: false with new API
+       val data = RNGestureHandlerStateChangeEvent.createEventData(handler, handlerFactory, newState, oldState)
+       sendEventForDeviceEvent(RNGestureHandlerStateChangeEvent.EVENT_NAME, data)
++    } else if (handler.actionType == GestureHandler.ACTION_TYPE_DIRECT_EVENT) {
++      val event = RNGestureHandlerStateChangeEvent.obtain(handler, newState, oldState, handlerFactory)
++      sendEventForDirectEvent(event)
+     }
+   }
+ 
 diff --git a/node_modules/react-native-gesture-handler/ios/RNGestureHandlerActionType.h b/node_modules/react-native-gesture-handler/ios/RNGestureHandlerActionType.h
 index 26adddc..1cf61a8 100644
 --- a/node_modules/react-native-gesture-handler/ios/RNGestureHandlerActionType.h

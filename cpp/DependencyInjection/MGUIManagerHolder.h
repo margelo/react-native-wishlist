@@ -11,7 +11,7 @@ class MGUIManagerHolder {
   static MGUIManagerHolder &getInstance();
 
   std::shared_ptr<UIManager> getUIManager() const;
-  void setUIManager(std::shared_ptr<UIManager> uiManager);
+  void setUIManager(const std::shared_ptr<UIManager> &uiManager);
 
  private:
   MGUIManagerHolder();

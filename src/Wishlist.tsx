@@ -20,6 +20,7 @@ import InflatorRepository, {
   ComponentPool,
   InflateMethod,
 } from './InflatorRepository';
+import NativeContentContainer from './Specs/NativeContentContainer';
 import NativeTemplateContainer from './Specs/NativeTemplateContainer';
 import NativeTemplateInterceptor from './Specs/NativeTemplateInterceptor';
 import NativeWishList, {
@@ -242,7 +243,6 @@ function InnerComponent({
 
   return (
     <NativeTemplateInterceptor
-      inflatorId={inflatorId}
       style={style}
       collapsable={false}
       removeClippedSubviews={false}
@@ -255,7 +255,9 @@ function InnerComponent({
         onEndReached={rest?.onEndReached}
         onStartReached={rest?.onStartReached}
         initialIndex={rest.initialIndex ?? 0}
-      />
+      >
+        <NativeContentContainer collapsable={false} />
+      </NativeWishList>
 
       <NativeTemplateContainer
         names={keys}
@@ -315,4 +317,5 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   noDisplay: { display: 'none' },
   offsetView: { height: 0 },
+  contentContainer: {},
 });

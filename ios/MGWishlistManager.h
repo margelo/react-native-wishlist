@@ -15,4 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MGTemplateInterceptorManager : RCTViewManager
 @end
 
+@interface MGContentContainerManager : RCTViewManager
+@end
+
 NS_ASSUME_NONNULL_END

@@ -9,9 +9,13 @@
 #import <react/renderer/components/rncore/Props.h>
 #include <react/renderer/components/wishlist/Props.h>
 #include <react/renderer/components/wishlist/ShadowNodes.h>
-#import "MGDIImpl.hpp"
+#import "MGDIIOS.h"
+#import "MGDataBindingImpl.hpp"
+#import "MGErrorHandlerIOS.h"
+#import "MGOrchestratorCPPAdapter.hpp"
 #import "MGScrollViewOrchestrator.h"
 #import "MGUIScheduleriOS.hpp"
+#import "MGWindowKeeper.hpp"
 #import "MGWishlistComponentDescriptor.h"
 #import "RCTFabricComponentsPlugins.h"
 
@@ -31,7 +35,7 @@ using namespace facebook::react;
   MGScrollViewOrchestrator *_orchestrator;
   std::shared_ptr<const MGWishlistEventEmitter> _emitter;
   int _initialIndex;
-  std::shared_ptr<MGDIImpl> di;
+  std::shared_ptr<MGDIIOS> di;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -94,22 +98,28 @@ using namespace facebook::react;
     self.scrollView.frame =
         CGRectMake(self.scrollView.frame.origin.x, self.scrollView.frame.origin.y, frame.size.width, frame.size.height);
 
-    di = std::make_shared<MGDIImpl>();
+    di = std::make_shared<MGDIIOS>();
+    auto weakDI = std::weak_ptr<MGDIIOS>(di);
     std::shared_ptr<MGViewportCarerImpl> viewportCarer = _sharedState->getData().viewportCarer;
     viewportCarer->setDI(di);
-    di->setViewportCarerImpl(viewportCarer);
+    di->setViewportCarer(viewportCarer);
 
     _orchestrator = [[MGScrollViewOrchestrator alloc] initWith:self.scrollView
-                                                            di:di->getWeak()
+                                                            di:weakDI
                                                     inflatorId:inflatorId
                                                     wishlistId:_wishlistId];
     __weak MGScrollViewOrchestrator *weakOrchestrator = _orchestrator;
-    di->setOrchestratorCppAdaper(std::make_shared<MGOrchestratorCppAdapter>(
+    auto orchestratorAdapter = std::make_shared<MGOrchestratorCppAdapter>(
         [=](float top, float bottom) { [weakOrchestrator edgesChangedWithTopEdge:top bottomEdge:bottom]; },
-        [=]() { [weakOrchestrator requestVSync]; }));
-    di->setDataBindingImpl(std::make_shared<MGDataBindingImpl>(_wishlistId, di->getWeak()));
-    di->setWindowKeeper(std::make_shared<MGWindowKeeper>(di->getWeak()));
+        [=]() { [weakOrchestrator requestVSync]; });
+    di->setVSyncRequester(orchestratorAdapter);
+    di->setBoundingBoxObserver(orchestratorAdapter);
+    di->setDataBinding(std::make_shared<MGDataBindingImpl>(_wishlistId, weakDI));
+    auto windowKeeper = std::make_shared<MGWindowKeeper>(weakDI);
+    di->setPushChildrenListener(windowKeeper);
+    di->setAnimationsSight(windowKeeper);
     di->setUIScheduler(std::make_shared<MGUIScheduleriOS>());
+    di->setErrorHandler(std::make_shared<MGErrorHandlerIOS>());
 
     [_orchestrator runWithTemplates:templates names:names initialIndex:_initialIndex];
 

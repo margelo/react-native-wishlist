@@ -5,29 +5,30 @@
 //  Created by Szymon on 13/01/2023.
 //
 
-#ifndef MGWindowKeeper_hpp
-#define MGWindowKeeper_hpp
+#pragma once
 
 #include <stdio.h>
 #include <vector>
 #include "MGAnimationSight.hpp"
+#include "MGDIIOS.h"
 #include "MGPushChildrenListener.hpp"
-#include "MGDI.hpp"
 
-struct MGWindowKeeper : MGAnimationSight, MGPushChildrenListener {
-    std::vector<Item> items;
-    std::weak_ptr<MGDI> di;
-    
-    MGWindowKeeper(std::weak_ptr<MGDI> _di);
-    
-#pragma MGAnimationSight
-    
-    virtual float getOffsetIfItemIsAlreadyRendered(int index);
-    virtual bool isTargetItemLocatedBelow(int targetItem);
-    
-#pragma MGPushChildrenListener
+namespace Wishlist {
 
-    virtual void didPushChildren(std::vector<Item> newWindow);
+struct MGWindowKeeper final : MGAnimationSight, MGPushChildrenListener {
+  std::vector<Item> items;
+  std::weak_ptr<MGDIIOS> di;
+
+  MGWindowKeeper(std::weak_ptr<MGDIIOS> _di);
+
+#pragma mark MGAnimationSight
+
+  float getOffsetIfItemIsAlreadyRendered(int index) override;
+  bool isTargetItemLocatedBelow(int targetItem) override;
+
+#pragma mark MGPushChildrenListener
+
+  void didPushChildren(std::vector<Item> newWindow) override;
 };
 
-#endif /* MGWindowKeeper_hpp */
+}; // namespace Wishlist

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <memory>
 #include "ComponentsPool.h"
+#include "MGDI.hpp"
 
 using namespace facebook::react;
 
@@ -41,17 +42,22 @@ class ItemProvider {
 struct WorkletItemProvider : ItemProvider {
   std::shared_ptr<ComponentsPool> cp;
   std::string tag;
+  std::weak_ptr<MGDI> di;
 
-  WorkletItemProvider(float maxWidth, LayoutContext lc, std::string tag)
-      : ItemProvider(maxWidth, lc) {
+  WorkletItemProvider(
+      std::weak_ptr<MGDI> di,
+      float maxWidth,
+      LayoutContext lc,
+      std::string tag)
+      : ItemProvider(maxWidth, lc), di(di) {
     this->tag = tag;
   }
 
-  void setComponentsPool(std::shared_ptr<ComponentsPool> pool) {
+  void setComponentsPool(std::shared_ptr<ComponentsPool> pool) override {
     cp = pool;
   }
 
-  WishItem provide(int index);
+  WishItem provide(int index) override;
 };
 
 }; // namespace Wishlist

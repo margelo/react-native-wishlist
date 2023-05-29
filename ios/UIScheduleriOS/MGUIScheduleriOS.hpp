@@ -5,14 +5,15 @@
 //  Created by Szymon on 14/01/2023.
 //
 
-#ifndef MGUIScheduleriOS_hpp
-#define MGUIScheduleriOS_hpp
+#pragma once
 
 #include <stdio.h>
 #include "MGUIScheduler.hpp"
 
+namespace Wishlist {
+
 struct MGUIScheduleriOS : MGUIScheduler {
-    virtual void scheduleOnUI(std::function<void()> && f);
+  virtual void scheduleOnUI(std::function<void()> &&f);
 };
 
-#endif /* MGUIScheduleriOS_hpp */
+}; // namespace Wishlist

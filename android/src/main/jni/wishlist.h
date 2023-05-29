@@ -3,6 +3,7 @@
 #include <ReactCommon/JavaTurboModule.h>
 #include <ReactCommon/TurboModule.h>
 #include <jsi/jsi.h>
+#include "MGContentContainerComponentDescriptor.h"
 #include "MGTemplateContainerComponentDescriptor.h"
 #include "MGWishlistComponentDescriptor.h"
 

@@ -13,8 +13,8 @@ namespace Wishlist {
 
 class ShadowNodeCopyMachine {
  public:
-  static std::shared_ptr<const ShadowNode> copyShadowSubtree(
-      std::shared_ptr<const ShadowNode> sn);
+  static ShadowNode::Shared copyShadowSubtree(
+      const std::shared_ptr<const ShadowNode> &sn);
 };
 
 // dirty hack don't do it at home

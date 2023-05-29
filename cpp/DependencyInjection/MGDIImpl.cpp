@@ -6,63 +6,64 @@
 //
 
 #include "MGDIImpl.hpp"
+
 #include <iostream>
 
-std::shared_ptr<MGAnimationSight> MGDIImpl::getAnimationsSight() {
-  return std::static_pointer_cast<MGAnimationSight>(this->windowKeeper);
-}
+namespace Wishlist {
 
 std::shared_ptr<MGDataBinding> MGDIImpl::getDataBinding() {
-  return std::static_pointer_cast<MGDataBinding>(dataBinding);
+  return dataBinding_;
 }
 
 std::shared_ptr<MGVSyncRequester> MGDIImpl::getVSyncRequester() {
-  return orchestratorAdapter;
+  return vSyncRequester_;
 }
 
 std::shared_ptr<MGPushChildrenListener> MGDIImpl::getPushChildrenListener() {
-  return windowKeeper;
+  return pushChildrenListener_;
 }
 
 std::shared_ptr<MGViewportCarer> MGDIImpl::getViewportCarer() {
-  return viewportCarerImpl;
+  return viewportCarer_;
 }
 
 std::shared_ptr<MGUIScheduler> MGDIImpl::getUIScheduler() {
-  return uiScheduler;
+  return uiScheduler_;
 };
 
-std::shared_ptr<MGBoundingBoxObserver> MGDIImpl::getBoundingBoxObserver() {
-  return orchestratorAdapter;
+std::shared_ptr<MGErrorHandler> MGDIImpl::getErrorHandler() {
+  return errorHandler_;
 }
 
-void MGDIImpl::setWindowKeeper(std::shared_ptr<MGWindowKeeper> wk) {
-  this->windowKeeper = wk;
+void MGDIImpl::setDataBinding(const std::shared_ptr<MGDataBinding> &db) {
+  dataBinding_ = db;
 }
 
-void MGDIImpl::setDataBindingImpl(
-    std::shared_ptr<MGDataBindingImpl> dataBinding) {
-  this->dataBinding = dataBinding;
+void MGDIImpl::setVSyncRequester(const std::shared_ptr<MGVSyncRequester> &vr) {
+  vSyncRequester_ = vr;
 }
 
-void MGDIImpl::setOrchestratorCppAdaper(
-    std::shared_ptr<MGOrchestratorCppAdapter> orchestratorAdapter) {
-  this->orchestratorAdapter = orchestratorAdapter;
+void MGDIImpl::setPushChildrenListener(
+    const std::shared_ptr<MGPushChildrenListener> &pcl) {
+  pushChildrenListener_ = pcl;
 }
 
-void MGDIImpl::setViewportCarerImpl(
-    std::shared_ptr<MGViewportCarerImpl> viewportCarerImpl) {
-  this->viewportCarerImpl = viewportCarerImpl;
+void MGDIImpl::setViewportCarer(const std::shared_ptr<MGViewportCarer> &vc) {
+  viewportCarer_ = vc;
 }
 
-void MGDIImpl::setUIScheduler(std::shared_ptr<MGUIScheduler> uiScheduler) {
-  this->uiScheduler = uiScheduler;
+void MGDIImpl::setUIScheduler(const std::shared_ptr<MGUIScheduler> &us) {
+  uiScheduler_ = us;
+}
+
+void MGDIImpl::setErrorHandler(const std::shared_ptr<MGErrorHandler> &eh) {
+  errorHandler_ = eh;
 }
 
 std::weak_ptr<MGDI> MGDIImpl::getWeak() {
-  return std::static_pointer_cast<MGDI>(shared_from_this());
+  return weak_from_this();
 }
 
-MGDIImpl::~MGDIImpl() {
-  std::cout << "sdfs" << std::endl;
-}
+MGDIImpl::~MGDIImpl() {}
+
+}; // namespace Wishlist

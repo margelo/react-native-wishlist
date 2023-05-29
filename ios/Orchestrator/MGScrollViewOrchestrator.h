@@ -5,9 +5,11 @@
 #import <string>
 #import <vector>
 #import "MGAnimations.h"
-#include "MGDI.hpp"
+#import "MGDIIOS.h"
 
 NS_ASSUME_NONNULL_BEGIN
+
+using namespace Wishlist;
 
 @interface PanEvent : NSObject
 
@@ -29,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak) id<MGScrollViewOrchestratorDelegate> delegate;
 
 - (instancetype)initWith:(UIScrollView *)scrollView
-                      di:(std::weak_ptr<MGDI>)di
+                      di:(std::weak_ptr<MGDIIOS>)di
               inflatorId:(std::string)inflatorId
               wishlistId:(std::string)wishlistId;
 

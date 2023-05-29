@@ -24,24 +24,16 @@ namespace react {
  */
 class JSI_EXPORT MGWishlistState final {
  public:
-  //
-  int revision;
-  //
-  double originContentOffset = 50000;
-  int originItemIndex = 10; // Hardcode for now
-  std::shared_ptr<MGViewportCarerImpl> viewportCarer =
-      std::make_shared<MGViewportCarerImpl>();
-  bool initialised = false;
+  bool initialised;
+  std::shared_ptr<MGViewportCarerImpl> viewportCarer;
   Rect contentBoundingRect;
 
-  virtual ~MGWishlistState();
+  MGWishlistState();
 
 #ifdef ANDROID
-  MGWishlistState();
   MGWishlistState(MGWishlistState const &previousState, folly::dynamic data);
   folly::dynamic getDynamic() const;
   MapBuffer getMapBuffer() const;
-
 #endif
 };
 

@@ -1,6 +1,8 @@
 package com.wishlist
 
 import com.facebook.react.module.annotations.ReactModule
+import com.facebook.react.uimanager.ReactStylesDiffMap
+import com.facebook.react.uimanager.StateWrapper
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.ViewGroupManager
 import com.facebook.react.uimanager.annotations.ReactProp
@@ -18,6 +20,15 @@ class WishlistViewManager : ViewGroupManager<Wishlist>(), MGWishlistManagerInter
   override fun createViewInstance(reactContext: ThemedReactContext) = Wishlist(reactContext)
 
   override fun getDelegate() = MGWishlistManagerDelegate(this)
+
+  override fun updateState(
+      view: Wishlist,
+      props: ReactStylesDiffMap?,
+      stateWrapper: StateWrapper?
+  ): Any? {
+    view.fabricViewStateManager.setStateWrapper(stateWrapper)
+    return null
+  }
 
   @ReactProp(name = "inflatorId")
   override fun setInflatorId(view: Wishlist, value: String?) {

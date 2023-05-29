@@ -22,18 +22,9 @@ class JSI_EXPORT MGWishlistShadowNode
           MGWishlistEventEmitter,
           MGWishlistState>,
       public std::enable_shared_from_this<MGWishlistShadowNode> {
- public:
-  MGWishlistShadowNode(
-      ShadowNodeFragment const &fragment,
-      ShadowNodeFamily::Shared const &family,
-      ShadowNodeTraits traits);
-
-  MGWishlistShadowNode(
-      ShadowNode const &sourceShadowNode,
-      ShadowNodeFragment const &fragment);
-
   using ConcreteViewShadowNode::ConcreteViewShadowNode;
 
+ public:
   void layout(LayoutContext layoutContext) override;
 
  private:

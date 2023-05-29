@@ -187,3 +187,14 @@ RCT_CUSTOM_VIEW_PROPERTY(inflatorId, NSString *, UIView) {}
 }
 
 @end
+
+@implementation MGContentContainerManager
+
+RCT_EXPORT_MODULE(MGContentContainerManager)
+
+- (UIView *)view
+{
+  return [[UIView alloc] init];
+}
+
+@end

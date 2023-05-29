@@ -5,17 +5,16 @@
 //  Created by Szymon on 13/01/2023.
 //
 
-#ifndef MGAnimationSight_hpp
-#define MGAnimationSight_hpp
+#pragma once
 
 #include <stdio.h>
 
-
+namespace Wishlist {
 
 struct MGAnimationSight {
-    virtual float getOffsetIfItemIsAlreadyRendered(int index) = 0;
-    virtual bool isTargetItemLocatedBelow(int targetItem) = 0;
-    static float NOT_FOUND;
+  virtual float getOffsetIfItemIsAlreadyRendered(int index) = 0;
+  virtual bool isTargetItemLocatedBelow(int targetItem) = 0;
+  static float NOT_FOUND;
 };
 
-#endif /* MGItemSight_hpp */
+}; // namespace Wishlist

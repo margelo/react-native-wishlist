@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.license      = "MIT"
   # s.license    = { :type => "MIT", :file => "FILE_LICENSE" }
   s.author       = { "author" => "author@domain.cn" }
-  s.platforms    =  { :ios => "12.4", :tvos => "12.4" }
+  s.platforms    =  { :ios => "13.4", :tvos => "13.4" }
   s.source       = { :git => "https://github.com/margelo/react-native-wishlist.git", :tag => "#{s.version}" }
 
   s.source_files = [

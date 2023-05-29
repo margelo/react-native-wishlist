@@ -1,35 +1,61 @@
-/*
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
 #include "WishlistManagerModule.hpp"
 
 #include <fbjni/fbjni.h>
 #include "MGUIManagerHolder.h"
 #include "WishlistJsRuntime.h"
 
-using namespace facebook;
+using namespace facebook::react;
+using namespace facebook::jni;
 
 namespace Wishlist {
 
-jni::local_ref<WishlistManagerModule::jhybriddata>
-WishlistManagerModule::initHybrid(jni::alias_ref<jclass>) {
+local_ref<WishlistManagerModule::jhybriddata> WishlistManagerModule::initHybrid(
+    alias_ref<jclass>) {
   return makeCxxInstance();
 }
 
 WishlistManagerModule::WishlistManagerModule() {}
 
+WishlistManagerModule::~WishlistManagerModule() {
+  scheduler_->removeEventListener(eventListener_);
+}
+
 void WishlistManagerModule::nativeInstall(
     jlong jsiRuntimeRef,
-    jni::alias_ref<react::CallInvokerHolder::javaobject> jsCallInvokerHolder,
-    jni::alias_ref<react::JFabricUIManager::javaobject> fabricUIManager) {
-  auto jsiRuntime{reinterpret_cast<jsi::Runtime *>(jsiRuntimeRef)};
-  auto jsCallInvoker = jsCallInvokerHolder->cthis()->getCallInvoker();
+    alias_ref<CallInvokerHolder::javaobject> jsCallInvokerHolder,
+    alias_ref<JFabricUIManager::javaobject> fabricUIManager) {
+  auto jsiRuntime{reinterpret_cast<Runtime *>(jsiRuntimeRef)};
+  auto const &jsCallInvoker = jsCallInvokerHolder->cthis()->getCallInvoker();
+  scheduler_ = fabricUIManager->getBinding()->getScheduler();
 
-  _wishlistQueue = std::make_shared<RNWorklet::DispatchQueue>("wishlistqueue");
+  eventListener_ =
+      std::make_shared<EventListener>([this](const RawEvent &event) -> bool {
+        if (event.eventTarget == nullptr) {
+          return false;
+        }
+
+        int tag = event.eventTarget->getTag();
+        if (tag >= 0) {
+          return false;
+        }
+
+        WishlistJsRuntime::getInstance().accessRuntime([this, event, tag](
+                                                           Runtime &rt) {
+          try {
+            auto handleEvent = rt.global()
+                                   .getPropertyAsObject(rt, "global")
+                                   .getPropertyAsFunction(rt, "handleEvent");
+            handleEvent.call(rt, event.type, tag, event.payloadFactory(rt));
+          } catch (std::exception &error) {
+            errorHandler_->reportError(error.what());
+          }
+        });
+
+        return true;
+      });
+  scheduler_->addEventListener(eventListener_);
+
+  wishlistQueue_ = std::make_shared<RNWorklet::DispatchQueue>("wishlistqueue");
 
   WishlistJsRuntime::getInstance().initialize(
       jsiRuntime,
@@ -37,12 +63,10 @@ void WishlistManagerModule::nativeInstall(
         jsCallInvoker->invokeAsync(std::move(f));
       },
       [=](std::function<void()> &&f) {
-        _wishlistQueue->dispatch(std::move(f));
+        wishlistQueue_->dispatch(std::move(f));
       });
 
-  auto uiManager =
-      fabricUIManager->getBinding()->getScheduler()->getUIManager();
-  MGUIManagerHolder::getInstance().setUIManager(std::move(uiManager));
+  MGUIManagerHolder::getInstance().setUIManager(scheduler_->getUIManager());
 }
 
 void WishlistManagerModule::registerNatives() {

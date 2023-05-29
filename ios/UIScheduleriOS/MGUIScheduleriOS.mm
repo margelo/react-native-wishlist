@@ -5,8 +5,10 @@
 //  Created by Szymon on 14/01/2023.
 //
 
-#include "MGUIScheduleriOS.hpp"
-#include <React/RCTUtils.h>
+#import "MGUIScheduleriOS.hpp"
+#import <React/RCTUtils.h>
+
+namespace Wishlist {
 
 void MGUIScheduleriOS::scheduleOnUI(std::function<void()> &&f)
 {
@@ -15,3 +17,5 @@ void MGUIScheduleriOS::scheduleOnUI(std::function<void()> &&f)
     retainedWork();
   });
 };
+
+}; // namespace Wishlist

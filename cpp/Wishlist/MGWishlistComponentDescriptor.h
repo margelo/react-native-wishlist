@@ -7,31 +7,8 @@
 namespace facebook {
 namespace react {
 
-class MGWishlistComponentDescriptor
-    : public ConcreteComponentDescriptor<MGWishlistShadowNode> {
-  using ConcreteComponentDescriptor::ConcreteComponentDescriptor;
-
-  ShadowNode::Unshared cloneShadowNode(
-      const ShadowNode &sourceShadowNode,
-      const ShadowNodeFragment &fragment) const override {
-    auto &wishlistSourceShadowNode =
-        static_cast<const MGWishlistShadowNode &>(sourceShadowNode);
-
-    // When we clone this shadow node we need to make sure to use the
-    // latest children of the viewport observer, otherwise react might
-    // set the children back to what was rendered.
-    auto shadowNode = std::make_shared<MGWishlistShadowNode>(
-        sourceShadowNode,
-        ShadowNodeFragment{
-            fragment.props,
-            wishlistSourceShadowNode.getStateData()
-                .viewportCarer->wishlistChildren,
-            fragment.state});
-
-    adopt(shadowNode);
-    return shadowNode;
-  }
-};
+using MGWishlistComponentDescriptor =
+    ConcreteComponentDescriptor<MGWishlistShadowNode>;
 
 } // namespace react
 } // namespace facebook

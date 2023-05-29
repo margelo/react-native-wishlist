@@ -6,10 +6,7 @@
 
 namespace Wishlist {
 
-struct
-
-    WishItem
-    WorkletItemProvider::provide(int index) {
+WishItem WorkletItemProvider::provide(int index) {
   WishItem wishItem;
 
   auto &rt = WishlistJsRuntime::getInstance().getRuntime();
@@ -27,8 +24,7 @@ struct
         jsi::Value(index),
         cp->prepareProxy(rt));
   } catch (std::exception &error) {
-    // TODO: Redbox from c++
-    // RCTLogError(@"%@", [NSString stringWithUTF8String:error.what()]);
+    di.lock()->getErrorHandler()->reportError(error.what());
     return wishItem;
   }
 

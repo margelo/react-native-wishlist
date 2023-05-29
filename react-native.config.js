@@ -3,6 +3,7 @@ module.exports = {
     platforms: {
       android: {
         componentDescriptors: [
+          'MGContentContainerComponentDescriptor',
           'MGTemplateContainerComponentDescriptor',
           'MGTemplateInterceptorComponentDescriptor',
           'MGWishlistComponentDescriptor',
