@@ -75,15 +75,17 @@ const attachGestureHandler = createRunInJsFn((tag: number) => {
   RNGestureHandlerModule.flushOperations();
 });
 
-const PressableView = createTemplateComponent(View, (item, props) => {
-  'worklet';
+const PressableView = createTemplateComponent(View, {
+  addProps: (item, props) => {
+    'worklet';
 
-  const tag = item.getTag();
-  item.addProps(props);
+    const tag = item.getTag();
+    item.addProps(props);
 
-  getUIInflatorRegistry().addPushChildrenCallback(() => {
-    attachGestureHandler(tag);
-  });
+    getUIInflatorRegistry().addPushChildrenCallback(() => {
+      attachGestureHandler(tag);
+    });
+  },
 });
 
 export const Pressable = forwardRef<any, PressableProps>(

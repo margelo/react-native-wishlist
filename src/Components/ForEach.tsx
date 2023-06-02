@@ -2,9 +2,8 @@ import { createTemplateComponent } from '../createTemplateComponent';
 import { ForEachBase } from './ForEachBase';
 import { getUIInflatorRegistry } from '../InflatorRepository';
 
-export const ForEach = createTemplateComponent(
-  ForEachBase,
-  (item, props, inflatorId, pool, rootValue) => {
+export const ForEach = createTemplateComponent(ForEachBase, {
+  addProps: (item, props, inflatorId, pool, rootValue) => {
     'worklet';
 
     const subItems: unknown[] = props.items;
@@ -24,4 +23,4 @@ export const ForEach = createTemplateComponent(
 
     item.setChildren(items);
   },
-);
+});

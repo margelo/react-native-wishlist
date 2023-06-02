@@ -124,7 +124,7 @@ export const ChatItemView: React.FC<Props> = ({ type, onAddReaction }) => {
     });
   };
 
-  const avatarSide = useTemplateValue((item: ChatItem) => {
+  const avatarSize = useTemplateValue((item: ChatItem) => {
     return item.showBiggerAvatar ? 60 : 30;
   });
 
@@ -135,7 +135,7 @@ export const ChatItemView: React.FC<Props> = ({ type, onAddReaction }) => {
           <Wishlist.Image
             style={[
               styles.avatarImage,
-              { width: avatarSide, height: avatarSide },
+              { width: avatarSize, height: avatarSize },
             ]}
             source={{ uri: avatarUrl }}
           />
