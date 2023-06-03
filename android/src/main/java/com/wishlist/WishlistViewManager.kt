@@ -1,5 +1,6 @@
 package com.wishlist
 
+import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.uimanager.ReactStylesDiffMap
 import com.facebook.react.uimanager.StateWrapper
@@ -15,11 +16,13 @@ class WishlistViewManager : ViewGroupManager<Wishlist>(), MGWishlistManagerInter
     const val REACT_CLASS = "MGWishlist"
   }
 
+  private val mDelegate = MGWishlistManagerDelegate(this)
+
   override fun getName() = REACT_CLASS
 
   override fun createViewInstance(reactContext: ThemedReactContext) = Wishlist(reactContext)
 
-  override fun getDelegate() = MGWishlistManagerDelegate(this)
+  override fun getDelegate() = mDelegate
 
   override fun updateState(
       view: Wishlist,
@@ -42,5 +45,9 @@ class WishlistViewManager : ViewGroupManager<Wishlist>(), MGWishlistManagerInter
 
   override fun scrollToItem(view: Wishlist, index: Int, animated: Boolean) {
     view.scrollToItem(index, animated)
+  }
+
+  override fun receiveCommand(root: Wishlist, commandId: String?, args: ReadableArray?) {
+    mDelegate.receiveCommand(root, commandId, args)
   }
 }

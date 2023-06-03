@@ -23,15 +23,22 @@ static inline std::vector<std::string> jListToVector(
 }
 
 jni::local_ref<Orchestrator::jhybriddata> Orchestrator::initHybrid(
-    jni::alias_ref<jclass>,
+    jni::alias_ref<jhybridobject> jThis,
     std::string wishlistId,
     int viewportCarerRef) {
-  return makeCxxInstance(wishlistId, viewportCarerRef);
+  return makeCxxInstance(jThis, wishlistId, viewportCarerRef);
 }
 
-Orchestrator::Orchestrator(const std::string &wishlistId, int viewportCarerRef)
-    : alreadyRendered_(false) {
-  adapter_ = std::make_shared<Adapter>([this]() { handleVSync(); });
+Orchestrator::Orchestrator(
+    jni::alias_ref<Orchestrator::javaobject> jThis,
+    const std::string &wishlistId,
+    int viewportCarerRef)
+    : javaPart_(jni::make_global(jThis)),
+      alreadyRendered_(false),
+      pendingScrollToItem_(-1) {
+  adapter_ = std::make_shared<Adapter>(
+      [this]() { handleVSync(); },
+      [this](std::vector<Item> items) { didPushChildren(std::move(items)); });
   auto viewportCarer =
       *reinterpret_cast<std::shared_ptr<MGViewportCarerImpl> *>(
           JNIStateRegistry::getInstance().getValue(viewportCarerRef));
@@ -73,7 +80,10 @@ void Orchestrator::renderAsync(
         jListToVector(namesList),
         inflatorId);
   } else {
-    // TODO:
+    width_ = width;
+    height_ = height;
+    inflatorId_ = inflatorId;
+    handleVSync();
   }
 }
 
@@ -98,10 +108,48 @@ void Orchestrator::handleVSync() {
       {width_, height_}, templates, names, contentOffset_, inflatorId_);
 }
 
-Orchestrator::Adapter::Adapter(std::function<void()> onRequestVSync)
-    : onRequestVSync_(onRequestVSync) {}
+void Orchestrator::scrollToItem(int index) {
+  float offset = -1;
+  for (auto &item : items_) {
+    if (item.index == index) {
+      offset = item.offset;
+      break;
+    }
+  }
 
-void Orchestrator::Adapter::didPushChildren(std::vector<Item> newWindow) {}
+  static const auto scrollToOffset =
+      javaClassStatic()->getMethod<void(float)>("scrollToOffset");
+
+  if (offset == -1) {
+    pendingScrollToItem_ = index;
+    bool isBelow = items_.back().index < index;
+    // TODO: Implement proper animation for items outside the window.
+    if (isBelow) {
+      scrollToOffset(javaPart_, items_.back().offset + 1000);
+    } else {
+      scrollToOffset(javaPart_, items_.front().offset - 1000);
+    }
+  } else {
+    pendingScrollToItem_ = -1;
+    scrollToOffset(javaPart_, offset);
+  }
+}
+
+void Orchestrator::didPushChildren(std::vector<Item> items) {
+  items_ = std::move(items);
+  if (pendingScrollToItem_ != -1) {
+    scrollToItem(pendingScrollToItem_);
+  }
+}
+
+Orchestrator::Adapter::Adapter(
+    std::function<void()> onRequestVSync,
+    std::function<void(std::vector<Item> items)> didPushChildren)
+    : onRequestVSync_(onRequestVSync), didPushChildren_(didPushChildren) {}
+
+void Orchestrator::Adapter::didPushChildren(std::vector<Item> newWindow) {
+  didPushChildren_(std::move(newWindow));
+}
 
 void Orchestrator::Adapter::requestVSync() {
   onRequestVSync_();
@@ -111,7 +159,8 @@ void Orchestrator::registerNatives() {
   registerHybrid(
       {makeNativeMethod("initHybrid", Orchestrator::initHybrid),
        makeNativeMethod("renderAsync", Orchestrator::renderAsync),
-       makeNativeMethod("didScrollAsync", Orchestrator::didScrollAsync)});
+       makeNativeMethod("didScrollAsync", Orchestrator::didScrollAsync),
+       makeNativeMethod("scrollToItem", Orchestrator::scrollToItem)});
 }
 
 } // namespace Wishlist
