@@ -40,11 +40,11 @@ export function useWishlistData<T extends Item>(
       }
 
       function deepClone<ObjT>(x: ObjT): ObjT {
-        if ((x as any).map != null) {
+        if (Array.isArray(x)) {
           return (x as any).map((ele: unknown) => deepClone(ele));
         }
 
-        if (typeof x === 'object') {
+        if (typeof x === 'object' && x !== null) {
           const res: any = {};
           for (let key of Object.keys(x as any)) {
             res[key] = deepClone((x as any)[key]);
