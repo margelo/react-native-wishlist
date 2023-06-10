@@ -115,6 +115,7 @@ const maybeInit = () => {
             for (const [nativeId, inflate] of mapping.entries()) {
               const templateItem = item.getByWishId(nativeId);
               if (templateItem) {
+                templateValueStates.clear();
                 inflate(value, templateItem, pool, rootValue);
               }
             }
