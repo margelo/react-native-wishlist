@@ -40,16 +40,17 @@ export function useWishlistData<T extends Item>(
       }
 
       function deepClone<ObjT>(x: ObjT): ObjT {
-        if (Array.isArray(x)) {
-          return (x as any).map((ele: unknown) => deepClone(ele));
-        }
-
         if (typeof x === 'object' && x !== null) {
-          const res: any = {};
-          for (let key of Object.keys(x as any)) {
-            res[key] = deepClone((x as any)[key]);
+          // rn-worklet arrays are proxy and Array.isArray doesn't work.
+          if (typeof (x as any).map === 'function') {
+            return (x as any).map((ele: unknown) => deepClone(ele));
+          } else {
+            const res: any = {};
+            for (let key of Object.keys(x as any)) {
+              res[key] = deepClone((x as any)[key]);
+            }
+            return res;
           }
-          return res;
         }
         return x;
       }
