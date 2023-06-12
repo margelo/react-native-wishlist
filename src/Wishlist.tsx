@@ -7,7 +7,14 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
-import { StyleSheet, useWindowDimensions, View, ViewProps } from 'react-native';
+import {
+  StyleSheet,
+  useWindowDimensions,
+  View,
+  ViewProps,
+  StyleProp,
+  ViewStyle,
+} from 'react-native';
 import { ForEach } from './Components/ForEach';
 import { IF } from './Components/IF';
 import { Pressable } from './Components/Pressable';
@@ -66,10 +73,11 @@ type Props = ViewProps & {
   onStartReached?: () => void;
   onEndReached?: () => void;
   initialIndex?: number;
+  contentContainerStyle?: StyleProp<ViewStyle> | undefined;
 };
 
 function ComponentBase<T extends BaseItem>(
-  { children, style, data, ...rest }: Props,
+  { children, style, data, contentContainerStyle, ...rest }: Props,
   ref: React.Ref<WishListInstance>,
 ) {
   const nativeWishlist = useRef<InstanceType<typeof NativeWishList> | null>(
@@ -207,6 +215,7 @@ function ComponentBase<T extends BaseItem>(
             rest={rest}
             templates={childrenTemplates}
             nestedTemplates={templatesRegistry.templates}
+            contentContainerStyle={contentContainerStyle}
           />
         </>
       </TemplatesRegistryContext.Provider>
@@ -226,6 +235,7 @@ type InnerComponentProps = ViewProps & {
   rest: any;
   templates: { [key: string]: any };
   nestedTemplates: { [key: string]: any };
+  contentContainerStyle?: StyleProp<ViewStyle> | undefined;
 };
 
 function InnerComponent({
@@ -235,6 +245,7 @@ function InnerComponent({
   rest,
   templates,
   nestedTemplates,
+  contentContainerStyle,
 }: InnerComponentProps) {
   const combinedTemplates = { ...templates, ...nestedTemplates };
 
@@ -258,7 +269,10 @@ function InnerComponent({
         onStartReached={rest?.onStartReached}
         initialIndex={rest.initialIndex ?? 0}
       >
-        <NativeContentContainer collapsable={false} />
+        <NativeContentContainer
+          collapsable={false}
+          style={contentContainerStyle}
+        />
       </NativeWishList>
 
       <NativeTemplateContainer
