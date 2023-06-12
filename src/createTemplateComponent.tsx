@@ -211,10 +211,6 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
         (value, templateItem, pool, rootValue) => {
           'worklet';
 
-          templateValues.forEach(({ templateValue }) => {
-            templateValue.__setDirty();
-          });
-
           const propsToSet: any = {};
           additionalProps.forEach(({ targetPath, value: v }) => {
             setInObject(propsToSet, targetPath, v);

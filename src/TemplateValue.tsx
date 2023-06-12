@@ -21,7 +21,6 @@ export type TemplateValue<ValueT> = {
 
 export type TemplateValueInternal<ValueT> = TemplateValue<ValueT> & {
   __isTemplateValue: boolean;
-  __setDirty: () => void;
   __remove: () => void;
 };
 
@@ -44,13 +43,6 @@ export function createTemplateValue<ValueT>(
     }
 
     return state;
-  }
-
-  function setDirty() {
-    'worklet';
-
-    const state = getOrCreateUIState();
-    state.dirty = true;
   }
 
   function value() {
@@ -79,7 +71,6 @@ export function createTemplateValue<ValueT>(
 
   return {
     __isTemplateValue: true,
-    __setDirty: setDirty,
     __remove: remove,
     value,
   };

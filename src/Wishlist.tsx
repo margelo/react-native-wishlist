@@ -72,7 +72,9 @@ function ComponentBase<T extends BaseItem>(
   { children, style, data, ...rest }: Props,
   ref: React.Ref<WishListInstance>,
 ) {
-  const nativeWishlist = useRef(null); // TODO type it properly
+  const nativeWishlist = useRef<InstanceType<typeof NativeWishList> | null>(
+    null,
+  );
   const wishlistId = useRef<string | null>(null);
   if (!wishlistId.current) {
     wishlistId.current = generateId();
