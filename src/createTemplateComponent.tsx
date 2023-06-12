@@ -97,16 +97,33 @@ function convertToTemplateValue(value: unknown, path: string[]) {
   };
 }
 
-export function createTemplateComponent<T extends React.ComponentType<any>>(
-  Component: T,
+type CreateTemplateComponentOptions = {
+  /**
+   * Worklet that will be called when items are inflated.
+   * This can be used to map props differently than the
+   * default implementation.
+   */
   addProps?: (
     templateItem: TemplateItem,
     props: any,
     inflatorId: string,
     pool: ComponentPool,
     rootValue: any,
-  ) => void,
+  ) => void;
+  /**
+   * Additional non-template props that should be passed to
+   * the inflator. Can use dot syntax to access nested props.
+   */
+  additionalTemplateProps?: string[];
+};
+
+export function createTemplateComponent<T extends React.ComponentType<any>>(
+  Component: T,
+  { addProps, additionalTemplateProps }: CreateTemplateComponentOptions = {},
 ): TemplateComponent<T> {
+  const parsedAdditionalTemplateProps =
+    additionalTemplateProps?.map((prop) => prop.split('.')) ?? [];
+
   const WishListComponent = forwardRef<any, any>(({ style, ...props }, ref) => {
     const { inflatorId } = useWishlistContext();
     const { templateType } = useTemplateContext();
@@ -125,6 +142,8 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
         worklet: TemplateCallbackWorklet;
         eventName: string;
       }[] = [];
+
+      const additionalProps: { targetPath: string[]; value: any }[] = [];
 
       const otherProps = {};
       traverseObject({ ...props, style: resolvedStyle }, (path, value) => {
@@ -173,6 +192,15 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
             templateValues.push(convertToTemplateValue(value, path));
           }
 
+          parsedAdditionalTemplateProps.forEach((additionalPath) => {
+            if (
+              additionalPath.length === path.length &&
+              additionalPath.every((p, i) => p === path[i])
+            ) {
+              additionalProps.push({ targetPath: path, value });
+            }
+          });
+
           setInObject(otherProps, path, value);
         }
       });
@@ -184,6 +212,9 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
           'worklet';
 
           const propsToSet: any = {};
+          additionalProps.forEach(({ targetPath, value: v }) => {
+            setInObject(propsToSet, targetPath, v);
+          });
           templateValues.forEach(({ templateValue, targetPath }) => {
             setInObject(propsToSet, targetPath, templateValue.value());
           });

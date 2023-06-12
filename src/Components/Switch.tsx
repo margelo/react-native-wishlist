@@ -27,9 +27,8 @@ export const CaseBase = forwardRef<any, any>((props, ref) => {
   return <View {...props} ref={ref} />;
 });
 
-const CaseTemplateComponent = createTemplateComponent(
-  CaseBase,
-  (item, props) => {
+const CaseTemplateComponent = createTemplateComponent(CaseBase, {
+  addProps: (item, props) => {
     'worklet';
 
     if (props.switchValue === props.value) {
@@ -38,7 +37,7 @@ const CaseTemplateComponent = createTemplateComponent(
       item.addProps({ display: 'none' });
     }
   },
-);
+});
 
 type CaseProps = React.PropsWithChildren<{
   value: TemplateValue<unknown> | string | boolean | number;
