@@ -14,20 +14,16 @@ class Wishlist(reactContext: Context) :
   private var orchestrator: Orchestrator? = null
   private var templatesRef: Int? = null
   private var names: List<String>? = null
-  private var didInitialRender = false
   private var didInitialScroll = false
   private val initialOffset = 100000f
 
   fun setTemplates(templatesRef: Int, names: List<String>) {
     this.templatesRef = templatesRef
     this.names = names
-    initialRenderIfReady()
+    renderIfReady()
   }
 
-  private fun initialRenderIfReady() {
-    if (didInitialRender) {
-      return
-    }
+  private fun renderIfReady() {
     val templatesRef = this.templatesRef
     val inflatorId = this.inflatorId
     val names = this.names
@@ -38,7 +34,8 @@ class Wishlist(reactContext: Context) :
     var orchestrator = this.orchestrator
     if (orchestrator == null) {
       orchestrator =
-          Orchestrator(wishlistId!!, fabricViewStateManager.stateData!!.getInt("viewportCarer"))
+          Orchestrator(
+              this, wishlistId!!, fabricViewStateManager.stateData!!.getInt("viewportCarer"))
       this.orchestrator = orchestrator
     }
 
@@ -50,8 +47,6 @@ class Wishlist(reactContext: Context) :
         templatesRef,
         names,
         inflatorId)
-
-    didInitialRender = true
   }
 
   private fun initialScrollIfReady() {
@@ -84,7 +79,7 @@ class Wishlist(reactContext: Context) :
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     super.onLayout(changed, l, t, r, b)
 
-    initialRenderIfReady()
+    renderIfReady()
     initialScrollIfReady()
   }
 
@@ -98,5 +93,7 @@ class Wishlist(reactContext: Context) :
         inflatorId!!)
   }
 
-  fun scrollToItem(index: Int, animated: Boolean) {}
+  fun scrollToItem(index: Int, animated: Boolean) {
+    orchestrator?.scrollToItem(index)
+  }
 }
