@@ -5,14 +5,21 @@
 #include "MGWishlistShadowNode.h"
 #include "WishlistJsRuntime.h"
 
+namespace Wishlist {
+
 using namespace facebook::react;
 
 void MGViewportCarerImpl::setDI(const std::weak_ptr<MGDI> &di) {
   di_ = di;
 }
 
+void MGViewportCarerImpl::setListener(
+    const std::weak_ptr<MGViewportCarerListener> &listener) {
+  listener_ = listener;
+}
+
 void MGViewportCarerImpl::setInitialValues(
-    const std::shared_ptr<ShadowNode> &wishListNode,
+    const std::shared_ptr<MGWishlistShadowNode> &wishListNode,
     const LayoutContext &lc) {
   wishListNode_ = wishListNode;
   lc_ = lc;
@@ -85,6 +92,8 @@ void MGViewportCarerImpl::didScrollAsync(
 void MGViewportCarerImpl::updateWindow() {
   float topEdge = offset_ - windowHeight_;
   float bottomEdge = offset_ + 2 * windowHeight_;
+  bool startReached = false;
+  bool endReached = false;
 
   assert(!window_.empty());
 
@@ -95,6 +104,7 @@ void MGViewportCarerImpl::updateWindow() {
     if (item.offset > topEdge) {
       WishItem wishItem = itemProvider_->provide(item.index - 1);
       if (wishItem.sn == nullptr) {
+        startReached = true;
         break;
       }
       wishItem.offset = item.offset - wishItem.height;
@@ -112,6 +122,7 @@ void MGViewportCarerImpl::updateWindow() {
     if (bottom < bottomEdge) {
       WishItem wishItem = itemProvider_->provide(item.index + 1);
       if (wishItem.sn == nullptr) {
+        endReached = true;
         break;
       }
       wishItem.offset = bottom;
@@ -168,6 +179,25 @@ void MGViewportCarerImpl::updateWindow() {
 
   for (auto &item : itemsToRemove) {
     componentsPool_->returnToPool(item.sn);
+  }
+
+  if (startReached) {
+    auto firstItemKey = window_.front().key;
+    if (firstItemKey != firstItemKeyForStartReached_) {
+      notifyAboutStartReached();
+      firstItemKeyForStartReached_ = firstItemKey;
+    }
+  } else {
+    firstItemKeyForStartReached_ = "";
+  }
+  if (endReached) {
+    auto lastItemKey = window_.back().key;
+    if (lastItemKey != lastItemKeyForEndReached_) {
+      notifyAboutEndReached();
+      lastItemKeyForEndReached_ = lastItemKey;
+    }
+  } else {
+    lastItemKeyForEndReached_ = "";
   }
 }
 
@@ -242,8 +272,7 @@ void MGViewportCarerImpl::pushChildren() {
 
 // TODO That could cause a lag we may need to push it through state
 void MGViewportCarerImpl::notifyAboutPushedChildren() {
-  std::shared_ptr<MGPushChildrenListener> listener =
-      di_.lock()->getPushChildrenListener();
+  auto listener = listener_.lock();
   if (listener != nullptr) {
     std::vector<Item> newWindow;
     for (auto &item : window_) {
@@ -262,3 +291,13 @@ void MGViewportCarerImpl::notifyAboutPushedChildren() {
     });
   }
 }
+
+void MGViewportCarerImpl::notifyAboutStartReached() {
+  wishListNode_->getConcreteEventEmitter().onStartReached({});
+}
+
+void MGViewportCarerImpl::notifyAboutEndReached() {
+  wishListNode_->getConcreteEventEmitter().onEndReached({});
+}
+
+}; // namespace Wishlist

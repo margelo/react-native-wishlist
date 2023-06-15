@@ -19,10 +19,6 @@ std::shared_ptr<MGVSyncRequester> MGDIImpl::getVSyncRequester() {
   return vSyncRequester_;
 }
 
-std::shared_ptr<MGPushChildrenListener> MGDIImpl::getPushChildrenListener() {
-  return pushChildrenListener_;
-}
-
 std::shared_ptr<MGViewportCarer> MGDIImpl::getViewportCarer() {
   return viewportCarer_;
 }
@@ -44,7 +40,7 @@ void MGDIImpl::setVSyncRequester(const std::shared_ptr<MGVSyncRequester> &vr) {
 }
 
 void MGDIImpl::setPushChildrenListener(
-    const std::shared_ptr<MGPushChildrenListener> &pcl) {
+    const std::shared_ptr<MGViewportCarerListener> &pcl) {
   pushChildrenListener_ = pcl;
 }
 

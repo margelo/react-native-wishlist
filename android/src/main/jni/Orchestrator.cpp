@@ -45,9 +45,9 @@ Orchestrator::Orchestrator(
   di_ = std::make_shared<MGDIImpl>();
   di_->setViewportCarer(viewportCarer);
   viewportCarer->setDI(di_);
+  viewportCarer->setListener(std::weak_ptr<Adapter>(adapter_));
   di_->setDataBinding(
       std::make_shared<MGDataBindingImpl>(wishlistId, di_->getWeak()));
-  di_->setPushChildrenListener(adapter_);
   di_->setVSyncRequester(adapter_);
   di_->setUIScheduler(std::make_shared<UISchedulerAndroid>());
   di_->setErrorHandler(std::make_shared<ErrorHandlerAndroid>());

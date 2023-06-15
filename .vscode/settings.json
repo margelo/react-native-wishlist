@@ -97,6 +97,8 @@
     "strstream": "cpp",
     "typeindex": "cpp",
     "unordered_set": "cpp",
-    "valarray": "cpp"
+    "valarray": "cpp",
+    "__verbose_abort": "cpp",
+    "shared_mutex": "cpp"
   }
 }

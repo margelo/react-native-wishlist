@@ -45,7 +45,8 @@ class Orchestrator : public jni::HybridClass<Orchestrator> {
 
   void didPushChildren(std::vector<Item> items);
 
-  class Adapter final : public MGPushChildrenListener, public MGVSyncRequester {
+  class Adapter final : public MGViewportCarerListener,
+                        public MGVSyncRequester {
    public:
     Adapter(
         std::function<void()> onRequestVSync,

@@ -1,6 +1,7 @@
 package com.wishlist
 
 import com.facebook.react.bridge.ReadableArray
+import com.facebook.react.common.MapBuilder
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.uimanager.ReactStylesDiffMap
 import com.facebook.react.uimanager.StateWrapper
@@ -49,5 +50,12 @@ class WishlistViewManager : ViewGroupManager<Wishlist>(), MGWishlistManagerInter
 
   override fun receiveCommand(root: Wishlist, commandId: String?, args: ReadableArray?) {
     mDelegate.receiveCommand(root, commandId, args)
+  }
+
+  override fun getExportedCustomDirectEventTypeConstants(): MutableMap<String, Any>? {
+    return MapBuilder.builder<String, Any>()
+        .put("topStartReached", MapBuilder.of("registrationName", "onStartReached"))
+        .put("topEndReached", MapBuilder.of("registrationName", "onEndReached"))
+        .build()
   }
 }
