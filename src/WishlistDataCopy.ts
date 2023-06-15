@@ -64,7 +64,7 @@ export function createItemsDataStructure<T extends Item>(
     },
     forKey: function forKey(key: string) {
       const index = this.getIndex(key);
-      if (!index) {
+      if (index == null) {
         return undefined;
       }
       return this.at(index);
