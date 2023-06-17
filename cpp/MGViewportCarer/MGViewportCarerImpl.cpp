@@ -158,6 +158,7 @@ void MGViewportCarerImpl::updateWindow() {
       item.offset = currentOffset;
       swap(item.sn, wishItem.sn);
       item.height = wishItem.height;
+      item.dirty = false;
     }
     currentOffset = item.offset + item.height;
   }
