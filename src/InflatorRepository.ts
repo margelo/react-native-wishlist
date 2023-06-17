@@ -23,6 +23,7 @@ export type ComponentPool = {
 export type InflateMethod = (
   index: number,
   pool: ComponentPool,
+  previousItem: TemplateItem | null,
 ) => [TemplateItem, any] | undefined;
 
 export type MappingInflateMethod = (
@@ -37,6 +38,7 @@ export type UIInflatorRegistry = {
     id: string,
     index: number,
     pool: ComponentPool,
+    prevItem: TemplateItem | null,
   ) => TemplateItem | undefined;
   registerInflator: (id: string, inflateMethod: InflateMethod) => void;
   unregisterInflator: (id: string) => void;
@@ -81,10 +83,10 @@ const maybeInit = () => {
       let currentRootValue: any;
 
       const InflatorRegistry: UIInflatorRegistry = {
-        inflateItem: (id, index, pool) => {
+        inflateItem: (id, index, pool, prevItem) => {
           const inflator = registry.get(id);
           if (inflator) {
-            const result = inflator(index, pool);
+            const result = inflator(index, pool, prevItem);
             if (!result) {
               return result;
             }

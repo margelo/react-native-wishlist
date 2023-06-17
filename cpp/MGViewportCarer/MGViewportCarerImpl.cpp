@@ -40,7 +40,7 @@ void MGViewportCarerImpl::initialRenderAsync(
     windowWidth_ = dimensions.width;
     inflatorId_ = inflatorId;
 
-    window_.push_back(itemProvider_->provide(originItem));
+    window_.push_back(itemProvider_->provide(originItem, nullptr));
     window_.back().offset = initialOffset;
     updateWindow();
   });
@@ -93,7 +93,7 @@ void MGViewportCarerImpl::updateWindow() {
     WishItem item = window_.front();
 
     if (item.offset > topEdge) {
-      WishItem wishItem = itemProvider_->provide(item.index - 1);
+      WishItem wishItem = itemProvider_->provide(item.index - 1, nullptr);
       if (wishItem.sn == nullptr) {
         break;
       }
@@ -110,7 +110,7 @@ void MGViewportCarerImpl::updateWindow() {
     float bottom = item.offset + item.height;
 
     if (bottom < bottomEdge) {
-      WishItem wishItem = itemProvider_->provide(item.index + 1);
+      WishItem wishItem = itemProvider_->provide(item.index + 1, nullptr);
       if (wishItem.sn == nullptr) {
         break;
       }
@@ -151,15 +151,13 @@ void MGViewportCarerImpl::updateWindow() {
   float currentOffset = window_[0].offset;
   for (auto &item : window_) {
     if (item.dirty) {
-      WishItem wishItem = itemProvider_->provide(item.index);
+      WishItem wishItem = itemProvider_->provide(item.index, item.sn);
       if (wishItem.sn == nullptr) {
         continue;
       }
       item.offset = currentOffset;
       swap(item.sn, wishItem.sn);
       item.height = wishItem.height;
-
-      itemsToRemove.push_back(wishItem);
     }
     currentOffset = item.offset + item.height;
   }
@@ -225,8 +223,9 @@ void MGViewportCarerImpl::pushChildren() {
                         sn.getChildren()[0]);
 
                     // TODO: This solution seems a little bit hacky still.
-                    // We need to update most recent state before creating cloning
-                    // the shadow node as it will be used to initialize children.
+                    // We need to update most recent state before creating
+                    // cloning the shadow node as it will be used to initialize
+                    // children.
                     auto stateData =
                         std::make_shared<MGContentContainerState>(children);
                     auto state = std::make_shared<

@@ -26,6 +26,7 @@ import { initEventHandler } from './EventHandler';
 import InflatorRepository, {
   ComponentPool,
   InflateMethod,
+  TemplateItem,
 } from './InflatorRepository';
 import NativeContentContainer from './Specs/NativeContentContainer';
 import NativeTemplateContainer from './Specs/NativeTemplateContainer';
@@ -134,14 +135,18 @@ function ComponentBase<T extends BaseItem>(
 
   // Resolve inflator - either use the provided callback or use the mapping
   const resolvedInflater: InflateMethod = useMemo(() => {
-    return (index: number, pool: ComponentPool) => {
+    return (
+      index: number,
+      pool: ComponentPool,
+      previousItem: TemplateItem | null,
+    ) => {
       'worklet';
       const value = (data as WishlistDataInternal<T>).__at(index);
       if (!value) {
         return undefined;
       }
 
-      const item = pool.getComponent(value.type);
+      const item = previousItem ?? pool.getComponent(value.type);
       if (!item) {
         return undefined;
       }

@@ -6,7 +6,9 @@
 
 namespace Wishlist {
 
-WishItem WorkletItemProvider::provide(int index) {
+WishItem WorkletItemProvider::provide(
+    int index,
+    const ShadowNode::Shared &prevSn) {
   WishItem wishItem;
 
   auto &rt = WishlistJsRuntime::getInstance().getRuntime();
@@ -22,7 +24,10 @@ WishItem WorkletItemProvider::provide(int index) {
         rt,
         jsi::String::createFromUtf8(rt, tag),
         jsi::Value(index),
-        cp->prepareProxy(rt));
+        cp->prepareProxy(rt),
+        prevSn ? jsi::Object::createFromHostObject(
+                     rt, std::make_shared<ShadowNodeBinding>(prevSn, cp))
+               : jsi::Value::null());
   } catch (std::exception &error) {
     di.lock()->getErrorHandler()->reportError(error.what());
     return wishItem;

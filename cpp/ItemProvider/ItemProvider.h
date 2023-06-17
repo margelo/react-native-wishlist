@@ -34,7 +34,7 @@ class ItemProvider {
 
   virtual void setComponentsPool(std::shared_ptr<ComponentsPool> pool) = 0;
 
-  virtual WishItem provide(int index) = 0;
+  virtual WishItem provide(int index, const ShadowNode::Shared &prevSn) = 0;
 
   virtual ~ItemProvider() {}
 };
@@ -57,7 +57,7 @@ struct WorkletItemProvider : ItemProvider {
     cp = pool;
   }
 
-  WishItem provide(int index) override;
+  WishItem provide(int index, const ShadowNode::Shared &prevSn) override;
 };
 
 }; // namespace Wishlist
