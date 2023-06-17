@@ -220,15 +220,30 @@ void MGViewportCarerImpl::pushChildren() {
                       }
                     }
 
-                    auto contentContainer =
+                    auto contentContainer = std::static_pointer_cast<
+                        const MGContentContainerShadowNode>(
+                        sn.getChildren()[0]);
+
+                    // TODO: This solution seems a little bit hacky still.
+                    // We need to update most recent state before creating cloning
+                    // the shadow node as it will be used to initialize children.
+                    auto stateData =
+                        std::make_shared<MGContentContainerState>(children);
+                    auto state = std::make_shared<
+                        MGContentContainerShadowNode::ConcreteState>(
+                        stateData, *contentContainer->getState());
+                    contentContainer->getFamily().setMostRecentState(state);
+
+                    auto newContentContainer =
                         std::static_pointer_cast<MGContentContainerShadowNode>(
-                            sn.getChildren()[0]->clone(
+                            contentContainer->clone(
                                 {nullptr, children, nullptr}));
-                    contentContainer->setWishlistChildren(children);
+
+                    newContentContainer->setWishlistChildren(children);
 
                     auto wishlistChildren =
                         std::make_shared<ShadowNode::ListOfShared>(
-                            ShadowNode::ListOfShared{contentContainer});
+                            ShadowNode::ListOfShared{newContentContainer});
 
                     return sn.clone(
                         ShadowNodeFragment{nullptr, wishlistChildren, nullptr});

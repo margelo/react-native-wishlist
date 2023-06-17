@@ -33,7 +33,7 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
         });
   }
 
-  if (name == "addProps") { // TODO implement that
+  if (name == "addProps") {
     return jsi::Function::createFromHostFunction(
         rt,
         nameProp,
