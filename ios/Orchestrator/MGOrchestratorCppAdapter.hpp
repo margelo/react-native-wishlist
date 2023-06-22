@@ -1,5 +1,5 @@
 //
-//  MGOrchestratorCPPAdapter.hpp
+//  MGOrchestratorCppAdapter.hpp
 //  CocoaAsyncSocket
 //
 //  Created by Szymon on 14/01/2023.

@@ -13,17 +13,16 @@
 #include "MGBindingProvider.hpp"
 #include "MGDataBinding.hpp"
 #include "MGErrorHandler.h"
-#include "MGPushChildrenListener.hpp"
 #include "MGUIScheduler.hpp"
 #include "MGVSyncRequester.hpp"
 #include "MGViewportCarer.hpp"
+#include "MGViewportCarerListener.hpp"
 
 namespace Wishlist {
 
 struct MGDI {
   virtual std::shared_ptr<MGDataBinding> getDataBinding() = 0;
   virtual std::shared_ptr<MGVSyncRequester> getVSyncRequester() = 0;
-  virtual std::shared_ptr<MGPushChildrenListener> getPushChildrenListener() = 0;
   virtual std::shared_ptr<MGViewportCarer> getViewportCarer() = 0;
   virtual std::shared_ptr<MGUIScheduler> getUIScheduler() = 0;
   virtual std::shared_ptr<MGErrorHandler> getErrorHandler() = 0;

@@ -5,11 +5,12 @@
 //  Created by Szymon on 13/01/2023.
 //
 
-#ifndef MGViewportCarer_hpp
-#define MGViewportCarer_hpp
+#pragma once
 
 #include <react/renderer/uimanager/UIManager.h>
 #include <stdio.h>
+
+namespace Wishlist {
 
 using namespace facebook::react;
 
@@ -38,4 +39,4 @@ class MGViewportCarer {
   virtual ~MGViewportCarer() {}
 };
 
-#endif /* MGViewportCarer_hpp */
+}; // namespace Wishlist

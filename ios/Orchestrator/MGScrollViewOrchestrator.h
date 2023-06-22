@@ -19,16 +19,7 @@ using namespace Wishlist;
 
 @end
 
-@protocol MGScrollViewOrchestratorDelegate <NSObject>
-
-- (void)onStartReached;
-- (void)onEndReached;
-
-@end
-
 @interface MGScrollViewOrchestrator : NSObject
-
-@property (nonatomic, weak) id<MGScrollViewOrchestratorDelegate> delegate;
 
 - (instancetype)initWith:(UIScrollView *)scrollView
                       di:(std::weak_ptr<MGDIIOS>)di

@@ -26,6 +26,12 @@ export const ChatListView = React.memo(
           initialIndex={intialIndex}
           data={data}
           ref={ref}
+          onStartReached={() => {
+            console.log('Start reached');
+          }}
+          onEndReached={() => {
+            console.log('End reached');
+          }}
         >
           <Wishlist.Template type="me">
             <ChatItemView onAddReaction={onAddReaction} type="me" />

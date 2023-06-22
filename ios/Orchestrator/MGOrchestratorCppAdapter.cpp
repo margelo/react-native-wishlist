@@ -1,11 +1,11 @@
 //
-//  MGOrchestratorCPPAdapter.cpp
+//  MGOrchestratorCppAdapter.cpp
 //  CocoaAsyncSocket
 //
 //  Created by Szymon on 14/01/2023.
 //
 
-#include "MGOrchestratorCPPAdapter.hpp"
+#include "MGOrchestratorCppAdapter.hpp"
 
 namespace Wishlist {
 
