@@ -45,6 +45,12 @@ function getRandomReactions() {
   return [...arr].splice(0, number);
 }
 
+let idGenerator = 0;
+
+function generateId() {
+  return `id#${idGenerator++}`;
+}
+
 const createChatItem = (index: number): ChatItem => {
   const len = SampleText.length;
   const start = Math.floor(Math.random() * len);
@@ -55,7 +61,7 @@ const createChatItem = (index: number): ChatItem => {
   const author = authors[index % authors.length];
 
   return {
-    key: `id#${index}`,
+    key: generateId(),
     type: author === 'Me' ? 'me' : 'other',
     author,
     message,
@@ -73,7 +79,7 @@ const createChatItem = (index: number): ChatItem => {
 
 export const getSendedMessage = (text: string) => {
   const message: ChatItem = {
-    key: `key#${Math.random()}`,
+    key: generateId(),
     type: 'me',
     author: 'Me',
     message: text,
