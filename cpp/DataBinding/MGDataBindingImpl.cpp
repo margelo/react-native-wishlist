@@ -37,18 +37,23 @@ std::set<int> MGDataBindingImpl::applyChangesAndGetDirtyIndices(
   jsi::Value val = obj.getProperty(rt, "listener");
   if (val.isObject()) {
     jsi::Function f = val.getObject(rt).getFunction(rt);
-    jsi::Array dirtyIndices = f.call(
-                                   rt,
-                                   jsi::Value(rt, windowIndexRange.first),
-                                   jsi::Value(rt, windowIndexRange.second))
-                                  .asObject(rt)
-                                  .asArray(rt);
-    std::set<int> res;
-    for (int i = 0; i < dirtyIndices.size(rt); ++i) {
-      int dirtyIndex = (int)dirtyIndices.getValueAtIndex(rt, i).asNumber();
-      res.insert(dirtyIndex);
+    try {
+      jsi::Array dirtyIndices = f.call(
+                                     rt,
+                                     jsi::Value(rt, windowIndexRange.first),
+                                     jsi::Value(rt, windowIndexRange.second))
+                                    .asObject(rt)
+                                    .asArray(rt);
+      std::set<int> res;
+      for (int i = 0; i < dirtyIndices.size(rt); ++i) {
+        int dirtyIndex = (int)dirtyIndices.getValueAtIndex(rt, i).asNumber();
+        res.insert(dirtyIndex);
+      }
+      return res;
+    } catch (std::exception &error) {
+      di.lock()->getErrorHandler()->reportError(error.what());
+      return {};
     }
-    return res;
   }
   return {};
 }

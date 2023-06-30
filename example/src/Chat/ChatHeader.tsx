@@ -1,25 +1,36 @@
 import React from 'react';
-import { StyleSheet, View, Image, Text } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 type HeaderProps = {
   isLoading: boolean;
+  onRefreshPress?: () => void;
 };
 
 const avatar = require('./assets/margelo_logo.png');
 
-export function ChatHeader({ isLoading }: HeaderProps) {
+export function ChatHeader({ isLoading, onRefreshPress }: HeaderProps) {
   return (
     <View style={styles.container}>
-      <View style={styles.left} />
-      <View style={styles.center}>
-        {!isLoading && <Text style={styles.title}>Margelo.io</Text>}
-      </View>
-      <View style={styles.right}>
+      <View style={styles.left}>
         <View style={[styles.avatarContainer, isLoading && styles.gray]}>
           {!isLoading && (
             <Image style={styles.avatar} resizeMode="contain" source={avatar} />
           )}
         </View>
+      </View>
+      <View style={styles.center}>
+        {!isLoading && <Text style={styles.title}>Margelo.io</Text>}
+      </View>
+      <View style={styles.right}>
+        {onRefreshPress != null && (
+          <TouchableOpacity onPress={onRefreshPress} style={styles.iconButton}>
+            <Image
+              source={require('./assets/refresh.png')}
+              style={styles.icon}
+            />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -63,5 +74,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '500',
+  },
+  iconButton: {
+    padding: 8,
+  },
+  icon: {
+    width: 24,
+    height: 24,
   },
 });

@@ -162,13 +162,20 @@ void MGViewportCarerImpl::updateWindow() {
   float currentOffset = window_[0].offset;
   for (auto &item : window_) {
     if (item.dirty) {
-      WishItem wishItem = itemProvider_->provide(item.index, item.sn);
+      std::shared_ptr<ShadowNodeBinding> prevSn = nullptr;
+      if (item.sn) {
+        prevSn = std::make_shared<ShadowNodeBinding>(
+            item.sn, componentsPool_, item.type, item.key);
+      }
+      WishItem wishItem = itemProvider_->provide(item.index, prevSn);
       if (wishItem.sn == nullptr) {
         continue;
       }
       item.offset = currentOffset;
       swap(item.sn, wishItem.sn);
       item.height = wishItem.height;
+      item.type = wishItem.type;
+      item.key = wishItem.key;
       item.dirty = false;
     }
     currentOffset = item.offset + item.height;

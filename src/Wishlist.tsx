@@ -146,7 +146,12 @@ function ComponentBase<T extends BaseItem>(
         return undefined;
       }
 
-      const item = previousItem ?? pool.getComponent(value.type);
+      const item =
+        previousItem != null &&
+        previousItem.type === value.type &&
+        previousItem.key === value.key
+          ? previousItem
+          : pool.getComponent(value.type);
       if (!item) {
         return undefined;
       }
@@ -157,6 +162,7 @@ function ComponentBase<T extends BaseItem>(
       // We set the key of the item here so that
       // viewportObserver knows what's the key and is able to rerender it later on
       item.key = value.key;
+      item.type = value.type;
 
       return [item, value];
     };
@@ -257,7 +263,6 @@ function InnerComponent({
   const { id } = useWishlistContext();
 
   const keys = Object.keys(combinedTemplates);
-  // console.log('@@@ Render WishList', inflatorId, keys.join(', '));
 
   return (
     <NativeTemplateInterceptor

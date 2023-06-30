@@ -104,10 +104,10 @@ export const ChatItemView: React.FC<Props> = ({ type, onAddReaction }) => {
     'worklet';
 
     data.update((dataCopy) => {
-      const oldValue = dataCopy.get(value.key);
+      const oldValue = dataCopy.getItem(value.key);
       if (oldValue) {
         oldValue.liked = !oldValue.liked;
-        dataCopy.set(value.key, oldValue);
+        dataCopy.setItem(value.key, oldValue);
       }
     });
   };
@@ -116,10 +116,10 @@ export const ChatItemView: React.FC<Props> = ({ type, onAddReaction }) => {
     'worklet';
 
     data.update((dataCopy) => {
-      const oldValue = dataCopy.get(value.key);
+      const oldValue = dataCopy.getItem(value.key);
       if (oldValue) {
         oldValue.showBiggerAvatar = !oldValue.showBiggerAvatar;
-        dataCopy.set(value.key, oldValue);
+        dataCopy.setItem(value.key, oldValue);
       }
     });
   };

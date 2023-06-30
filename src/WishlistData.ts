@@ -39,25 +39,7 @@ export function useWishlistData<T extends Item>(
         return global.dataCtx[dataId] as WishlistDataInternal<T>;
       }
 
-      function deepClone<ObjT>(x: ObjT): ObjT {
-        if (typeof x === 'object' && x !== null) {
-          // rn-worklet arrays are proxy and Array.isArray doesn't work.
-          if (typeof (x as any).map === 'function') {
-            return (x as any).map((ele: unknown) => deepClone(ele));
-          } else {
-            const res: any = {};
-            for (let key of Object.keys(x as any)) {
-              res[key] = deepClone((x as any)[key]);
-            }
-            return res;
-          }
-        }
-        return x;
-      }
-
-      const initialDataCopy__cur = deepClone(initialData);
-      const currentlyRenderedCopy =
-        createItemsDataStructure(initialDataCopy__cur);
+      const currentlyRenderedCopy = createItemsDataStructure(initialData);
       const attachedListIds = new Set<string>();
       const pendingUpdates: Array<UpdateJob<T, unknown>> = [];
 
@@ -67,8 +49,13 @@ export function useWishlistData<T extends Item>(
             const result = updateJob(dataCopy);
             resolve(result);
           });
-          for (const id of attachedListIds) {
-            scheduleSyncUp(id);
+          if (attachedListIds.size > 0) {
+            for (const id of attachedListIds) {
+              scheduleSyncUp(id);
+            }
+          } else {
+            // If we are not rendering a list yet, just apply changes immediately.
+            currentlyRenderedCopy.__applyChanges(pendingUpdates);
           }
         });
       }
@@ -86,30 +73,13 @@ export function useWishlistData<T extends Item>(
         if (!global.wishlists[wishlistId]) {
           global.wishlists[wishlistId] = {};
         }
-        global.wishlists[wishlistId].listener = (
-          firstIndexInWindow: number,
-          lastIndexInWindow: number,
-        ) => {
+        global.wishlists[wishlistId].listener = () => {
           const pendingUpdatesCopy = pendingUpdates.splice(
             0,
             pendingUpdates.length,
           );
 
-          const dirty = currentlyRenderedCopy.applyChanges(pendingUpdatesCopy);
-
-          const dirtyItems = [];
-
-          for (let i = firstIndexInWindow; i <= lastIndexInWindow; ++i) {
-            const key = currentlyRenderedCopy.at(i)?.key;
-            if (key === undefined) {
-              throw new Error('Key cannot be undefined [Wishlist data]');
-            }
-            if (dirty.has(key)) {
-              dirtyItems.push(i);
-            }
-          }
-
-          return dirtyItems;
+          return currentlyRenderedCopy.__applyChanges(pendingUpdatesCopy);
         };
       }
 

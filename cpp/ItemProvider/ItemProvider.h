@@ -14,6 +14,7 @@ struct WishItem {
   float offset;
   int index;
   std::string key;
+  std::string type;
   float height;
   bool dirty = false;
   std::shared_ptr<ShadowNode> sn;
@@ -34,7 +35,9 @@ class ItemProvider {
 
   virtual void setComponentsPool(std::shared_ptr<ComponentsPool> pool) = 0;
 
-  virtual WishItem provide(int index, const ShadowNode::Shared &prevSn) = 0;
+  virtual WishItem provide(
+      int index,
+      const std::shared_ptr<ShadowNodeBinding> &prevSn) = 0;
 
   virtual ~ItemProvider() {}
 };
@@ -57,7 +60,8 @@ struct WorkletItemProvider : ItemProvider {
     cp = pool;
   }
 
-  WishItem provide(int index, const ShadowNode::Shared &prevSn) override;
+  WishItem provide(int index, const std::shared_ptr<ShadowNodeBinding> &prevSn)
+      override;
 };
 
 }; // namespace Wishlist
