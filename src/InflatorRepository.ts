@@ -1,26 +1,12 @@
 import { getColorsUIModule } from './Colors';
+import {
+  ComponentPool,
+  NativeComponentPool,
+  wrapComponentPool,
+} from './ComponentPool';
+import { TemplateItem } from './TemplateItem';
 import type { TemplateValueUIState } from './TemplateValue';
 import { createRunInWishlistFn } from './WishlistJsRuntime';
-
-export type TemplateItem = {
-  [key: string]: TemplateItem | undefined;
-} & {
-  key: string;
-  type: string;
-  getByWishId: (id: string) => TemplateItem | undefined;
-  addProps: (props: any) => void;
-  setCallback: (
-    eventName: string,
-    callback: (nativeEvent: any) => void,
-  ) => void;
-  describe: () => string;
-  setChildren: (children: TemplateItem[]) => void;
-  getTag: () => number;
-};
-
-export type ComponentPool = {
-  getComponent: (id: string) => TemplateItem | undefined;
-};
 
 export type InflateMethod = (
   index: number,
@@ -39,7 +25,7 @@ export type UIInflatorRegistry = {
   inflateItem: (
     id: string,
     index: number,
-    pool: ComponentPool,
+    pool: NativeComponentPool,
     prevItem: TemplateItem | null,
   ) => TemplateItem | undefined;
   registerInflator: (id: string, inflateMethod: InflateMethod) => void;
@@ -86,7 +72,8 @@ const maybeInit = () => {
       let currentRootValue: any;
 
       const InflatorRegistry: UIInflatorRegistry = {
-        inflateItem: (id, index, pool, prevItem) => {
+        inflateItem: (id, index, nativePool, prevItem) => {
+          const pool = wrapComponentPool(nativePool);
           const inflator = registry.get(id);
           if (inflator) {
             const result = inflator(index, pool, prevItem);

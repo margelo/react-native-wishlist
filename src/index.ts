@@ -11,3 +11,4 @@ export {
   WishlistData,
 } from './WishlistData';
 export { createRunInJsFn, createRunInWishlistFn } from './WishlistJsRuntime';
+export { renderTemplate } from './renderTemplate';

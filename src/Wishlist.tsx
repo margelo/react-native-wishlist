@@ -8,13 +8,15 @@ import React, {
   useRef,
 } from 'react';
 import {
+  StyleProp,
   StyleSheet,
+  Text,
   useWindowDimensions,
   View,
   ViewProps,
-  StyleProp,
   ViewStyle,
 } from 'react-native';
+import { ComponentPool } from './ComponentPool';
 import { ForEach } from './Components/ForEach';
 import { IF } from './Components/IF';
 import { Pressable } from './Components/Pressable';
@@ -23,11 +25,7 @@ import { WishlistImage } from './Components/WishlistImage';
 import { WishlistText } from './Components/WishlistText';
 import { WishlistView } from './Components/WishlistView';
 import { initEventHandler } from './EventHandler';
-import InflatorRepository, {
-  ComponentPool,
-  InflateMethod,
-  TemplateItem,
-} from './InflatorRepository';
+import InflatorRepository, { InflateMethod } from './InflatorRepository';
 import NativeContentContainer from './Specs/NativeContentContainer';
 import NativeTemplateContainer from './Specs/NativeTemplateContainer';
 import NativeTemplateInterceptor from './Specs/NativeTemplateInterceptor';
@@ -35,6 +33,7 @@ import NativeWishList, {
   Commands as WishlistCommands,
 } from './Specs/NativeWishlist';
 import { TemplateContext } from './TemplateContext';
+import { TemplateItem } from './TemplateItem';
 import { generateId } from './Utils';
 import { useWishlistContext, WishlistContext } from './WishlistContext';
 import type { WishlistData, WishlistDataInternal } from './WishlistData';
@@ -50,6 +49,8 @@ const TemplatesRegistryContext =
 function getTemplatesFromChildren(children: React.ReactNode, width: number) {
   const nextTemplates: { [key: string]: React.ReactElement } = {
     __offsetComponent: <View style={[styles.offsetView, { width }]} />,
+    __viewComponent: <View />,
+    __textComponent: <Text> </Text>,
   };
   React.Children.forEach(children, (c) => {
     if ((c as any).type.displayName === 'WishListTemplate') {

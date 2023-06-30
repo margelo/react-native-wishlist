@@ -2,10 +2,7 @@ import React, { forwardRef, useMemo } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { TemplateCallback, TemplateCallbackWorklet } from './EventHandler';
 import { ForEachBase } from './Components/ForEachBase';
-import InflatorRepository, {
-  ComponentPool,
-  TemplateItem,
-} from './InflatorRepository';
+import InflatorRepository from './InflatorRepository';
 import { CaseBase } from './Components/Switch';
 import { useTemplateContext } from './TemplateContext';
 import {
@@ -16,6 +13,8 @@ import {
 } from './TemplateValue';
 import { generateId } from './Utils';
 import { useWishlistContext } from './WishlistContext';
+import { TemplateItem } from './TemplateItem';
+import { ComponentPool } from './ComponentPool';
 
 // This is based on types from @types/react-native createAnimatedComponent.
 
