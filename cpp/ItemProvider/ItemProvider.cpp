@@ -39,7 +39,7 @@ WishItem WorkletItemProvider::provide(
   std::shared_ptr<ShadowNodeBinding> shadowNodeWrapper =
       returnedValue.asObject(rt).getHostObject<ShadowNodeBinding>(rt);
 
-  std::shared_ptr<const ShadowNode> sn = shadowNodeWrapper->sn;
+  auto sn = shadowNodeWrapper->getShadowNode();
 
   auto affected = std::vector<const LayoutableShadowNode *>();
   this->lc.affectedNodes = &affected;
@@ -51,8 +51,8 @@ WishItem WorkletItemProvider::provide(
   wishItem.sn = std::static_pointer_cast<ShadowNode>(ysn);
   wishItem.height = sz.height;
   wishItem.index = index;
-  wishItem.key = shadowNodeWrapper->key;
-  wishItem.type = shadowNodeWrapper->type;
+  wishItem.key = shadowNodeWrapper->getKey();
+  wishItem.type = shadowNodeWrapper->getType();
   return wishItem;
 }
 

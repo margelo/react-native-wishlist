@@ -12,16 +12,12 @@ using namespace jsi;
 
 namespace Wishlist {
 
-struct ComponentsPool;
+class ComponentsPool;
 
-struct ShadowNodeBinding : public jsi::HostObject,
-                           std::enable_shared_from_this<ShadowNodeBinding> {
-  std::shared_ptr<const ShadowNode> sn;
-  std::weak_ptr<ComponentsPool> wcp;
-  std::shared_ptr<ShadowNodeBinding> parent;
-  std::string key;
-  std::string type;
-
+class ShadowNodeBinding
+    : public jsi::HostObject,
+      public std::enable_shared_from_this<ShadowNodeBinding> {
+ public:
   ShadowNodeBinding(
       std::shared_ptr<const ShadowNode> sn,
       std::weak_ptr<ComponentsPool> wcp,
@@ -33,6 +29,15 @@ struct ShadowNodeBinding : public jsi::HostObject,
       std::weak_ptr<ComponentsPool> wcp,
       std::shared_ptr<ShadowNodeBinding> parent);
 
+  virtual Value get(Runtime &rt, const PropNameID &nameProp);
+
+  virtual void set(Runtime &rt, const PropNameID &name, const Value &value);
+
+  std::string getType() const;
+  std::string getKey() const;
+  ShadowNode::Shared getShadowNode() const;
+
+ private:
   void describe(
       std::stringstream &ss,
       const std::shared_ptr<const ShadowNode> n,
@@ -42,9 +47,12 @@ struct ShadowNodeBinding : public jsi::HostObject,
       const std::string &nativeId,
       std::shared_ptr<ShadowNodeBinding> p);
 
-  virtual Value get(Runtime &rt, const PropNameID &nameProp);
-
-  virtual void set(Runtime &rt, const PropNameID &name, const Value &value);
+ private:
+  std::shared_ptr<const ShadowNode> sn_;
+  std::weak_ptr<ComponentsPool> wcp_;
+  std::shared_ptr<ShadowNodeBinding> parent_;
+  std::string key_;
+  std::string type_;
 };
 
 }; // namespace Wishlist
