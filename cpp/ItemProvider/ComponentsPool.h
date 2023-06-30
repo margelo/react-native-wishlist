@@ -13,25 +13,17 @@ using namespace jsi;
 
 namespace Wishlist {
 
-struct ComponentsPool : std::enable_shared_from_this<ComponentsPool> {
-  std::map<std::string, int> nameToIndex;
-  std::map<int, std::string> tagToType;
-  std::map<std::string, std::vector<std::shared_ptr<const ShadowNode>>>
-      reusable;
-  std::vector<std::shared_ptr<ShadowNode const>> registeredViews;
-  std::shared_ptr<jsi::HostObject> proxy;
+class ComponentsPool : public std::enable_shared_from_this<ComponentsPool> {
+ public:
+  void setNames(const std::vector<std::string> &names);
 
-  void setNames(std::vector<std::string> names);
+  void setRegisteredViews(std::vector<ShadowNode::Shared> registeredViews);
 
-  void returnToPool(std::shared_ptr<const ShadowNode> sn);
+  void returnToPool(ShadowNode::Shared sn);
 
-  void templatesUpdated() { // optimise by reusing some of elements if they are
-    // the same
-    tagToType.clear();
-    reusable.clear();
-  }
+  void templatesUpdated();
 
-  std::shared_ptr<const ShadowNode> getNodeForType(std::string type);
+  ShadowNode::Shared getNodeForType(const std::string &type);
 
   jsi::Object prepareProxy(jsi::Runtime &rt);
 
@@ -45,6 +37,13 @@ struct ComponentsPool : std::enable_shared_from_this<ComponentsPool> {
 
     virtual void set(Runtime &rt, const PropNameID &name, const Value &value);
   };
+
+ private:
+  std::map<std::string, int> nameToIndex_;
+  std::map<int, std::string> tagToType_;
+  std::map<std::string, std::vector<ShadowNode::Shared>> reusable_;
+  std::vector<ShadowNode::Shared> registeredViews_;
+  std::shared_ptr<jsi::HostObject> proxy_;
 };
 
 }; // namespace Wishlist

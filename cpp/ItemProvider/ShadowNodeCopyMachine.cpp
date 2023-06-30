@@ -7,7 +7,7 @@ namespace Wishlist {
 int tag = -2;
 
 ShadowNode::Shared ShadowNodeCopyMachine::copyShadowSubtree(
-    const std::shared_ptr<const ShadowNode> &sn) {
+    const ShadowNode::Shared &sn) {
   auto const &cd = sn->getComponentDescriptor();
 
   PropsParserContext propsParserContext{
@@ -55,6 +55,13 @@ ShadowNode::Shared ShadowNodeCopyMachine::copyShadowSubtree(
   }
 
   return shadowNode;
+}
+
+void ShadowNodeCopyMachine::clearParent(const ShadowNode::Shared &sn) {
+  auto *family =
+      reinterpret_cast<const ShadowNodeFamilyHack *>(&sn->getFamily());
+  family->hasParent_ = false;
+  family->parent_.reset();
 }
 
 }; // namespace Wishlist

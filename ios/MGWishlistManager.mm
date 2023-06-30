@@ -106,8 +106,11 @@ RCT_EXPORT_MODULE(WishlistManager);
 {
   auto &rt = WishlistJsRuntime::getInstance().getRuntime();
   try {
-    jsi::Function f = rt.global().getPropertyAsObject(rt, "global").getPropertyAsFunction(rt, "handleEvent");
-    f.call(rt, type, tag, payload);
+    auto global = rt.global().getPropertyAsObject(rt, "global");
+    if (global.hasProperty(rt, "handleEvent")) {
+      auto f = global.getPropertyAsFunction(rt, "handleEvent");
+      f.call(rt, type, tag, payload);
+    }
   } catch (std::exception &error) {
     RCTLogError(@"%@", [NSString stringWithUTF8String:error.what()]);
   }

@@ -7,47 +7,53 @@ using namespace jsi;
 
 namespace Wishlist {
 
-void ComponentsPool::setNames(std::vector<std::string> names) {
-  nameToIndex.clear();
+void ComponentsPool::setNames(const std::vector<std::string> &names) {
+  nameToIndex_.clear();
   for (int i = 0; i < names.size(); ++i) {
-    nameToIndex[names[i]] = i;
+    nameToIndex_[names[i]] = i;
   }
 }
 
-void ComponentsPool::returnToPool(std::shared_ptr<const ShadowNode> sn) {
+void ComponentsPool::setRegisteredViews(
+    std::vector<ShadowNode::Shared> registeredViews) {
+  registeredViews_ = registeredViews;
+}
+
+void ComponentsPool::returnToPool(ShadowNode::Shared sn) {
   if (sn == nullptr) {
     return;
   }
-  auto *family =
-      reinterpret_cast<const ShadowNodeFamilyHack *>(&sn->getFamily());
-  family->hasParent_ = false;
-  family->parent_.reset();
-  std::string type = tagToType[sn->getTag()];
-  reusable[type].push_back(sn);
+  ShadowNodeCopyMachine::clearParent(sn);
+  std::string type = tagToType_[sn->getTag()];
+  reusable_[type].push_back(sn);
 }
 
-std::shared_ptr<const ShadowNode> ComponentsPool::getNodeForType(
-    std::string type) {
-  if (reusable[type].size() > 0) {
-    auto res = reusable[type].back();
-    reusable[type].pop_back();
+void ComponentsPool::templatesUpdated() {
+  // optimise by reusing some of elements if they are
+  // the same
+  tagToType_.clear();
+  reusable_.clear();
+}
+
+ShadowNode::Shared ComponentsPool::getNodeForType(const std::string &type) {
+  if (reusable_[type].size() > 0) {
+    auto res = reusable_[type].back();
+    reusable_[type].pop_back();
     return res;
   }
 
-  std::shared_ptr<const ShadowNode> templateNode =
-      registeredViews[nameToIndex[type]];
-  std::shared_ptr<const ShadowNode> deepCopy =
-      ShadowNodeCopyMachine::copyShadowSubtree(templateNode);
-  tagToType[deepCopy->getTag()] = type;
+  auto templateNode = registeredViews_[nameToIndex_[type]];
+  auto deepCopy = ShadowNodeCopyMachine::copyShadowSubtree(templateNode);
+  tagToType_[deepCopy->getTag()] = type;
   return deepCopy;
 }
 
 jsi::Object ComponentsPool::prepareProxy(jsi::Runtime &rt) {
-  if (proxy == nullptr) {
-    proxy = std::static_pointer_cast<jsi::HostObject>(
+  if (proxy_ == nullptr) {
+    proxy_ = std::static_pointer_cast<jsi::HostObject>(
         std::make_shared<ComponentsPool::Proxy>(shared_from_this()));
   }
-  return jsi::Object::createFromHostObject(rt, this->proxy);
+  return jsi::Object::createFromHostObject(rt, proxy_);
 }
 
 ComponentsPool::Proxy::Proxy(std::weak_ptr<ComponentsPool> wcp) : wcp(wcp) {}

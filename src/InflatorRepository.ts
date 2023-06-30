@@ -1,3 +1,4 @@
+import { getColorsUIModule } from './Colors';
 import type { TemplateValueUIState } from './TemplateValue';
 import { createRunInWishlistFn } from './WishlistJsRuntime';
 
@@ -64,6 +65,7 @@ export type UIInflatorRegistry = {
   getCurrentRootValue: () => any;
   didPushChildren: () => void;
   addPushChildrenCallback: (callback: () => void) => void;
+  processProps: (props: any) => any;
 };
 
 let done = false;
@@ -169,6 +171,18 @@ const maybeInit = () => {
         },
         addPushChildrenCallback: (callback) => {
           pushChildrenCallbacks.push(callback);
+        },
+        processProps: (props) => {
+          const colors = getColorsUIModule();
+          const result: any = {};
+          for (const [key, value] of Object.entries(props)) {
+            if (colors.colorProps.includes(key)) {
+              result[key] = colors.processColor(value);
+            } else {
+              result[key] = value;
+            }
+          }
+          return result;
         },
       };
       global.InflatorRegistry = InflatorRegistry;
