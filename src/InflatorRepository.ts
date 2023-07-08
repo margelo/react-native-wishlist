@@ -147,6 +147,7 @@ const maybeInit = () => {
           templateValueStates.delete(id);
         },
         withCurrentValues: (value, rootValue, callback) => {
+          templateValueStates.clear();
           const previousValue = currentValue;
           const previousRootValue = currentRootValue;
           currentValue = value;
