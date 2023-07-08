@@ -1,6 +1,6 @@
 #import "MGWishlistQueue.h"
 
-dispatch_queue_t MGGetWishlistQueue()
+dispatch_queue_t MGGetWishlistQueue(void)
 {
   static dispatch_queue_t wishlistQueue;
   static dispatch_once_t onceToken;
@@ -12,7 +12,7 @@ dispatch_queue_t MGGetWishlistQueue()
   return wishlistQueue;
 }
 
-BOOL MGIsWishlistQueue()
+BOOL MGIsWishlistQueue(void)
 {
   static void *wishlistQueueKey = &wishlistQueueKey;
   static dispatch_once_t onceToken;
