@@ -2,7 +2,9 @@ import React, { forwardRef, useMemo } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { TemplateCallback, TemplateCallbackWorklet } from './EventHandler';
 import { ForEachBase } from './Components/ForEachBase';
-import InflatorRepository from './InflatorRepository';
+import InflatorRepository, {
+  getUIInflatorRegistry,
+} from './InflatorRepository';
 import { CaseBase } from './Components/Switch';
 import { useTemplateContext } from './TemplateContext';
 import {
@@ -220,7 +222,13 @@ export function createTemplateComponent<T extends React.ComponentType<any>>(
 
           templateCallbacks.forEach(({ eventName, worklet }) => {
             templateItem.setCallback(eventName, (ev) => {
-              worklet(ev, value, rootValue);
+              getUIInflatorRegistry().withCurrentValues(
+                value,
+                rootValue,
+                () => {
+                  worklet(ev, value, rootValue);
+                },
+              );
             });
           });
 

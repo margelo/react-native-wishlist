@@ -15,7 +15,7 @@ WishItem WorkletItemProvider::provide(
 
   jsi::Function inflateItem = rt.global()
                                   .getPropertyAsObject(rt, "global")
-                                  .getPropertyAsObject(rt, "InflatorRegistry")
+                                  .getPropertyAsObject(rt, "__wishlistInflatorRegistry")
                                   .getPropertyAsFunction(rt, "inflateItem");
 
   jsi::Value returnedValue;

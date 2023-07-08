@@ -117,7 +117,7 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
           // JS.
           auto processProps = rt.global()
                                   .getPropertyAsObject(rt, "global")
-                                  .getPropertyAsObject(rt, "InflatorRegistry")
+                                  .getPropertyAsObject(rt, "__wishlistInflatorRegistry")
                                   .getPropertyAsFunction(rt, "processProps");
           auto props = processProps.call(rt, args[0]);
           RawProps rawProps(rt, props);

@@ -15,10 +15,10 @@ export type InflateMethod = (
 ) => [TemplateItem, any] | undefined;
 
 export type MappingInflateMethod = (
-  value: any,
+  value: unknown,
   templateItem: TemplateItem,
   pool: ComponentPool,
-  rootValue: any,
+  rootValue: unknown,
 ) => void;
 
 export type UIInflatorRegistry = {
@@ -38,17 +38,22 @@ export type UIInflatorRegistry = {
   ) => void;
   useMappings: (
     item: TemplateItem,
-    value: any,
+    value: unknown,
     templateType: string,
     id: string,
     pool: ComponentPool,
-    rootValue: any,
+    rootValue: unknown,
   ) => TemplateItem;
   getTemplateValueState: (id: string) => TemplateValueUIState | undefined;
   setTemplateValueState: (id: string, state: TemplateValueUIState) => void;
   deleteTemplateValueState: (id: string) => void;
-  getCurrentValue: () => any;
-  getCurrentRootValue: () => any;
+  getCurrentValue: () => unknown;
+  getCurrentRootValue: () => unknown;
+  withCurrentValues: (
+    value: unknown,
+    rootValue: unknown,
+    callback: () => void,
+  ) => void;
   didPushChildren: () => void;
   addPushChildrenCallback: (callback: () => void) => void;
   processProps: (props: any) => any;
@@ -68,10 +73,10 @@ const maybeInit = () => {
       >();
       const templateValueStates = new Map<string, TemplateValueUIState>();
       let pushChildrenCallbacks: (() => void)[] = [];
-      let currentValue: any;
-      let currentRootValue: any;
+      let currentValue: unknown;
+      let currentRootValue: unknown;
 
-      const InflatorRegistry: UIInflatorRegistry = {
+      const inflatorRegistry: UIInflatorRegistry = {
         inflateItem: (id, index, nativePool, prevItem) => {
           const pool = wrapComponentPool(nativePool);
           const inflator = registry.get(id);
@@ -82,7 +87,7 @@ const maybeInit = () => {
             }
             const [item, value] = result;
 
-            return getUIInflatorRegistry().useMappings(
+            return inflatorRegistry.useMappings(
               item,
               value,
               value.type,
@@ -98,22 +103,18 @@ const maybeInit = () => {
         useMappings: (item, value, templateType, id, pool, rootValue) => {
           // We need to save and restore current values to support things like ForEach
           // where current value can change.
-          const previousValue = currentValue;
-          const previousRootValue = currentRootValue;
-          currentValue = value;
-          currentRootValue = rootValue;
-          const mapping = mappings.get(id)?.get(templateType);
-          if (mapping) {
-            for (const [nativeId, inflate] of mapping.entries()) {
-              const templateItem = item.getByWishId(nativeId);
-              if (templateItem) {
-                templateValueStates.clear();
-                inflate(value, templateItem, pool, rootValue);
+          inflatorRegistry.withCurrentValues(value, rootValue, () => {
+            const mapping = mappings.get(id)?.get(templateType);
+            if (mapping) {
+              for (const [nativeId, inflate] of mapping.entries()) {
+                const templateItem = item.getByWishId(nativeId);
+                if (templateItem) {
+                  templateValueStates.clear();
+                  inflate(value, templateItem, pool, rootValue);
+                }
               }
             }
-          }
-          currentValue = previousValue;
-          currentRootValue = previousRootValue;
+          });
           return item;
         },
         registerInflator: (id, inflateMethod) => {
@@ -145,6 +146,15 @@ const maybeInit = () => {
         deleteTemplateValueState: (id) => {
           templateValueStates.delete(id);
         },
+        withCurrentValues: (value, rootValue, callback) => {
+          const previousValue = currentValue;
+          const previousRootValue = currentRootValue;
+          currentValue = value;
+          currentRootValue = rootValue;
+          callback();
+          currentValue = previousValue;
+          currentRootValue = previousRootValue;
+        },
         getCurrentValue: () => {
           return currentValue;
         },
@@ -172,7 +182,7 @@ const maybeInit = () => {
           return result;
         },
       };
-      global.InflatorRegistry = InflatorRegistry;
+      global.__wishlistInflatorRegistry = inflatorRegistry;
     })();
   }
 };
@@ -180,7 +190,7 @@ const maybeInit = () => {
 export function getUIInflatorRegistry(): UIInflatorRegistry {
   'worklet';
 
-  return global.InflatorRegistry;
+  return global.__wishlistInflatorRegistry;
 }
 
 export default class InflatorRepository {

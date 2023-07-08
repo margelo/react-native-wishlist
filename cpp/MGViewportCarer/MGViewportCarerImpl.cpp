@@ -307,7 +307,7 @@ void MGViewportCarerImpl::notifyAboutPushedChildren() {
       jsi::Function didPushChildren =
           rt.global()
               .getPropertyAsObject(rt, "global")
-              .getPropertyAsObject(rt, "InflatorRegistry")
+              .getPropertyAsObject(rt, "__wishlistInflatorRegistry")
               .getPropertyAsFunction(rt, "didPushChildren");
       didPushChildren.call(rt, 0);
     });
