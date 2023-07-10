@@ -57,7 +57,7 @@ export const State = {
 } as const;
 
 type PressableProps = ViewProps & {
-  onPress: (item: any, rootItem: any) => void;
+  onPress?: ((item: any, rootItem: any) => void) | null;
 };
 
 const attachGestureHandler = createRunInJsFn((tag: number) => {
@@ -94,7 +94,7 @@ export const Pressable = forwardRef<any, PressableProps>(
       'worklet';
 
       if (ev.state === State.ACTIVE) {
-        onPress(item, rootItem);
+        onPress?.(item, rootItem);
       }
     }, 'onGestureHandlerStateChange');
 
