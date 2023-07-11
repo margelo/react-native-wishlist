@@ -50,7 +50,12 @@ function getTemplatesFromChildren(children: React.ReactNode, width: number) {
   const nextTemplates: { [key: string]: React.ReactElement } = {
     __offsetComponent: <View style={[styles.offsetView, { width }]} />,
     __viewComponent: <View />,
-    __textComponent: <Text> </Text>,
+    __textComponent: (
+      <Text>
+        <Text> </Text>
+      </Text>
+    ),
+    __paragraphComponent: <Text> </Text>,
   };
   React.Children.forEach(children, (c) => {
     if ((c as any).type.displayName === 'WishListTemplate') {
