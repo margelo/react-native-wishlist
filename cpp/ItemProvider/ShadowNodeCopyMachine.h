@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <iostream>
 
+using namespace facebook;
 using namespace facebook::react;
 
 namespace Wishlist {
@@ -29,10 +30,10 @@ class ShadowNodeFamilyHack final {
           int /* childIndex */>,
       64>;
 
+  mutable std::unique_ptr<folly::dynamic> nativeProps_DEPRECATED;
   EventDispatcher::Weak eventDispatcher_;
   mutable std::shared_ptr<State const> mostRecentState_;
-  mutable butter::shared_mutex mutex_;
-
+  mutable std::shared_mutex mutex_;
   Tag const tag_;
   SurfaceId const surfaceId_;
   SharedEventEmitter const eventEmitter_;

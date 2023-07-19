@@ -1,7 +1,7 @@
 #pragma once
 
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
-#include <react/renderer/graphics/Geometry.h>
+#include <react/renderer/graphics/Rect.h>
 
 #ifdef ANDROID
 #include <folly/dynamic.h>

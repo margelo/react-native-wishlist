@@ -286,7 +286,7 @@ void MGViewportCarerImpl::pushChildren() {
                         ShadowNodeFragment{nullptr, wishlistChildren, nullptr});
                   }));
         };
-        st.commit(transaction);
+        st.commit(transaction, {});
       });
 
   notifyAboutPushedChildren();

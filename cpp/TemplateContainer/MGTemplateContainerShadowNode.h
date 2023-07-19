@@ -30,7 +30,7 @@ class JSI_EXPORT MGTemplateContainerShadowNode final
 
   std::vector<std::shared_ptr<ShadowNode const>> templates;
 
-  void appendChild(ShadowNode::Shared const &childNode);
+  void appendChild(ShadowNode::Shared const &childNode) override;
 
   void layout(LayoutContext layoutContext) override;
 

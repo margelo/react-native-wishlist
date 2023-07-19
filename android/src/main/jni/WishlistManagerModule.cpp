@@ -4,8 +4,8 @@
 #include "MGUIManagerHolder.h"
 #include "WishlistJsRuntime.h"
 
+using namespace facebook;
 using namespace facebook::react;
-using namespace facebook::jni;
 
 namespace Wishlist {
 
@@ -24,7 +24,7 @@ void WishlistManagerModule::nativeInstall(
     jlong jsiRuntimeRef,
     alias_ref<CallInvokerHolder::javaobject> jsCallInvokerHolder,
     alias_ref<JFabricUIManager::javaobject> fabricUIManager) {
-  auto jsiRuntime{reinterpret_cast<Runtime *>(jsiRuntimeRef)};
+  auto jsiRuntime{reinterpret_cast<jsi::Runtime *>(jsiRuntimeRef)};
   auto const &jsCallInvoker = jsCallInvokerHolder->cthis()->getCallInvoker();
   scheduler_ = fabricUIManager->getBinding()->getScheduler();
 
@@ -40,7 +40,7 @@ void WishlistManagerModule::nativeInstall(
         }
 
         WishlistJsRuntime::getInstance().accessRuntime([this, event, tag](
-                                                           Runtime &rt) {
+                                                           jsi::Runtime &rt) {
           try {
             auto handleEvent = rt.global()
                                    .getPropertyAsObject(rt, "global")

@@ -7,8 +7,8 @@
 #include <sstream>
 #include "ShadowNodeCopyMachine.h"
 
+using namespace facebook;
 using namespace facebook::react;
-using namespace jsi;
 
 namespace Wishlist {
 
@@ -29,9 +29,9 @@ class ShadowNodeBinding
       std::weak_ptr<ComponentsPool> wcp,
       std::shared_ptr<ShadowNodeBinding> parent);
 
-  virtual Value get(Runtime &rt, const PropNameID &nameProp);
+  virtual jsi::Value get(jsi::Runtime &rt, const jsi::PropNameID &nameProp);
 
-  virtual void set(Runtime &rt, const PropNameID &name, const Value &value);
+  virtual void set(jsi::Runtime &rt, const jsi::PropNameID &name, const jsi::Value &value);
 
   std::string getType() const;
   std::string getKey() const;
@@ -51,8 +51,8 @@ class ShadowNodeBinding
   std::shared_ptr<const ShadowNode> sn_;
   std::weak_ptr<ComponentsPool> wcp_;
   std::shared_ptr<ShadowNodeBinding> parent_;
-  std::string key_;
   std::string type_;
+  std::string key_;
 };
 
 }; // namespace Wishlist

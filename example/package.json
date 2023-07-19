@@ -11,18 +11,21 @@
   },
   "dependencies": {
     "react": "^18.2.0",
-    "react-native": "^0.71.7",
-    "react-native-gesture-handler": "^2.9.0",
-    "react-native-worklets": "janicduplessis/react-native-worklets#react-native-worklets-v0.1.0-alpha.2-gitpkg"
+    "react-native": "^0.72.3",
+    "react-native-gesture-handler": "^2.12.0",
+    "react-native-worklets": "janicduplessis/react-native-worklets#react-native-worklets-v0.1.0-alpha.4-gitpkg"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.9",
-    "@babel/runtime": "^7.12.5",
-    "@react-native/babel-plugin-codegen": "^0.71.0",
-    "metro-react-native-babel-preset": "0.72.3",
+    "@babel/core": "^7.20.0",
+    "@babel/runtime": "^7.20.0",
+    "@react-native/metro-config": "^0.72.9",
+    "metro-react-native-babel-preset": "0.76.7",
     "string-hash-64": "^1.0.3",
     "babel-plugin-module-resolver": "^4.1.0",
     "patch-package": "^6.4.7",
     "postinstall-postinstall": "^2.1.0"
+  },
+  "engines": {
+    "node": ">=16"
   }
 }

@@ -9,7 +9,7 @@
 #include "ShadowNodeCopyMachine.h"
 
 using namespace facebook::react;
-using namespace jsi;
+using namespace facebook::jsi;
 
 namespace Wishlist {
 
@@ -25,9 +25,9 @@ class ComponentsPool : public std::enable_shared_from_this<ComponentsPool> {
 
   ShadowNode::Shared getNodeForType(const std::string &type);
 
-  jsi::Object prepareProxy(jsi::Runtime &rt);
+  Object prepareProxy(Runtime &rt);
 
-  class Proxy : public jsi::HostObject {
+  class Proxy : public HostObject {
    public:
     std::weak_ptr<ComponentsPool> wcp;
 
@@ -43,7 +43,7 @@ class ComponentsPool : public std::enable_shared_from_this<ComponentsPool> {
   std::map<int, std::string> tagToType_;
   std::map<std::string, std::vector<ShadowNode::Shared>> reusable_;
   std::vector<ShadowNode::Shared> registeredViews_;
-  std::shared_ptr<jsi::HostObject> proxy_;
+  std::shared_ptr<HostObject> proxy_;
 };
 
 }; // namespace Wishlist

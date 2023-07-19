@@ -4,8 +4,8 @@
 
 #include <iostream>
 
+using namespace facebook;
 using namespace facebook::react;
-using namespace jsi;
 
 namespace Wishlist {
 
