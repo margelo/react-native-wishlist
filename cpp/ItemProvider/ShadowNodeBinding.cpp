@@ -115,10 +115,11 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
             size_t count) -> jsi::Value {
           // TODO: Avoid this extra call into JS by wrapping this function in
           // JS.
-          auto processProps = rt.global()
-                                  .getPropertyAsObject(rt, "global")
-                                  .getPropertyAsObject(rt, "__wishlistInflatorRegistry")
-                                  .getPropertyAsFunction(rt, "processProps");
+          auto processProps =
+              rt.global()
+                  .getPropertyAsObject(rt, "global")
+                  .getPropertyAsObject(rt, "__wishlistInflatorRegistry")
+                  .getPropertyAsFunction(rt, "processProps");
           auto props = processProps.call(rt, args[0]);
           RawProps rawProps(rt, props);
 

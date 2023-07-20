@@ -31,7 +31,8 @@ class ShadowNodeBinding
 
   virtual jsi::Value get(jsi::Runtime &rt, const jsi::PropNameID &nameProp);
 
-  virtual void set(jsi::Runtime &rt, const jsi::PropNameID &name, const jsi::Value &value);
+  virtual void
+  set(jsi::Runtime &rt, const jsi::PropNameID &name, const jsi::Value &value);
 
   std::string getType() const;
   std::string getKey() const;

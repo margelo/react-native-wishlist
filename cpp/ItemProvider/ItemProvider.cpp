@@ -13,10 +13,11 @@ WishItem WorkletItemProvider::provide(
 
   auto &rt = WishlistJsRuntime::getInstance().getRuntime();
 
-  jsi::Function inflateItem = rt.global()
-                                  .getPropertyAsObject(rt, "global")
-                                  .getPropertyAsObject(rt, "__wishlistInflatorRegistry")
-                                  .getPropertyAsFunction(rt, "inflateItem");
+  jsi::Function inflateItem =
+      rt.global()
+          .getPropertyAsObject(rt, "global")
+          .getPropertyAsObject(rt, "__wishlistInflatorRegistry")
+          .getPropertyAsFunction(rt, "inflateItem");
 
   jsi::Value returnedValue;
   try {
