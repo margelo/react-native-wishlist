@@ -32,6 +32,7 @@ apply plugin: "com.facebook.react"
 
 android {
     compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
+    ndkVersion getExtOrDefault("ndkVersion")
 
     defaultConfig {
         minSdkVersion getExtOrIntegerDefault("minSdkVersion")
