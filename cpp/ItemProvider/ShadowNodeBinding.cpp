@@ -49,7 +49,9 @@ void ShadowNodeBinding::describe(
   if (n->getProps()->nativeId.length() > 0) {
     ss << " (" << n->getProps()->nativeId << ")";
   }
+#if DEBUG
   ss << " " << n->getProps()->getDebugDescription();
+#endif
   ss << "\n";
   for (auto child : n->getChildren()) {
     describe(ss, child, level + 2);

@@ -61,6 +61,7 @@ type PressableProps = ViewProps & {
 };
 
 const attachGestureHandler = createRunInJsFn((tag: number) => {
+  // TODO: Do we need to detach handlers?
   const handlerTag = getNextHandlerTag();
   RNGestureHandlerModule.createGestureHandler(
     'TapGestureHandler',
