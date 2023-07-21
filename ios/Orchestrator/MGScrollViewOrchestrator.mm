@@ -44,7 +44,10 @@ using namespace Wishlist;
     _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(handleVSync:)];
     [_displayLink addToRunLoop:NSRunLoop.currentRunLoop forMode:NSDefaultRunLoopMode];
     [_displayLink setPaused:YES];
-
+    _displayLink.preferredFramesPerSecond = 120;
+    if (@available(iOS 15.0, *)) {
+      _displayLink.preferredFrameRateRange = CAFrameRateRangeMake(60, 120, 120);
+    }
     areEventsBlocked = YES;
 
     _di = di;
