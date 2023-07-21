@@ -79,10 +79,36 @@ type Props = ViewProps & {
   onEndReached?: () => void;
   initialIndex?: number;
   contentContainerStyle?: StyleProp<ViewStyle> | undefined;
+  /**
+   * Rendered at the bottom of all the items. Can be a React Component Class, a render function, or
+   * a rendered element.
+   */
+  ListFooterComponent?:
+    | React.ComponentType<any>
+    | React.ReactElement
+    | null
+    | undefined;
+  /**
+   * Rendered at the top of all the items. Can be a React Component Class, a render function, or
+   * a rendered element.
+   */
+  ListHeaderComponent?:
+    | React.ComponentType<any>
+    | React.ReactElement
+    | null
+    | undefined;
 };
 
 function ComponentBase<T extends BaseItem>(
-  { children, style, data, contentContainerStyle, ...rest }: Props,
+  {
+    children,
+    style,
+    data,
+    contentContainerStyle,
+    ListFooterComponent,
+    ListHeaderComponent,
+    ...rest
+  }: Props,
   ref: React.Ref<WishListInstance>,
 ) {
   const nativeWishlist = useRef<InstanceType<typeof NativeWishList> | null>(
@@ -123,6 +149,28 @@ function ComponentBase<T extends BaseItem>(
     [children, width],
   );
 
+  if (ListHeaderComponent) {
+    childrenTemplates.__wishlistHeader = React.isValidElement(
+      ListHeaderComponent,
+    ) ? (
+      ListHeaderComponent
+    ) : (
+      // @ts-expect-error
+      <ListHeaderComponent />
+    );
+  }
+
+  if (ListFooterComponent) {
+    childrenTemplates.__wishlistFooter = React.isValidElement(
+      ListFooterComponent,
+    ) ? (
+      ListFooterComponent
+    ) : (
+      // @ts-expect-error
+      <ListFooterComponent />
+    );
+  }
+
   const templatesRegistry = useMemo<NestedTemplatesContextValue>(
     () => ({
       templates: {},
@@ -137,6 +185,9 @@ function ComponentBase<T extends BaseItem>(
     [],
   );
 
+  const hasHeader = !!ListHeaderComponent;
+  const hasFooter = !!ListFooterComponent;
+
   // Resolve inflator - either use the provided callback or use the mapping
   const resolvedInflater: InflateMethod = useMemo(() => {
     return (
@@ -145,7 +196,17 @@ function ComponentBase<T extends BaseItem>(
       previousItem: TemplateItem | null,
     ) => {
       'worklet';
-      const value = (data as WishlistDataInternal<T>).__at(index);
+      const internalData = data as WishlistDataInternal<T>;
+
+      let value: T | undefined;
+      if (hasHeader && index === internalData.__firstIndex() - 1) {
+        value = { key: '__wishlistHeader', type: '__wishlistHeader' } as T;
+      } else if (hasFooter && index === internalData.__lastIndex()) {
+        value = { key: '__wishlistFooter', type: '__wishlistFooter' } as T;
+      } else {
+        value = internalData.__at(index);
+      }
+
       if (!value) {
         return undefined;
       }
@@ -170,7 +231,7 @@ function ComponentBase<T extends BaseItem>(
 
       return [item, value];
     };
-  }, [data]);
+  }, [data, hasFooter, hasHeader]);
 
   const inflatorIdRef = useRef<string | null>(null);
   const prevInflatorRef = useRef<typeof resolvedInflater>();
@@ -222,7 +283,6 @@ function ComponentBase<T extends BaseItem>(
               </View>
             ))}
           </View>
-
           <InnerComponent
             inflatorId={inflatorId}
             style={style}
@@ -231,6 +291,7 @@ function ComponentBase<T extends BaseItem>(
             templates={childrenTemplates}
             nestedTemplates={templatesRegistry.templates}
             contentContainerStyle={contentContainerStyle}
+            initialIndex={rest.initialIndex ?? (hasHeader ? -1 : 0)}
           />
         </>
       </TemplatesRegistryContext.Provider>
@@ -251,6 +312,7 @@ type InnerComponentProps = ViewProps & {
   templates: { [key: string]: any };
   nestedTemplates: { [key: string]: any };
   contentContainerStyle?: StyleProp<ViewStyle> | undefined;
+  initialIndex: number;
 };
 
 function InnerComponent({
@@ -261,8 +323,12 @@ function InnerComponent({
   templates,
   nestedTemplates,
   contentContainerStyle,
+  initialIndex,
 }: InnerComponentProps) {
-  const combinedTemplates = { ...templates, ...nestedTemplates };
+  const combinedTemplates: { [key: string]: React.ReactElement<any> } = {
+    ...templates,
+    ...nestedTemplates,
+  };
 
   const { id } = useWishlistContext();
 
@@ -281,14 +347,13 @@ function InnerComponent({
         inflatorId={inflatorId}
         onEndReached={rest?.onEndReached}
         onStartReached={rest?.onStartReached}
-        initialIndex={rest.initialIndex ?? 0}
+        initialIndex={initialIndex}
       >
         <NativeContentContainer
           collapsable={false}
           style={contentContainerStyle}
         />
       </NativeWishList>
-
       <NativeTemplateContainer
         names={keys}
         inflatorId={inflatorId}

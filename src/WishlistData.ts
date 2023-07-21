@@ -18,6 +18,8 @@ export interface WishlistDataInternal<T extends Item> extends WishlistData<T> {
   __attach: (wishlistId: string) => void;
   __detach: (wishlistId: string) => void;
   __at: (index: number) => T | undefined;
+  __firstIndex: () => number;
+  __lastIndex: () => number;
 }
 
 /**
@@ -64,6 +66,17 @@ export function useWishlistData<T extends Item>(
         return currentlyRenderedCopy.at(index);
       }
 
+      function __firstIndex() {
+        return 0 - currentlyRenderedCopy.__numberOfNegative;
+      }
+
+      function __lastIndex() {
+        return (
+          currentlyRenderedCopy.length -
+          currentlyRenderedCopy.__numberOfNegative
+        );
+      }
+
       function __attach(wishlistId: string) {
         attachedListIds.add(wishlistId);
 
@@ -92,6 +105,8 @@ export function useWishlistData<T extends Item>(
         __at,
         __attach,
         __detach,
+        __firstIndex,
+        __lastIndex,
       };
 
       global.dataCtx[dataId] = internalData;
@@ -102,7 +117,7 @@ export function useWishlistData<T extends Item>(
   }, []);
 
   return useMemo(
-    () => ({
+    (): WishlistDataInternal<T> => ({
       update: <ResT>(updateJob: UpdateJob<T, ResT>) => {
         'worklet';
 
@@ -137,6 +152,14 @@ export function useWishlistData<T extends Item>(
           'worklet';
           getWishlistData().__detach(wishlistId);
         })();
+      },
+      __firstIndex: () => {
+        'worklet';
+        return getWishlistData().__firstIndex();
+      },
+      __lastIndex: () => {
+        'worklet';
+        return getWishlistData().__lastIndex();
       },
     }),
     [getWishlistData],
