@@ -26,7 +26,7 @@ export interface WishlistDataInternal<T extends Item> extends WishlistData<T> {
  * Creates an instance of Wishlist data which can be passed to Wishlist components.
  */
 export function useWishlistData<T extends Item>(
-  initialData: Array<T>,
+  getInitialData: () => Array<T>,
 ): WishlistData<T> {
   const dataId = useGeneratedId();
   const getWishlistData = useMemo((): (() => WishlistDataInternal<T>) => {
@@ -41,7 +41,7 @@ export function useWishlistData<T extends Item>(
         return global.dataCtx[dataId] as WishlistDataInternal<T>;
       }
 
-      const currentlyRenderedCopy = createItemsDataStructure(initialData);
+      const currentlyRenderedCopy = createItemsDataStructure(getInitialData());
       const attachedListIds = new Set<string>();
       const pendingUpdates: Array<UpdateJob<T, unknown>> = [];
 

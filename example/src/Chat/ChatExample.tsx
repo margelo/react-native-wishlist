@@ -17,7 +17,7 @@ const START_LOADING_ITEM = { type: 'loading', key: 'start-loading' } as any;
 const END_LOADING_ITEM = { type: 'loading', key: 'end-loading' } as any;
 
 export default function App() {
-  const data = useWishlistData<ChatItem>([]);
+  const data = useWishlistData<ChatItem>(() => []);
   const [loading, setLoading] = useState(true);
   const loadingStartRef = useRef(false);
   const loadingEndRef = useRef(false);

@@ -117,7 +117,7 @@ export const AssetListExample: React.FC<{}> = () => {
 
       <Wishlist.Component
         // @ts-expect-error: TODO: update the new useWishlistData api.
-        initialData={list}
+        initialData={() => list}
         style={styles.listContainer}
         initialIndex={0}
       >
