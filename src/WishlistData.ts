@@ -29,6 +29,10 @@ export function useWishlistData<T extends Item>(
   getInitialData: () => Array<T>,
 ): WishlistData<T> {
   const dataId = useGeneratedId();
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const initialData = useMemo(getInitialData, []);
+
   const getWishlistData = useMemo((): (() => WishlistDataInternal<T>) => {
     return () => {
       'worklet';
@@ -41,7 +45,7 @@ export function useWishlistData<T extends Item>(
         return global.dataCtx[dataId] as WishlistDataInternal<T>;
       }
 
-      const currentlyRenderedCopy = createItemsDataStructure(getInitialData());
+      const currentlyRenderedCopy = createItemsDataStructure(initialData);
       const attachedListIds = new Set<string>();
       const pendingUpdates: Array<UpdateJob<T, unknown>> = [];
 
