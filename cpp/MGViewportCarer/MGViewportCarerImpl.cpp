@@ -59,6 +59,10 @@ void MGViewportCarerImpl::didScrollAsync(
     const std::vector<std::string> &names,
     float newOffset,
     const std::string &inflatorId) {
+  // TODO: Check why this happens.
+  if (newOffset == 0) {
+    return;
+  }
   WishlistJsRuntime::getInstance().accessRuntime([=](jsi::Runtime &rt) {
     if (dimensions.width != windowWidth_ || !names.empty() ||
         inflatorId != inflatorId_) {
