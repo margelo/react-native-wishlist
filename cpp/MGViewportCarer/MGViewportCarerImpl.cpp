@@ -67,10 +67,9 @@ void MGViewportCarerImpl::didScrollAsync(
     return;
   }
   auto generation = generation_.load();
-  auto currentGeneration = &generation_;
 
   WishlistJsRuntime::getInstance().accessRuntime([=](jsi::Runtime &rt) {
-    if (*currentGeneration != generation) {
+    if (generation_ != generation) {
       return;
     }
 
