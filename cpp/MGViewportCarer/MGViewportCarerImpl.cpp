@@ -237,9 +237,8 @@ void MGViewportCarerImpl::updateWindow() {
   // on the wishlist thread.
   if (contentOffsetAdjustment != 0) {
     generation_++;
+    contentOffset_ += contentOffsetAdjustment;
   }
-
-  contentOffset_ += contentOffsetAdjustment;
   
   // If we are near the end don't add extra offset and use the actual content size.
   auto endContentSize = endReached ? 0 : initialContentSize_ / 2;
