@@ -107,9 +107,6 @@ void MGViewportCarerImpl::updateWindow() {
   float bottomEdge = contentOffset_ + 2 * windowHeight_;
   bool startReached = false;
   bool endReached = false;
-  float startContentOffsetAdjustment = 0;
-  auto firstItemKey = window_.front().key;
-  auto oldWindow = window_;
 
   assert(!window_.empty());
   
@@ -147,8 +144,6 @@ void MGViewportCarerImpl::updateWindow() {
       }
       wishItem.offset = item.offset - wishItem.height;
       window_.push_front(wishItem);
-      
-      startContentOffsetAdjustment += wishItem.height;
     } else {
       break;
     }
@@ -181,9 +176,6 @@ void MGViewportCarerImpl::updateWindow() {
     if (bottom <= topEdge) {
       window_.pop_front();
       itemsToRemove.push_back(item);
-      
-      startContentOffsetAdjustment -= item.height;
-      
       continue;
     } else {
       break;
