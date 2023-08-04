@@ -61,8 +61,8 @@ void MGViewportCarerImpl::didScrollAsync(
     const std::vector<std::string> &names,
     float contentOffset,
     const std::string &inflatorId) {
-  // If we are adjusting content size / offset we do not want to process scroll events
-  // again here.
+  // If we are adjusting content size / offset we do not want to process scroll
+  // events again here.
   if (updatingContentSize_) {
     return;
   }
@@ -107,9 +107,10 @@ void MGViewportCarerImpl::updateWindow() {
   float bottomEdge = contentOffset_ + 2 * windowHeight_;
   bool startReached = false;
   bool endReached = false;
+  bool changed = false;
 
   assert(!window_.empty());
-  
+
   float currentOffset = window_[0].offset;
   for (auto &item : window_) {
     if (item.dirty) {
@@ -128,10 +129,11 @@ void MGViewportCarerImpl::updateWindow() {
       item.type = wishItem.type;
       item.key = wishItem.key;
       item.dirty = false;
+      changed = true;
     }
     currentOffset = item.offset + item.height;
   }
-  
+
   // Add above
   while (true) {
     WishItem item = window_.front();
@@ -144,6 +146,7 @@ void MGViewportCarerImpl::updateWindow() {
       }
       wishItem.offset = item.offset - wishItem.height;
       window_.push_front(wishItem);
+      changed = true;
     } else {
       break;
     }
@@ -162,6 +165,7 @@ void MGViewportCarerImpl::updateWindow() {
       }
       wishItem.offset = bottom;
       window_.push_back(wishItem);
+      changed = true;
     } else {
       break;
     }
@@ -176,6 +180,7 @@ void MGViewportCarerImpl::updateWindow() {
     if (bottom <= topEdge) {
       window_.pop_front();
       itemsToRemove.push_back(item);
+      changed = true;
       continue;
     } else {
       break;
@@ -188,16 +193,22 @@ void MGViewportCarerImpl::updateWindow() {
     if (item.offset >= bottomEdge) {
       window_.pop_back();
       itemsToRemove.push_back(item);
+      changed = true;
       continue;
     } else {
       break;
     }
   }
+  
+  // Bail out early if no changes to the window.
+  if (!changed) {
+    return;
+  }
 
   // This will be used to adjust scroll position to maintain the visible content
   // position.
   float contentOffsetAdjustment = 0;
-  
+
   // Make sure we don't have negative offsets, this can happen when
   // we are at the start of the list.
   if (window_.front().offset < 0) {
@@ -208,7 +219,7 @@ void MGViewportCarerImpl::updateWindow() {
       currentOffset = currentOffset + item.height;
     }
   }
-  
+
   // We reach the start of the list and still have extra offset
   // we need to remove it so that the content size is exact and
   // the list stops scrolling correctly.
@@ -239,11 +250,13 @@ void MGViewportCarerImpl::updateWindow() {
     generation_++;
     contentOffset_ += contentOffsetAdjustment;
   }
-  
-  // If we are near the end don't add extra offset and use the actual content size.
+
+  // If we are near the end don't add extra offset and use the actual content
+  // size.
   auto endContentSize = endReached ? 0 : initialContentSize_ / 2;
   updateContentSize(
-      {windowWidth_, window_.back().offset + window_.back().height + endContentSize},
+      {windowWidth_,
+       window_.back().offset + window_.back().height + endContentSize},
       contentOffset_);
 
   pushChildren();
@@ -286,8 +299,8 @@ void MGViewportCarerImpl::updateContentSize(
 
   di_.lock()->getUIScheduler()->scheduleOnUI(
       [this, listener, contentSize, contentOffset] {
-        // We are updating the scroll position programatically here we want to make sure we
-        // don't reprocess those as regular scroll events.
+        // We are updating the scroll position programatically here we want to
+        // make sure we don't reprocess those as regular scroll events.
         updatingContentSize_ = true;
         listener->didChangeContentSize(contentSize, contentOffset);
         updatingContentSize_ = false;

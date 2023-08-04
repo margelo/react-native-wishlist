@@ -18,6 +18,11 @@ struct Item {
   float height;
   int index;
   std::string key;
+  
+  bool operator ==(const Item &item) const
+  {
+    return offset == item.offset && height == item.height && index == item.index && key == item.key;
+  }
 };
 
 struct MGViewportCarerListener {

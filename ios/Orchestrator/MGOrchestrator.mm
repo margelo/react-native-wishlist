@@ -20,6 +20,8 @@ using namespace Wishlist;
   CGFloat _contentOffset;
   BOOL _alreadyRendered;
   std::shared_ptr<MGOrchestratorCppAdapter> _adapter;
+  std::vector<Item> _items;
+  int _pendingScrollToItem;
 }
 
 - (instancetype)initWith:(UIScrollView *)scrollView
@@ -30,6 +32,7 @@ using namespace Wishlist;
     _scrollView = scrollView;
     _wishlistId = wishlistId;
     _alreadyRendered = NO;
+    _pendingScrollToItem = -1;
     _di = std::make_shared<MGDIImpl>();
     auto weakDI = std::weak_ptr<MGDIImpl>(_di);
     viewportCarer->setDI(_di);
@@ -101,11 +104,40 @@ using namespace Wishlist;
 
 - (void)scrollToItem:(int)index
 {
-  // TODO: Implement
+  float offset = -1;
+  for (auto &item : _items) {
+    if (item.index == index) {
+      offset = item.offset;
+      break;
+    }
+  }
+
+  if (offset == -1) {
+    _pendingScrollToItem = index;
+    bool isBelow = _items.back().index < index;
+    // TODO: Implement proper animation for items outside the window.
+    if (isBelow) {
+      [self scrollToOffset:_items.back().offset + 10000];
+    } else {
+      [self scrollToOffset:_items.back().offset - 10000];
+    }
+  } else {
+    _pendingScrollToItem = -1;
+    [self scrollToOffset:offset];
+  }
+}
+
+- (void)scrollToOffset:(float)offset
+{
+  [_scrollView setContentOffset:{0, offset} animated:YES];
 }
 
 - (void)didPushChildren:(std::vector<Item>)items
 {
+  _items = std::move(items);
+  if (_pendingScrollToItem != -1) {
+    [self scrollToItem:_pendingScrollToItem];
+  }
 }
 
 - (void)didChangeContentSize:(MGDims)contentSize contentOffset:(CGFloat)contentOffset
