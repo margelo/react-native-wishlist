@@ -29,7 +29,7 @@ class MGViewportCarerImpl : public MGViewportCarer {
 
   void initialRenderAsync(
       MGDims dimensions,
-      float initialOffset,
+      float initialContentSize,
       int originItem,
       const std::vector<std::shared_ptr<ShadowNode const>> &registeredViews,
       const std::vector<std::string> &names,
@@ -39,11 +39,13 @@ class MGViewportCarerImpl : public MGViewportCarer {
       MGDims dimensions,
       const std::vector<std::shared_ptr<ShadowNode const>> &registeredViews,
       const std::vector<std::string> &names,
-      float newOffset,
+      float contentOffset,
       const std::string &inflatorId) override;
 
  private:
   void updateWindow();
+
+  void updateContentSize(MGDims contentSize, float contentOffset);
 
   std::shared_ptr<ShadowNode> getOffseter(float offset);
 
@@ -55,7 +57,9 @@ class MGViewportCarerImpl : public MGViewportCarer {
 
   void notifyAboutEndReached();
 
-  float offset_;
+  float contentOffset_;
+  MGDims contentSize_;
+  float initialContentSize_;
   float windowHeight_;
   float windowWidth_;
   int surfaceId_;
@@ -70,6 +74,11 @@ class MGViewportCarerImpl : public MGViewportCarer {
   std::string firstItemKeyForStartReached_;
   std::string lastItemKeyForEndReached_;
   std::weak_ptr<MGViewportCarerListener> listener_;
+
+  // Used to discard scroll events that have out of date
+  // content offset.
+  std::atomic_int generation_ = {0};
+  bool updatingContentSize_ = false;
 };
 
 }; // namespace Wishlist

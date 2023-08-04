@@ -10,18 +10,26 @@
 namespace Wishlist {
 
 MGOrchestratorCppAdapter::MGOrchestratorCppAdapter(
-    std::function<void(float, float)> _onBoundingBoxDidChange,
-    std::function<void()> _onRequestVSync)
-    : onBoundingBoxDidChange(_onBoundingBoxDidChange),
-      onRequestVSync(_onRequestVSync) {}
+    std::function<void()> onRequestVSync,
+    std::function<void(std::vector<Item> items)> didPushChildren,
+    std::function<void(MGDims contentSize, float contentOffset)>
+        didChangeContentSize)
+    : onRequestVSync_(onRequestVSync),
+      didPushChildren_(didPushChildren),
+      didChangeContentSize_(didChangeContentSize) {}
 
-void MGOrchestratorCppAdapter::boundingBoxDidChange(
-    std::pair<float, float> topAndBottomEdges) {
-  onBoundingBoxDidChange(topAndBottomEdges.first, topAndBottomEdges.second);
+void MGOrchestratorCppAdapter::didPushChildren(std::vector<Item> newWindow) {
+  didPushChildren_(std::move(newWindow));
+}
+
+void MGOrchestratorCppAdapter::didChangeContentSize(
+    MGDims contentSize,
+    float contentOffset) {
+  didChangeContentSize_(contentSize, contentOffset);
 }
 
 void MGOrchestratorCppAdapter::requestVSync() {
-  onRequestVSync();
+  onRequestVSync_();
 }
 
 }; // namespace Wishlist

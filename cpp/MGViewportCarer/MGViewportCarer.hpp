@@ -23,7 +23,7 @@ class MGViewportCarer {
  public:
   virtual void initialRenderAsync(
       MGDims dimensions,
-      float initialOffset,
+      float initialContentSize,
       int originItem,
       const std::vector<std::shared_ptr<ShadowNode const>> &registeredViews,
       const std::vector<std::string> &names,
@@ -33,7 +33,7 @@ class MGViewportCarer {
       MGDims dimensions,
       const std::vector<std::shared_ptr<ShadowNode const>> &registeredViews,
       const std::vector<std::string> &names,
-      float newOffset,
+      float contentOffset,
       const std::string &inflatorId) = 0;
 
   virtual ~MGViewportCarer() {}

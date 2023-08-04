@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <string>
+#include "MGViewportCarer.hpp"
 
 namespace Wishlist {
 
@@ -21,6 +22,9 @@ struct Item {
 
 struct MGViewportCarerListener {
   virtual void didPushChildren(std::vector<Item> newWindow) = 0;
+  virtual void didChangeContentSize(
+      MGDims contentSize,
+      float contentOffset) = 0;
 };
 
 }; // namespace Wishlist

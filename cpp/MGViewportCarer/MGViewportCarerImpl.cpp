@@ -27,7 +27,7 @@ void MGViewportCarerImpl::setInitialValues(
 
 void MGViewportCarerImpl::initialRenderAsync(
     MGDims dimensions,
-    float initialOffset,
+    float initialContentSize,
     int originItem,
     const std::vector<std::shared_ptr<ShadowNode const>> &registeredViews,
     const std::vector<std::string> &names,
@@ -42,13 +42,15 @@ void MGViewportCarerImpl::initialRenderAsync(
     itemProvider_->setComponentsPool(componentsPool_);
 
     surfaceId_ = wishListNode_->getFamily().getSurfaceId();
-    offset_ = initialOffset;
+    initialContentSize_ = initialContentSize;
+    contentSize_ = {dimensions.width, initialContentSize};
+    contentOffset_ = initialContentSize / 2;
     windowHeight_ = dimensions.height;
     windowWidth_ = dimensions.width;
     inflatorId_ = inflatorId;
 
     window_.push_back(itemProvider_->provide(originItem, nullptr));
-    window_.back().offset = initialOffset;
+    window_.back().offset = initialContentSize / 2;
     updateWindow();
   });
 }
@@ -57,13 +59,21 @@ void MGViewportCarerImpl::didScrollAsync(
     MGDims dimensions,
     const std::vector<std::shared_ptr<ShadowNode const>> &registeredViews,
     const std::vector<std::string> &names,
-    float newOffset,
+    float contentOffset,
     const std::string &inflatorId) {
-  // TODO: Check why this happens.
-  if (newOffset == 0) {
+  // If we are adjusting content size / offset we do not want to process scroll events
+  // again here.
+  if (updatingContentSize_) {
     return;
   }
+  auto generation = generation_.load();
+  auto currentGeneration = &generation_;
+
   WishlistJsRuntime::getInstance().accessRuntime([=](jsi::Runtime &rt) {
+    if (*currentGeneration != generation) {
+      return;
+    }
+
     if (dimensions.width != windowWidth_ || !names.empty() ||
         inflatorId != inflatorId_) {
       componentsPool_->setRegisteredViews(registeredViews);
@@ -86,21 +96,46 @@ void MGViewportCarerImpl::didScrollAsync(
       }
     }
 
-    this->offset_ = newOffset;
-    this->windowHeight_ = dimensions.height;
+    contentOffset_ = contentOffset;
+    windowHeight_ = dimensions.height;
 
     updateWindow();
   });
 }
 
 void MGViewportCarerImpl::updateWindow() {
-  float topEdge = offset_ - windowHeight_;
-  float bottomEdge = offset_ + 2 * windowHeight_;
+  float topEdge = contentOffset_ - windowHeight_;
+  float bottomEdge = contentOffset_ + 2 * windowHeight_;
   bool startReached = false;
   bool endReached = false;
+  float startContentOffsetAdjustment = 0;
+  auto firstItemKey = window_.front().key;
+  auto oldWindow = window_;
 
   assert(!window_.empty());
-
+  
+  float currentOffset = window_[0].offset;
+  for (auto &item : window_) {
+    if (item.dirty) {
+      std::shared_ptr<ShadowNodeBinding> prevSn = nullptr;
+      if (item.sn) {
+        prevSn = std::make_shared<ShadowNodeBinding>(
+            item.sn, componentsPool_, item.type, item.key);
+      }
+      WishItem wishItem = itemProvider_->provide(item.index, prevSn);
+      if (wishItem.sn == nullptr) {
+        continue;
+      }
+      swap(item.sn, wishItem.sn);
+      item.offset = currentOffset - (wishItem.height - item.height);
+      item.height = wishItem.height;
+      item.type = wishItem.type;
+      item.key = wishItem.key;
+      item.dirty = false;
+    }
+    currentOffset = item.offset + item.height;
+  }
+  
   // Add above
   while (true) {
     WishItem item = window_.front();
@@ -113,6 +148,8 @@ void MGViewportCarerImpl::updateWindow() {
       }
       wishItem.offset = item.offset - wishItem.height;
       window_.push_front(wishItem);
+      
+      startContentOffsetAdjustment += wishItem.height;
     } else {
       break;
     }
@@ -145,6 +182,9 @@ void MGViewportCarerImpl::updateWindow() {
     if (bottom <= topEdge) {
       window_.pop_front();
       itemsToRemove.push_back(item);
+      
+      startContentOffsetAdjustment -= item.height;
+      
       continue;
     } else {
       break;
@@ -163,27 +203,58 @@ void MGViewportCarerImpl::updateWindow() {
     }
   }
 
-  float currentOffset = window_[0].offset;
-  for (auto &item : window_) {
-    if (item.dirty) {
-      std::shared_ptr<ShadowNodeBinding> prevSn = nullptr;
-      if (item.sn) {
-        prevSn = std::make_shared<ShadowNodeBinding>(
-            item.sn, componentsPool_, item.type, item.key);
-      }
-      WishItem wishItem = itemProvider_->provide(item.index, prevSn);
-      if (wishItem.sn == nullptr) {
-        continue;
-      }
+  // This will be used to adjust scroll position to maintain the visible content
+  // position.
+  float contentOffsetAdjustment = 0;
+  
+  // Make sure we don't have negative offsets, this can happen when
+  // we are at the start of the list.
+  if (window_.front().offset < 0) {
+    contentOffsetAdjustment -= window_.front().offset;
+    float currentOffset = 0;
+    for (auto &item : window_) {
       item.offset = currentOffset;
-      swap(item.sn, wishItem.sn);
-      item.height = wishItem.height;
-      item.type = wishItem.type;
-      item.key = wishItem.key;
-      item.dirty = false;
+      currentOffset = currentOffset + item.height;
     }
-    currentOffset = item.offset + item.height;
   }
+  
+  // We reach the start of the list and still have extra offset
+  // we need to remove it so that the content size is exact and
+  // the list stops scrolling correctly.
+  if (startReached && window_.front().offset > 0) {
+    contentOffsetAdjustment -= window_.front().offset;
+
+    float currentOffset = 0;
+    for (auto &item : window_) {
+      item.offset = currentOffset;
+      currentOffset = currentOffset + item.height;
+    }
+  }
+  // We are no longer at the start of the list and don't have extra offset
+  // we need to add it back.
+  else if (!startReached && window_.front().offset <= 0) {
+    auto newOffset = initialContentSize_ / 2;
+    for (auto &item : window_) {
+      item.offset += newOffset;
+    }
+    contentOffsetAdjustment += newOffset;
+  }
+
+  // If there is a content offset adjustment to be made we need to make
+  // sure to discard incoming scroll events as their offset will be invalid.
+  // This happens since scroll events come from the main thread and we are
+  // on the wishlist thread.
+  if (contentOffsetAdjustment != 0) {
+    generation_++;
+  }
+
+  contentOffset_ += contentOffsetAdjustment;
+  
+  // If we are near the end don't add extra offset and use the actual content size.
+  auto endContentSize = endReached ? 0 : initialContentSize_ / 2;
+  updateContentSize(
+      {windowWidth_, window_.back().offset + window_.back().height + endContentSize},
+      contentOffset_);
 
   pushChildren();
 
@@ -209,6 +280,28 @@ void MGViewportCarerImpl::updateWindow() {
   } else {
     lastItemKeyForEndReached_ = "";
   }
+}
+
+void MGViewportCarerImpl::updateContentSize(
+    MGDims contentSize,
+    float contentOffset) {
+  auto listener = listener_.lock();
+  if (!listener ||
+      (contentSize.width == contentSize_.width &&
+       contentSize.height == contentSize_.height)) {
+    return;
+  }
+
+  contentSize_ = contentSize;
+
+  di_.lock()->getUIScheduler()->scheduleOnUI(
+      [this, listener, contentSize, contentOffset] {
+        // We are updating the scroll position programatically here we want to make sure we
+        // don't reprocess those as regular scroll events.
+        updatingContentSize_ = true;
+        listener->didChangeContentSize(contentSize, contentOffset);
+        updatingContentSize_ = false;
+      });
 }
 
 std::shared_ptr<ShadowNode> MGViewportCarerImpl::getOffseter(float offset) {

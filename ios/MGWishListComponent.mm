@@ -9,15 +9,11 @@
 #import <react/renderer/components/rncore/Props.h>
 #include <react/renderer/components/wishlist/Props.h>
 #include <react/renderer/components/wishlist/ShadowNodes.h>
-#import "MGDIIOS.h"
-#import "MGDataBindingImpl.hpp"
-#import "MGErrorHandlerIOS.h"
-#import "MGOrchestratorCPPAdapter.hpp"
-#import "MGScrollViewOrchestrator.h"
-#import "MGUIScheduleriOS.hpp"
-#import "MGWindowKeeper.hpp"
+#import "MGOrchestrator.h"
 #import "MGWishlistComponentDescriptor.h"
 #import "RCTFabricComponentsPlugins.h"
+
+#define MG_INITIAL_CONTENT_SIZE 100000
 
 using namespace facebook::react;
 
@@ -29,28 +25,17 @@ using namespace facebook::react;
 
 @implementation MGWishListComponent {
   MGWishlistShadowNode::ConcreteState::Shared _sharedState;
-  bool _alreadyRendered;
   std::string _inflatorId;
   std::string _wishlistId;
-  MGScrollViewOrchestrator *_orchestrator;
+  MGOrchestrator *_orchestrator;
   std::shared_ptr<const MGWishlistEventEmitter> _emitter;
   int _initialIndex;
-  std::shared_ptr<MGDIIOS> _di;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
   if (self = [super initWithFrame:frame]) {
-    self.scrollView.delaysContentTouches = NO;
-    self.scrollView.canCancelContentTouches = true;
-    _alreadyRendered = false;
-
-    [self.scrollView removeGestureRecognizer:self.scrollView.panGestureRecognizer];
-
-    UIPanGestureRecognizer *customR = [UIPanGestureRecognizer new];
-    [customR setMinimumNumberOfTouches:1];
-    [self.scrollView addGestureRecognizer:customR];
-    [customR addTarget:self action:@selector(handlePan:)];
+    // self.scrollView.showsVerticalScrollIndicator = NO;
   }
   return self;
 }
@@ -70,17 +55,6 @@ using namespace facebook::react;
   _wishlistId = wishlistId;
 }
 
-- (void)handlePan:(UIPanGestureRecognizer *)gesture
-{
-  if (_orchestrator != nil) {
-    PanEvent *panEvent = [PanEvent new];
-    panEvent.state = gesture.state;
-    panEvent.velocity = [gesture velocityInView:self].y;
-    panEvent.translation = [gesture translationInView:self.scrollView].y;
-    [_orchestrator notifyAboutEvent:panEvent];
-  }
-}
-
 - (BOOL)scrollViewShouldScrollToTop:(UIScrollView *)scrollView
 {
   [self scrollToItem:0 animated:YES]; // Maybe it would be better to scroll to initial (which is not always 0)
@@ -90,43 +64,23 @@ using namespace facebook::react;
 - (void)setTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates
            withNames:(std::vector<std::string>)names
 {
-  if (!_alreadyRendered && names.size() > 0 && names.size() == templates.size()) {
-    _alreadyRendered = true;
-    CGRect frame = self.frame;
+  if (!_orchestrator) {
+    self.scrollView.contentSize = CGSizeMake(self.frame.size.width, MG_INITIAL_CONTENT_SIZE);
+    self.scrollView.contentOffset = CGPointMake(0, MG_INITIAL_CONTENT_SIZE / 2);
 
-    self.scrollView.contentSize = CGSizeMake(frame.size.width, 10000000);
-    self.scrollView.frame =
-        CGRectMake(self.scrollView.frame.origin.x, self.scrollView.frame.origin.y, frame.size.width, frame.size.height);
-
-    _di = std::make_shared<MGDIIOS>();
-    auto weakDI = std::weak_ptr<MGDIIOS>(_di);
     std::shared_ptr<MGViewportCarerImpl> viewportCarer = _sharedState->getData().viewportCarer;
-    viewportCarer->setDI(_di);
-    _di->setViewportCarer(viewportCarer);
-
-    _orchestrator = [[MGScrollViewOrchestrator alloc] initWith:self.scrollView
-                                                            di:weakDI
-                                                    inflatorId:_inflatorId
-                                                    wishlistId:_wishlistId];
-    __weak MGScrollViewOrchestrator *weakOrchestrator = _orchestrator;
-    auto orchestratorAdapter = std::make_shared<MGOrchestratorCppAdapter>(
-        [=](float top, float bottom) { [weakOrchestrator edgesChangedWithTopEdge:top bottomEdge:bottom]; },
-        [=]() { [weakOrchestrator requestVSync]; });
-    _di->setVSyncRequester(orchestratorAdapter);
-    _di->setBoundingBoxObserver(orchestratorAdapter);
-    _di->setDataBinding(std::make_shared<MGDataBindingImpl>(_wishlistId, weakDI));
-    auto windowKeeper = std::make_shared<MGWindowKeeper>(weakDI);
-    _di->setAnimationsSight(windowKeeper);
-    _di->setUIScheduler(std::make_shared<MGUIScheduleriOS>());
-    _di->setErrorHandler(std::make_shared<MGErrorHandlerIOS>());
-
-    viewportCarer->setListener(std::weak_ptr(windowKeeper));
-
-    [_orchestrator runWithTemplates:templates names:names initialIndex:_initialIndex];
-
-  } else {
-    [_orchestrator notifyAboutNewTemplates:templates withNames:names inflatorId:_inflatorId];
+    _orchestrator = [[MGOrchestrator alloc] initWith:self.scrollView
+                                          wishlistId:_wishlistId
+                                       viewportCarer:viewportCarer];
   }
+
+  [_orchestrator
+      renderAsyncWithDimensions:{(float)self.scrollView.frame.size.width, (float)self.scrollView.frame.size.height}
+             initialContentSize:MG_INITIAL_CONTENT_SIZE
+                   initialIndex:_initialIndex
+                      templates:templates
+                          names:names
+                     inflatorId:_inflatorId];
 }
 
 #pragma mark - RCTComponentViewProtocol
@@ -170,17 +124,15 @@ using namespace facebook::react;
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-  if (_sharedState == nullptr) {
-    return;
-  }
+  [_orchestrator didScrollAsyncWithDimensions:{(float)scrollView.frame.size.width, (float)scrollView.frame.size.height}
+                                contentOffset:scrollView.contentOffset.y
+                                   inflatorId:_inflatorId];
 }
 
 - (void)prepareForRecycle
 {
   _sharedState.reset();
   _orchestrator = nil;
-  _di = nullptr;
-  _alreadyRendered = NO;
   [super prepareForRecycle];
 }
 

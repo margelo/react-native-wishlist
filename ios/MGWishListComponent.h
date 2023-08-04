@@ -12,8 +12,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setInflatorId:(std::string)inflatorId;
 - (void)setWishlistId:(std::string)wishlistId;
 
-- (void)handlePan:(UIPanGestureRecognizer *)gesture;
-
 @end
 
 NS_ASSUME_NONNULL_END
