@@ -7,12 +7,13 @@
 #include "MGOrchestratorCppAdapter.hpp"
 #include "MGUIScheduleriOS.hpp"
 #include "MGViewportCarerImpl.h"
+#include "MGWishListComponent.h"
 #include "WishlistJsRuntime.h"
 
 using namespace Wishlist;
 
 @implementation MGOrchestrator {
-  UIScrollView *_scrollView;
+  MGWishListComponent *_wishlist;
   std::shared_ptr<MGDIImpl> _di;
   std::string _inflatorId;
   std::string _wishlistId;
@@ -24,12 +25,12 @@ using namespace Wishlist;
   int _pendingScrollToItem;
 }
 
-- (instancetype)initWith:(UIScrollView *)scrollView
+- (instancetype)initWith:(MGWishListComponent *)wishlist
               wishlistId:(std::string)wishlistId
            viewportCarer:(std::shared_ptr<MGViewportCarerImpl>)viewportCarer
 {
   if (self = [super init]) {
-    _scrollView = scrollView;
+    _wishlist = wishlist;
     _wishlistId = wishlistId;
     _alreadyRendered = NO;
     _pendingScrollToItem = -1;
@@ -41,10 +42,7 @@ using namespace Wishlist;
     __weak __typeof(self) weakSelf = self;
     _adapter = std::make_shared<MGOrchestratorCppAdapter>(
         [weakSelf]() { [weakSelf handleVSync]; },
-        [weakSelf](std::vector<Item> items) { [weakSelf didPushChildren:std::move(items)]; },
-        [weakSelf](MGDims contentSize, float contentOffset) {
-          [weakSelf didChangeContentSize:contentSize contentOffset:contentOffset];
-        });
+        [weakSelf](std::vector<Item> items) { [weakSelf didPushChildren:std::move(items)]; });
     _di->setVSyncRequester(_adapter);
     _di->setDataBinding(std::make_shared<MGDataBindingImpl>(_wishlistId, weakDI));
     _di->setUIScheduler(std::make_shared<MGUIScheduleriOS>());
@@ -129,7 +127,7 @@ using namespace Wishlist;
 
 - (void)scrollToOffset:(float)offset
 {
-  [_scrollView setContentOffset:{0, offset} animated:YES];
+  [_wishlist.scrollView setContentOffset:{0, offset} animated:YES];
 }
 
 - (void)didPushChildren:(std::vector<Item>)items
@@ -140,15 +138,9 @@ using namespace Wishlist;
   }
 }
 
-- (void)didChangeContentSize:(MGDims)contentSize contentOffset:(CGFloat)contentOffset
-{
-  _scrollView.contentSize = CGSizeMake(contentSize.width, contentSize.height);
-  _scrollView.contentOffset = CGPointMake(0, contentOffset);
-}
-
 - (void)dealloc
 {
-  _scrollView = nil;
+  _wishlist = nil;
 }
 
 @end

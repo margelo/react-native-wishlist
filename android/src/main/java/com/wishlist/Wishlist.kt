@@ -16,6 +16,8 @@ class Wishlist(reactContext: Context) :
   private var names: List<String>? = null
   private var didInitialScroll = false
   private val initialOffset = 100000f
+  private var pendingScrollOffset = -1
+  private var ignoreScrollEvents = false
 
   fun setTemplates(templatesRef: Int, names: List<String>) {
     this.templatesRef = templatesRef
@@ -74,6 +76,7 @@ class Wishlist(reactContext: Context) :
   ) {
     super.onLayoutChange(v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom)
     initialScrollIfReady()
+    maybeScrollToOffsetForContentChange()
   }
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -81,10 +84,15 @@ class Wishlist(reactContext: Context) :
 
     renderIfReady()
     initialScrollIfReady()
+    maybeScrollToOffsetForContentChange()
   }
 
   override fun onScrollChanged(x: Int, y: Int, oldX: Int, oldY: Int) {
     super.onScrollChanged(x, y, oldX, oldY)
+
+    if (ignoreScrollEvents) {
+      return
+    }
 
     orchestrator?.didScrollAsync(
         PixelUtil.toDIPFromPixel(width.toFloat()),
@@ -95,5 +103,27 @@ class Wishlist(reactContext: Context) :
 
   fun scrollToItem(index: Int, animated: Boolean) {
     orchestrator?.scrollToItem(index)
+  }
+
+  fun scrollToOffsetForContentChange(offset: Float) {
+    // State is updated before content view is laid out so update the
+    // scroll position in layout handler.
+    pendingScrollOffset = PixelUtil.toPixelFromDIP(offset).toInt()
+  }
+
+  private fun maybeScrollToOffsetForContentChange() {
+    if (pendingScrollOffset == -1) {
+      return
+    }
+    val contentView = getChildAt(0)
+    if (contentView == null ||
+        contentView.height == 0 ||
+        pendingScrollOffset > contentView.height) {
+      return
+    }
+    ignoreScrollEvents = true
+    scrollTo(0, pendingScrollOffset)
+    ignoreScrollEvents = false
+    pendingScrollOffset = -1
   }
 }

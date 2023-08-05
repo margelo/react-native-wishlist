@@ -17,7 +17,7 @@ namespace Wishlist {
 
 // TODO make this class testable by injecting componentsPool and itemProvider
 // or their factories
-class MGViewportCarerImpl : public MGViewportCarer {
+class MGViewportCarerImpl final : public MGViewportCarer {
  public:
   void setInitialValues(
       const std::shared_ptr<MGWishlistShadowNode> &wishListNode,
@@ -45,11 +45,11 @@ class MGViewportCarerImpl : public MGViewportCarer {
  private:
   void updateWindow();
 
-  void updateContentSize(MGDims contentSize, float contentOffset);
+  void updateContentOffset(float contentOffset);
 
   std::shared_ptr<ShadowNode> getOffseter(float offset);
 
-  void pushChildren();
+  void pushChildren(float contentOffset);
 
   void notifyAboutPushedChildren();
 
@@ -58,7 +58,6 @@ class MGViewportCarerImpl : public MGViewportCarer {
   void notifyAboutEndReached();
 
   float contentOffset_;
-  MGDims contentSize_;
   float initialContentSize_;
   float windowHeight_;
   float windowWidth_;
@@ -74,11 +73,6 @@ class MGViewportCarerImpl : public MGViewportCarer {
   std::string firstItemKeyForStartReached_;
   std::string lastItemKeyForEndReached_;
   std::weak_ptr<MGViewportCarerListener> listener_;
-
-  // Used to discard scroll events that have out of date
-  // content offset.
-  std::atomic_int generation_ = {0};
-  bool updatingContentSize_ = false;
 };
 
 }; // namespace Wishlist

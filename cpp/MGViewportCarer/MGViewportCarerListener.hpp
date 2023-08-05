@@ -18,18 +18,10 @@ struct Item {
   float height;
   int index;
   std::string key;
-  
-  bool operator ==(const Item &item) const
-  {
-    return offset == item.offset && height == item.height && index == item.index && key == item.key;
-  }
 };
 
 struct MGViewportCarerListener {
   virtual void didPushChildren(std::vector<Item> newWindow) = 0;
-  virtual void didChangeContentSize(
-      MGDims contentSize,
-      float contentOffset) = 0;
 };
 
 }; // namespace Wishlist

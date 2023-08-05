@@ -24,18 +24,20 @@ using namespace facebook::react;
 @end
 
 @implementation MGWishListComponent {
-  MGWishlistShadowNode::ConcreteState::Shared _sharedState;
+  MGWishlistShadowNode::ConcreteState::Shared _state;
   std::string _inflatorId;
   std::string _wishlistId;
   MGOrchestrator *_orchestrator;
   std::shared_ptr<const MGWishlistEventEmitter> _emitter;
   int _initialIndex;
+  BOOL _ignoreScrollEvents;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
   if (self = [super initWithFrame:frame]) {
     self.scrollView.showsVerticalScrollIndicator = NO;
+    _ignoreScrollEvents = NO;
   }
   return self;
 }
@@ -68,10 +70,8 @@ using namespace facebook::react;
     self.scrollView.contentSize = CGSizeMake(self.frame.size.width, MG_INITIAL_CONTENT_SIZE);
     self.scrollView.contentOffset = CGPointMake(0, MG_INITIAL_CONTENT_SIZE / 2);
 
-    std::shared_ptr<MGViewportCarerImpl> viewportCarer = _sharedState->getData().viewportCarer;
-    _orchestrator = [[MGOrchestrator alloc] initWith:self.scrollView
-                                          wishlistId:_wishlistId
-                                       viewportCarer:viewportCarer];
+    std::shared_ptr<MGViewportCarerImpl> viewportCarer = _state->getData().viewportCarer;
+    _orchestrator = [[MGOrchestrator alloc] initWith:self wishlistId:_wishlistId viewportCarer:viewportCarer];
   }
 
   [_orchestrator
@@ -103,15 +103,21 @@ using namespace facebook::react;
 
 - (void)updateState:(State::Shared const &)state oldState:(State::Shared const &)oldState
 {
-  if (state == nullptr)
-    return;
-  auto newState = std::static_pointer_cast<MGWishlistShadowNode::ConcreteState const>(state);
-  auto &data = newState->getData();
-  _sharedState = newState;
+  assert(std::dynamic_pointer_cast<MGWishlistShadowNode::ConcreteState const>(state));
+  _state = std::static_pointer_cast<MGWishlistShadowNode::ConcreteState const>(state);
+  auto &data = _state->getData();
 
   CGSize contentSize = RCTCGSizeFromSize(data.contentBoundingRect.size);
 
-  self.containerView.frame = CGRect{RCTCGPointFromPoint(data.contentBoundingRect.origin), contentSize};
+  self.contentView.frame = CGRect{RCTCGPointFromPoint(data.contentBoundingRect.origin), contentSize};
+  self.scrollView.contentSize = contentSize;
+
+  if (data.contentOffset != -1) {
+    _ignoreScrollEvents = YES;
+    NSLog(@"setContentOffset %f", data.contentOffset);
+    [self.scrollView setContentOffset:{0, data.contentOffset} animated:NO];
+    _ignoreScrollEvents = NO;
+  }
 }
 
 #pragma clang diagnostic push
@@ -124,6 +130,10 @@ using namespace facebook::react;
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+  if (_ignoreScrollEvents) {
+    return;
+  }
+
   [_orchestrator didScrollAsyncWithDimensions:{(float)scrollView.frame.size.width, (float)scrollView.frame.size.height}
                                 contentOffset:scrollView.contentOffset.y
                                    inflatorId:_inflatorId];
@@ -131,7 +141,7 @@ using namespace facebook::react;
 
 - (void)prepareForRecycle
 {
-  _sharedState.reset();
+  _state.reset();
   _orchestrator = nil;
   [super prepareForRecycle];
 }

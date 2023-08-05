@@ -4,7 +4,6 @@
 #import <memory>
 #import <string>
 #import <vector>
-#import "MGAnimations.h"
 #import "MGDI.hpp"
 #import "MGViewportCarerImpl.h"
 
@@ -12,9 +11,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 using namespace Wishlist;
 
+@class MGWishListComponent;
+
 @interface MGOrchestrator : NSObject
 
-- (instancetype)initWith:(UIScrollView *)scrollView
+- (instancetype)initWith:(MGWishListComponent *)wishlist
               wishlistId:(std::string)wishlistId
            viewportCarer:(std::shared_ptr<MGViewportCarerImpl>)viewportCarer;
 

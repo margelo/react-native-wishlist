@@ -35,8 +35,6 @@ class MGViewportCarer {
       const std::vector<std::string> &names,
       float contentOffset,
       const std::string &inflatorId) = 0;
-
-  virtual ~MGViewportCarer() {}
 };
 
 }; // namespace Wishlist

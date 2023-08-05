@@ -10,7 +10,8 @@ namespace react {
 MGWishlistState::MGWishlistState()
     : initialised(false),
       viewportCarer(std::make_shared<MGViewportCarerImpl>()),
-      contentBoundingRect({}){};
+      contentBoundingRect({}),
+      contentOffset(-1){};
 
 #ifdef ANDROID
 
@@ -19,12 +20,14 @@ MGWishlistState::MGWishlistState(
     folly::dynamic data)
     : initialised(previousState.initialised),
       viewportCarer(previousState.viewportCarer),
-      contentBoundingRect(previousState.contentBoundingRect){};
+      contentBoundingRect(previousState.contentBoundingRect),
+      contentOffset(-1){};
 
 folly::dynamic MGWishlistState::getDynamic() const {
   auto viewportCarerRef = Wishlist::JNIStateRegistry::getInstance().addValue(
       (void *)&viewportCarer);
-  return folly::dynamic::object("viewportCarer", viewportCarerRef);
+  return folly::dynamic::object("viewportCarer", viewportCarerRef)(
+      "contentOffset", contentOffset);
 };
 
 MapBuffer MGWishlistState::getMapBuffer() const {

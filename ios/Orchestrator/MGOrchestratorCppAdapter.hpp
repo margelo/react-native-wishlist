@@ -19,19 +19,14 @@ class MGOrchestratorCppAdapter final : public MGVSyncRequester,
  public:
   MGOrchestratorCppAdapter(
       std::function<void()> onRequestVSync,
-      std::function<void(std::vector<Item> items)> didPushChildren,
-      std::function<void(MGDims contentSize, float contentOffset)>
-          didChangeContentSize);
+      std::function<void(std::vector<Item> items)> didPushChildren);
 
  private:
   void didPushChildren(std::vector<Item> newWindow) override;
-  void didChangeContentSize(MGDims contentSize, float contentOffset) override;
   void requestVSync() override;
 
   std::function<void()> onRequestVSync_;
   std::function<void(std::vector<Item> items)> didPushChildren_;
-  std::function<void(MGDims contentSize, float contentOffset)>
-      didChangeContentSize_;
 };
 
 }; // namespace Wishlist
