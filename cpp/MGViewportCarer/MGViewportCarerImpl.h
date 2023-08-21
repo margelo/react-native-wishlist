@@ -19,6 +19,8 @@ namespace Wishlist {
 // or their factories
 class MGViewportCarerImpl final : public MGViewportCarer {
  public:
+  MGViewportCarerImpl();
+
   void setInitialValues(
       const std::shared_ptr<MGWishlistShadowNode> &wishListNode,
       const LayoutContext &lc);
@@ -37,10 +39,10 @@ class MGViewportCarerImpl final : public MGViewportCarer {
 
   void didScrollAsync(
       MGDims dimensions,
-      const std::vector<std::shared_ptr<ShadowNode const>> &registeredViews,
-      const std::vector<std::string> &names,
       float contentOffset,
       const std::string &inflatorId) override;
+
+  void didUpdateContentOffset() override;
 
  private:
   void updateWindow();
@@ -63,8 +65,7 @@ class MGViewportCarerImpl final : public MGViewportCarer {
   float windowWidth_;
   int surfaceId_;
   std::string inflatorId_;
-  std::shared_ptr<ComponentsPool> componentsPool_ =
-      std::make_shared<ComponentsPool>();
+  std::shared_ptr<ComponentsPool> componentsPool_;
   std::shared_ptr<ItemProvider> itemProvider_;
   std::deque<WishItem> window_;
   std::shared_ptr<MGWishlistShadowNode> wishListNode_;
@@ -73,6 +74,7 @@ class MGViewportCarerImpl final : public MGViewportCarer {
   std::string firstItemKeyForStartReached_;
   std::string lastItemKeyForEndReached_;
   std::weak_ptr<MGViewportCarerListener> listener_;
+  bool ignoreScrollEvents_;
 };
 
 }; // namespace Wishlist

@@ -18,7 +18,6 @@ using namespace Wishlist;
   std::string _inflatorId;
   std::string _wishlistId;
   MGDims _dimensions;
-  CGFloat _contentOffset;
   BOOL _alreadyRendered;
   std::shared_ptr<MGOrchestratorCppAdapter> _adapter;
   std::vector<Item> _items;
@@ -55,11 +54,7 @@ using namespace Wishlist;
 
 - (void)handleVSync
 {
-  // TODO: These do not seem to be needed.
-  auto templates = std::vector<std::shared_ptr<facebook::react::ShadowNode const>>();
-  auto names = std::vector<std::string>();
-
-  _di->getViewportCarer()->didScrollAsync(_dimensions, templates, names, _contentOffset, _inflatorId);
+  _di->getViewportCarer()->didScrollAsync(_dimensions, MG_NO_OFFSET, _inflatorId);
 }
 
 - (void)renderAsyncWithDimensions:(MGDims)dimensions
@@ -73,7 +68,6 @@ using namespace Wishlist;
     _alreadyRendered = YES;
     _dimensions = dimensions;
     _inflatorId = inflatorId;
-    _contentOffset = initialContentSize / 2;
     _di->getViewportCarer()->initialRenderAsync(
         dimensions, initialContentSize, initialIndex, templates, names, inflatorId);
   } else {
@@ -88,9 +82,8 @@ using namespace Wishlist;
                           inflatorId:(std::string)inflatorId
 {
   _dimensions = dimensions;
-  _contentOffset = contentOffset;
   _inflatorId = inflatorId;
-  [self handleVSync];
+  _di->getViewportCarer()->didScrollAsync(dimensions, contentOffset, inflatorId);
 }
 - (void)notifyAboutNewTemplates:(std::vector<std::shared_ptr<facebook::react::ShadowNode const>>)templates
                       withNames:(std::vector<std::string>)names

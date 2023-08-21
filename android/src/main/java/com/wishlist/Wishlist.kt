@@ -15,8 +15,8 @@ class Wishlist(reactContext: Context) :
   private var templatesRef: Int? = null
   private var names: List<String>? = null
   private var didInitialScroll = false
-  private val initialOffset = 100000f
-  private var pendingScrollOffset = -1
+  private val initialContentSize = 100000f
+  private var pendingScrollOffset = Int.MIN_VALUE
   private var ignoreScrollEvents = false
 
   fun setTemplates(templatesRef: Int, names: List<String>) {
@@ -44,7 +44,7 @@ class Wishlist(reactContext: Context) :
     orchestrator.renderAsync(
         PixelUtil.toDIPFromPixel(width.toFloat()),
         PixelUtil.toDIPFromPixel(height.toFloat()),
-        initialOffset,
+        initialContentSize,
         initialIndex,
         templatesRef,
         names,
@@ -59,7 +59,7 @@ class Wishlist(reactContext: Context) :
     if (contentView == null || contentView.height == 0) {
       return
     }
-    scrollTo(0, PixelUtil.toPixelFromDIP(initialOffset).toInt())
+    scrollTo(0, PixelUtil.toPixelFromDIP(initialContentSize / 2).toInt())
     didInitialScroll = true
   }
 
@@ -112,7 +112,7 @@ class Wishlist(reactContext: Context) :
   }
 
   private fun maybeScrollToOffsetForContentChange() {
-    if (pendingScrollOffset == -1) {
+    if (pendingScrollOffset == Int.MIN_VALUE) {
       return
     }
     val contentView = getChildAt(0)
@@ -123,7 +123,8 @@ class Wishlist(reactContext: Context) :
     }
     ignoreScrollEvents = true
     scrollTo(0, pendingScrollOffset)
+    orchestrator?.didUpdateContentOffset()
     ignoreScrollEvents = false
-    pendingScrollOffset = -1
+    pendingScrollOffset = Int.MIN_VALUE
   }
 }

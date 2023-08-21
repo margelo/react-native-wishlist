@@ -27,7 +27,7 @@ class Orchestrator : public jni::HybridClass<Orchestrator> {
   void renderAsync(
       float width,
       float height,
-      float initialOffset,
+      float initialContentSize,
       int originItem,
       int templatesRef,
       jni::alias_ref<jni::JList<jni::JString>> names,
@@ -40,6 +40,8 @@ class Orchestrator : public jni::HybridClass<Orchestrator> {
       std::string inflatorId);
 
   void handleVSync();
+
+  void didUpdateContentOffset();
 
   void scrollToItem(int index);
 
@@ -68,7 +70,6 @@ class Orchestrator : public jni::HybridClass<Orchestrator> {
   std::shared_ptr<Adapter> adapter_;
   float width_;
   float height_;
-  float contentOffset_;
   std::string inflatorId_;
   std::vector<Item> items_;
   int pendingScrollToItem_;

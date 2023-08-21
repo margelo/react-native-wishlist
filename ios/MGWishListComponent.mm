@@ -12,6 +12,7 @@
 #import "MGOrchestrator.h"
 #import "MGWishlistComponentDescriptor.h"
 #import "RCTFabricComponentsPlugins.h"
+#include "WishlistDefine.h"
 
 #define MG_INITIAL_CONTENT_SIZE 100000
 
@@ -103,21 +104,29 @@ using namespace facebook::react;
 
 - (void)updateState:(State::Shared const &)state oldState:(State::Shared const &)oldState
 {
+  // Updating content size or offset can trigger scroll events but we do not want to
+  // process those as they can have invalid offset or were already processed.
+  _ignoreScrollEvents = YES;
+
   assert(std::dynamic_pointer_cast<MGWishlistShadowNode::ConcreteState const>(state));
   _state = std::static_pointer_cast<MGWishlistShadowNode::ConcreteState const>(state);
   auto &data = _state->getData();
 
   CGSize contentSize = RCTCGSizeFromSize(data.contentBoundingRect.size);
-
   self.contentView.frame = CGRect{RCTCGPointFromPoint(data.contentBoundingRect.origin), contentSize};
   self.scrollView.contentSize = contentSize;
 
-  if (data.contentOffset != -1) {
-    _ignoreScrollEvents = YES;
-    NSLog(@"setContentOffset %f", data.contentOffset);
+#if MG_WISHLIST_DEBUG
+  std::cout << "updateState {offset: " << data.contentOffset << ", contentHeight: " << contentSize.height << "}"
+            << std::endl;
+#endif
+
+  if (data.contentOffset != MG_NO_OFFSET) {
     [self.scrollView setContentOffset:{0, data.contentOffset} animated:NO];
-    _ignoreScrollEvents = NO;
+    data.viewportCarer->didUpdateContentOffset();
   }
+
+  _ignoreScrollEvents = NO;
 }
 
 #pragma clang diagnostic push

@@ -11,7 +11,7 @@ MGWishlistState::MGWishlistState()
     : initialised(false),
       viewportCarer(std::make_shared<MGViewportCarerImpl>()),
       contentBoundingRect({}),
-      contentOffset(-1){};
+      contentOffset(MG_NO_OFFSET){};
 
 #ifdef ANDROID
 
@@ -21,13 +21,17 @@ MGWishlistState::MGWishlistState(
     : initialised(previousState.initialised),
       viewportCarer(previousState.viewportCarer),
       contentBoundingRect(previousState.contentBoundingRect),
-      contentOffset(-1){};
+      contentOffset(MG_NO_OFFSET){};
 
 folly::dynamic MGWishlistState::getDynamic() const {
   auto viewportCarerRef = Wishlist::JNIStateRegistry::getInstance().addValue(
       (void *)&viewportCarer);
-  return folly::dynamic::object("viewportCarer", viewportCarerRef)(
-      "contentOffset", contentOffset);
+  folly::dynamic result = folly::dynamic::object();
+  result["viewportCarer"] = viewportCarerRef;
+  if (contentOffset != MG_NO_OFFSET) {
+    result["contentOffset"] = contentOffset;
+  }
+  return result;
 };
 
 MapBuffer MGWishlistState::getMapBuffer() const {
