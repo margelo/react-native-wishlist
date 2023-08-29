@@ -27,6 +27,7 @@ class JSI_EXPORT MGWishlistState final {
   bool initialised;
   std::shared_ptr<MGViewportCarerImpl> viewportCarer;
   Rect contentBoundingRect;
+  float contentOffset;
 
   MGWishlistState();
 

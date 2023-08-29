@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <string>
+#include "MGViewportCarer.hpp"
 
 namespace Wishlist {
 

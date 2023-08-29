@@ -94,7 +94,6 @@ Value ShadowNodeBinding::get(Runtime &rt, const PropNameID &nameProp) {
           std::string callbackName = args[0].asString(rt).utf8(rt);
           int tag = sn_->getTag();
           std::string eventName = std::to_string(tag) + callbackName;
-          std::cout << "register native for name " << eventName << std::endl;
           jsi::Function callback = args[1].asObject(rt).asFunction(rt);
 
           auto handlerRegistry = rt.global()

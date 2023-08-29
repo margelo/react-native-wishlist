@@ -18,7 +18,7 @@ class Orchestrator(private val mWishlist: Wishlist, wishlistId: String, viewport
   external fun renderAsync(
       width: Float,
       height: Float,
-      initialOffset: Float,
+      initialContentSize: Float,
       originItem: Int,
       templatesRef: Int,
       names: List<String>,
@@ -29,8 +29,10 @@ class Orchestrator(private val mWishlist: Wishlist, wishlistId: String, viewport
 
   external fun scrollToItem(index: Int)
 
+  external fun didUpdateContentOffset()
+
   @DoNotStrip
-  private fun scrollToOffset(offset: Float) {
+  private fun scrollToOffset(offset: Float, animated: Boolean) {
     mWishlist.reactSmoothScrollTo(0, PixelUtil.toPixelFromDIP(offset).toInt())
   }
 }

@@ -17,8 +17,10 @@ namespace Wishlist {
 
 // TODO make this class testable by injecting componentsPool and itemProvider
 // or their factories
-class MGViewportCarerImpl : public MGViewportCarer {
+class MGViewportCarerImpl final : public MGViewportCarer {
  public:
+  MGViewportCarerImpl();
+
   void setInitialValues(
       const std::shared_ptr<MGWishlistShadowNode> &wishListNode,
       const LayoutContext &lc);
@@ -29,7 +31,7 @@ class MGViewportCarerImpl : public MGViewportCarer {
 
   void initialRenderAsync(
       MGDims dimensions,
-      float initialOffset,
+      float initialContentSize,
       int originItem,
       const std::vector<std::shared_ptr<ShadowNode const>> &registeredViews,
       const std::vector<std::string> &names,
@@ -37,17 +39,19 @@ class MGViewportCarerImpl : public MGViewportCarer {
 
   void didScrollAsync(
       MGDims dimensions,
-      const std::vector<std::shared_ptr<ShadowNode const>> &registeredViews,
-      const std::vector<std::string> &names,
-      float newOffset,
+      float contentOffset,
       const std::string &inflatorId) override;
+
+  void didUpdateContentOffset() override;
 
  private:
   void updateWindow();
 
+  void updateContentOffset(float contentOffset);
+
   std::shared_ptr<ShadowNode> getOffseter(float offset);
 
-  void pushChildren();
+  void pushChildren(float contentOffset);
 
   void notifyAboutPushedChildren();
 
@@ -55,13 +59,13 @@ class MGViewportCarerImpl : public MGViewportCarer {
 
   void notifyAboutEndReached();
 
-  float offset_;
+  float contentOffset_;
+  float initialContentSize_;
   float windowHeight_;
   float windowWidth_;
   int surfaceId_;
   std::string inflatorId_;
-  std::shared_ptr<ComponentsPool> componentsPool_ =
-      std::make_shared<ComponentsPool>();
+  std::shared_ptr<ComponentsPool> componentsPool_;
   std::shared_ptr<ItemProvider> itemProvider_;
   std::deque<WishItem> window_;
   std::shared_ptr<MGWishlistShadowNode> wishListNode_;
@@ -70,6 +74,7 @@ class MGViewportCarerImpl : public MGViewportCarer {
   std::string firstItemKeyForStartReached_;
   std::string lastItemKeyForEndReached_;
   std::weak_ptr<MGViewportCarerListener> listener_;
+  bool ignoreScrollEvents_;
 };
 
 }; // namespace Wishlist

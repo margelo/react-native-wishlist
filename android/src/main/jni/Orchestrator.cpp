@@ -56,7 +56,7 @@ Orchestrator::Orchestrator(
 void Orchestrator::renderAsync(
     float width,
     float height,
-    float initialOffset,
+    float initialContentSize,
     int originItem,
     int templatesRef,
     jni::alias_ref<jni::JList<jni::JString>> namesList,
@@ -69,12 +69,11 @@ void Orchestrator::renderAsync(
     alreadyRendered_ = true;
     width_ = width;
     height_ = height;
-    contentOffset_ = initialOffset;
     inflatorId_ = inflatorId;
 
     di_->getViewportCarer()->initialRenderAsync(
         {width, height},
-        initialOffset,
+        initialContentSize,
         originItem,
         templates,
         jListToVector(namesList),
@@ -94,18 +93,18 @@ void Orchestrator::didScrollAsync(
     std::string inflatorId) {
   width_ = width;
   height_ = height;
-  contentOffset_ = contentOffset;
   inflatorId_ = inflatorId;
-  handleVSync();
+  di_->getViewportCarer()->didScrollAsync(
+      {width, height}, contentOffset, inflatorId);
 }
 
 void Orchestrator::handleVSync() {
-  // TODO: These do not seem to be needed.
-  auto templates =
-      std::vector<std::shared_ptr<facebook::react::ShadowNode const>>();
-  auto names = std::vector<std::string>();
   di_->getViewportCarer()->didScrollAsync(
-      {width_, height_}, templates, names, contentOffset_, inflatorId_);
+      {width_, height_}, MG_NO_OFFSET, inflatorId_);
+}
+
+void Orchestrator::didUpdateContentOffset() {
+  di_->getViewportCarer()->didUpdateContentOffset();
 }
 
 void Orchestrator::scrollToItem(int index) {
@@ -160,6 +159,8 @@ void Orchestrator::registerNatives() {
       {makeNativeMethod("initHybrid", Orchestrator::initHybrid),
        makeNativeMethod("renderAsync", Orchestrator::renderAsync),
        makeNativeMethod("didScrollAsync", Orchestrator::didScrollAsync),
+       makeNativeMethod(
+           "didUpdateContentOffset", Orchestrator::didUpdateContentOffset),
        makeNativeMethod("scrollToItem", Orchestrator::scrollToItem)});
 }
 

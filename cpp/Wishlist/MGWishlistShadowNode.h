@@ -27,6 +27,8 @@ class JSI_EXPORT MGWishlistShadowNode
  public:
   void layout(LayoutContext layoutContext) override;
 
+  void updateContentOffset(float contentOffset);
+
  private:
   void updateStateIfNeeded();
 };

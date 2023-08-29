@@ -14,6 +14,8 @@ namespace Wishlist {
 
 using namespace facebook::react;
 
+static float MG_NO_OFFSET = std::numeric_limits<float>::min();
+
 struct MGDims {
   float width;
   float height;
@@ -23,7 +25,7 @@ class MGViewportCarer {
  public:
   virtual void initialRenderAsync(
       MGDims dimensions,
-      float initialOffset,
+      float initialContentSize,
       int originItem,
       const std::vector<std::shared_ptr<ShadowNode const>> &registeredViews,
       const std::vector<std::string> &names,
@@ -31,12 +33,10 @@ class MGViewportCarer {
 
   virtual void didScrollAsync(
       MGDims dimensions,
-      const std::vector<std::shared_ptr<ShadowNode const>> &registeredViews,
-      const std::vector<std::string> &names,
-      float newOffset,
+      float contentOffset,
       const std::string &inflatorId) = 0;
 
-  virtual ~MGViewportCarer() {}
+  virtual void didUpdateContentOffset() = 0;
 };
 
 }; // namespace Wishlist

@@ -31,6 +31,10 @@ class WishlistViewManager : ViewGroupManager<Wishlist>(), MGWishlistManagerInter
       stateWrapper: StateWrapper?
   ): Any? {
     view.fabricViewStateManager.setStateWrapper(stateWrapper)
+    val stateData = stateWrapper?.stateData
+    if (stateData != null && stateData.hasKey("contentOffset")) {
+      view.scrollToOffsetForContentChange(stateData.getDouble("contentOffset").toFloat())
+    }
     return null
   }
 

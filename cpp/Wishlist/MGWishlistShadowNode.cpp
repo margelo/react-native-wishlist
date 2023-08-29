@@ -37,5 +37,13 @@ void MGWishlistShadowNode::updateStateIfNeeded() {
   }
 }
 
+void MGWishlistShadowNode::updateContentOffset(float contentOffset) {
+  ensureUnsealed();
+
+  auto state = getStateData();
+  state.contentOffset = contentOffset;
+  setStateData(std::move(state));
+}
+
 } // namespace react
 } // namespace facebook

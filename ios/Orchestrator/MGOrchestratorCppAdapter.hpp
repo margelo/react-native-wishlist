@@ -9,23 +9,24 @@
 
 #include <stdio.h>
 #include <functional>
-#include "MGBoundingBoxObserver.hpp"
 #include "MGVSyncRequester.hpp"
+#include "MGViewportCarerListener.hpp"
 
 namespace Wishlist {
 
-struct MGOrchestratorCppAdapter final : MGVSyncRequester,
-                                        MGBoundingBoxObserver {
-  std::function<void(float, float)> onBoundingBoxDidChange;
-  std::function<void()> onRequestVSync;
-
+class MGOrchestratorCppAdapter final : public MGVSyncRequester,
+                                       public MGViewportCarerListener {
+ public:
   MGOrchestratorCppAdapter(
-      std::function<void(float, float)> onBoundingBoxDidChange,
-      std::function<void()> onRequestVSync);
+      std::function<void()> onRequestVSync,
+      std::function<void(std::vector<Item> items)> didPushChildren);
 
-  void boundingBoxDidChange(std::pair<float, float> topAndBottomEdges) override;
-
+ private:
+  void didPushChildren(std::vector<Item> newWindow) override;
   void requestVSync() override;
+
+  std::function<void()> onRequestVSync_;
+  std::function<void(std::vector<Item> items)> didPushChildren_;
 };
 
 }; // namespace Wishlist

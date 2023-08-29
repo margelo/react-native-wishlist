@@ -68,7 +68,9 @@ export const ChatItemView: React.FC<Props> = ({ type, onAddReaction }) => {
   const avatarUrl = useTemplateValue((item: ChatItem) => {
     return item.avatarUrl;
   });
-  const message = useTemplateValue((item: ChatItem) => item.message);
+  const message = useTemplateValue(
+    (item: ChatItem) => `${item.key}: ${item.message}`,
+  );
   const likeText = useTemplateValue((item: ChatItem) => {
     if (item.liked) {
       return '♥️';
