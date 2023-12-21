@@ -18,6 +18,10 @@ function ChatRoom({ room }) {
 }
 ```
 
+## State of WishList
+
+WishList is an archived, read-only repository, and should probably not be used in production. It's a good proof of concept, and a pretty impressive experiment. See [this Notion document](https://margelo.notion.site/WishList-Summit-b20c24d1f0da4889a0513dfa929be5ed?pvs=74) for more details.
+
 ## Installation
 
 ```sh
