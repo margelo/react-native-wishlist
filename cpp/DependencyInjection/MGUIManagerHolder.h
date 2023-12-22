@@ -1,6 +1,6 @@
 #pragma once
 
-#include <react/renderer/uimanager/UIManager.h>
+#include <React-Fabric/react/renderer/uimanager/UIManager.h>
 
 using namespace facebook::react;
 

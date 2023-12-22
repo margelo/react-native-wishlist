@@ -1,7 +1,7 @@
 #pragma once
 
-#include <react/renderer/components/view/ConcreteViewShadowNode.h>
-#include <react/renderer/core/ConcreteComponentDescriptor.h>
+#include <React-Fabric/react/renderer/components/view/ConcreteViewShadowNode.h>
+#include <React-Fabric/react/renderer/core/ConcreteComponentDescriptor.h>
 #include <iostream>
 #include "MGContentContainerShadowNode.h"
 
@@ -29,8 +29,8 @@ class MGContentContainerComponentDescriptor
                 ? mostRecentStateData.wishlistChildren
                 : fragment.children,
             fragment.state});
-
-    adopt(shadowNode);
+          
+    // adopt(shadowNode);
     return shadowNode;
   }
 };

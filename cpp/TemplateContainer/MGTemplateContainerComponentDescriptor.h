@@ -1,7 +1,7 @@
 #pragma once
 
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
-#include <react/renderer/core/ConcreteComponentDescriptor.h>
+#include <React-Fabric/react/renderer/components/view/ConcreteViewShadowNode.h>
 #include <iostream>
 #include "MGTemplateContainerShadowNode.h"
 

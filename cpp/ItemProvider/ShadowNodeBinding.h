@@ -1,6 +1,7 @@
 #pragma once
 
-#include <react/renderer/core/ConcreteComponentDescriptor.h>
+#include <React-Fabric/react/renderer/components/view/ConcreteViewShadowNode.h>
+#include <React-Fabric/react/renderer/core/ComponentDescriptor.h>
 #include <stdio.h>
 #include <map>
 #include <memory>
