@@ -1,6 +1,6 @@
 #pragma once
 
-#include <react/renderer/components/view/ConcreteViewShadowNode.h>
+#include <React-Fabric/react/renderer/components/view/ConcreteViewShadowNode.h>
 #include <react/renderer/components/wishlist/Props.h>
 #include <react/renderer/core/LayoutConstraints.h>
 #include <react/renderer/core/LayoutContext.h>
@@ -24,11 +24,10 @@ class ShadowNodeFamilyHack final {
   using Shared = std::shared_ptr<ShadowNodeFamily const>;
   using Weak = std::weak_ptr<ShadowNodeFamily const>;
 
-  using AncestorList = butter::small_vector<
+  using AncestorList = std::vector<
       std::pair<
           std::reference_wrapper<ShadowNode const> /* parentNode */,
-          int /* childIndex */>,
-      64>;
+          int /* childIndex */>>;
 
   mutable std::unique_ptr<folly::dynamic> nativeProps_DEPRECATED;
   EventDispatcher::Weak eventDispatcher_;
@@ -42,6 +41,7 @@ class ShadowNodeFamilyHack final {
   ComponentName componentName_;
   mutable ShadowNodeFamily::Weak parent_{};
   mutable bool hasParent_{false};
+  InstanceHandle::Shared const instanceHandle_;
 };
 
 }; // namespace Wishlist

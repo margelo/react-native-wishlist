@@ -20,10 +20,10 @@ ShadowNode::Shared ShadowNodeCopyMachine::copyShadowSubtree(
   auto const fragment =
       ShadowNodeFamilyFragment{tag -= 2, sn->getSurfaceId(), nullptr};
   auto &rt = WishlistJsRuntime::getInstance().getRuntime();
-  auto const eventTarget =
-      std::make_shared<EventTarget>(rt, jsi::Object(rt), tag);
+  // auto const eventTarget =
+  //     std::make_shared<EventTarget>(rt, jsi::Object(rt), tag);
 
-  auto const family = cd.createFamily(fragment, eventTarget);
+  auto const family = cd.createFamily(fragment);
   auto const props = cd.cloneProps(
       propsParserContext,
       sn->getProps(),
@@ -33,7 +33,7 @@ ShadowNode::Shared ShadowNodeCopyMachine::copyShadowSubtree(
       {}
 #endif
   );
-  auto const state = cd.createInitialState(ShadowNodeFragment{props}, family);
+  auto const state = cd.createInitialState(props, family);
 
   // prevent fabric from clearing EventTarget
   auto const *familyH =

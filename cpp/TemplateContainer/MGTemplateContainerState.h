@@ -1,6 +1,6 @@
 #pragma once
 
-#include <react/renderer/core/ShadowNode.h>
+#include <React-Fabric/react/renderer/core/ShadowNode.h>
 #include <vector>
 
 #ifdef ANDROID

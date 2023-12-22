@@ -9,7 +9,7 @@
 #import <ReactCommon/RCTTurboModule.h>
 #include <jsi/JSIDynamic.h>
 #include <jsi/jsi.h>
-#include <react/renderer/components/view/ViewEventEmitter.h>
+#include <React-Fabric/react/renderer/components/view/ViewEventEmitter.h>
 #include <react/renderer/core/EventListener.h>
 #include "MGObjCJSIUtils.h"
 #include "MGUIManagerHolder.h"
@@ -84,7 +84,7 @@ RCT_EXPORT_MODULE(WishlistManager);
     return false;
 
   WishlistJsRuntime::getInstance().accessRuntime([=](jsi::Runtime &rt) {
-    [self sendEventWithType:jsi::String::createFromUtf8(rt, type) tag:tag payload:event.payloadFactory(rt)];
+      [self sendEventWithType:jsi::String::createFromUtf8(rt, type) tag:tag payload:event.eventPayload->asJSIValue(rt)];
   });
 
   return true;
